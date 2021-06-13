@@ -25,13 +25,8 @@ fn main() {
 
     println!("Running {}", args[1]);
 
-    let clean_contents = remove_comments(contents.clone());
-    let tokens = tokenize(clean_contents.clone());
-    
     // Test
+    let tokens = perform_lexing(contents.clone());
     handle.write_all(contents.as_bytes()).expect("Error writing out!");
-    println!("\n");
-    handle.write_all(clean_contents.as_bytes()).expect("Error writing out!");
-    println!("\n");
     println!("{:?}", tokens)
 }
