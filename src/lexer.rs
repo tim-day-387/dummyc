@@ -1,7 +1,12 @@
 // Lexer module
 pub mod lexer {
+    // Perform all lexer commands
+    pub fn perform_lexing(file_string:String) -> Vec<String> {
+	return tokenize(remove_comments(file_string));
+    }
+
     // Remove all comments (enclosed within ##)
-    pub fn remove_comments(file_string:String) -> String {
+    fn remove_comments(file_string:String) -> String {
 	let mut in_comment = false;
 	let file_bytes = file_string.as_bytes();
 	let mut to_del: Vec<usize> = Vec::new();
@@ -33,7 +38,7 @@ pub mod lexer {
     }
 
     // Create a vector of tokens
-    pub fn tokenize(file_string:String) -> Vec<String> {
+    fn tokenize(file_string:String) -> Vec<String> {
 	let file_bytes = file_string.as_bytes();
 	let mut token: Vec<u8> = Vec::new();
 	let mut output: Vec<String> = Vec::new();
@@ -53,6 +58,11 @@ pub mod lexer {
 		output.push(String::from_utf8_lossy(&token).to_string());
 		token = Vec::new();
 	    }
+	}
+
+	// If we have a stray token, push it
+	if token.len() > 0 {
+		output.push(String::from_utf8_lossy(&token).to_string());
 	}
 
 	return output;
@@ -75,7 +85,7 @@ pub mod lexer {
                             002
                             003 #This is a test comment#
                             004
-                            005 IF hat = \"the\" THEN GOTO 0#yuh#08 ELSE GOTO 010 #This is another comment#
+                            005 IF hat = \"the\" THEN GOTO 0#yuh#08 ELSE GOTO 010 #This is an#
                             0#yuh#06
                             007
                             008 PRINT#yuh# \"Hat is 7\"
@@ -110,4 +120,49 @@ pub mod lexer {
 
 	assert_eq!(answer, remove_comments(given));
     }
+
+    // Testing tokenize()
+    #[test]
+    fn token_1() {
+	let given:String = "001 GOTO 001".to_string();
+	let answer:Vec<String> = vec!["001".to_string(),"GOTO".to_string(),"001".to_string()];
+
+	assert_eq!(answer, tokenize(given));
+    }
+
+    // Testing tokenize()
+    #[test]
+    fn token_2() {
+	let given:String = "000 PRINT \"This ismy program\"
+                            001 LET hat = \"the\"
+                            002 LET BaBa = \"booey\"
+                            003 GOTO 000".to_string();
+	let answer:Vec<String> = vec!["000".to_string(),"PRINT".to_string(),
+				      "\"This ismy program\"".to_string(),"001".to_string(),
+	                              "LET".to_string(), "hat".to_string(), "=".to_string(),
+	                              "\"the\"".to_string(), "002".to_string(), "LET".to_string(),
+	                              "BaBa".to_string(), "=".to_string(), "\"booey\"".to_string(),
+	                              "003".to_string(), "GOTO".to_string(), "000".to_string()];
+
+	assert_eq!(answer, tokenize(given));
+    }
+
+    // Testing tokenize()
+    #[test]
+    fn token_3() {
+	let given:String = "001 002 
+                           345 #yuh#
+                           CAR     HAT".to_string();
+	let answer:Vec<String> = vec!["001".to_string(),"002".to_string(),"345".to_string(),
+	                              "#yuh#".to_string(),"CAR".to_string(),"HAT".to_string()];
+
+	assert_eq!(answer, tokenize(given));
+    }
+}
+
+// Testing public methods
+#[cfg(test)]
+mod test {
+    // File Imports
+    use super::lexer::*;
 }
