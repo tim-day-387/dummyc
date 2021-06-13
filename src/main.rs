@@ -29,9 +29,9 @@ fn main() {
     let tokens = tokenize(clean_contents.clone());
     
     // Test
-    handle.write_all(contents.as_bytes());
+    handle.write_all(contents.as_bytes()).expect("Error writing out!");
     println!("\n");
-    handle.write_all(clean_contents.as_bytes());
+    handle.write_all(clean_contents.as_bytes()).expect("Error writing out!");
     println!("\n");
     println!("{:?}", tokens)
 }

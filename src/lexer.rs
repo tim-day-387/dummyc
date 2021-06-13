@@ -58,11 +58,55 @@ pub mod lexer {
 	return output;
     }
 
-    // Basic lexer test
+    // Testing remove_comments()
     #[test]
     fn rm_cmts_1() {
 	let given:String = "001 GOTO 001 #This is an example comment#".to_string();
 	let answer:String = "001 GOTO 001 ".to_string();
+
+	assert_eq!(answer, remove_comments(given));
+    }
+
+    // Testing remove_comments()
+    #[test]
+    fn rm_cmts_2() {
+	let given:String = "00#yuh#0 PRINT \"This is a Dummy program\"
+                            001 LET hat = \"the\"
+                            002
+                            003 #This is a test comment#
+                            004
+                            005 IF hat = \"the\" THEN GOTO 0#yuh#08 ELSE GOTO 010 #This is another comment#
+                            0#yuh#06
+                            007
+                            008 PRINT#yuh# \"Hat is 7\"
+                            009 END
+                            010 EN#yuh#D".to_string();
+	let answer:String = "000 PRINT \"This is a Dummy program\"
+                            001 LET hat = \"the\"
+                            002
+                            003 
+                            004
+                            005 IF hat = \"the\" THEN GOTO 008 ELSE GOTO 010 
+                            006
+                            007
+                            008 PRINT \"Hat is 7\"
+                            009 END
+                            010 END".to_string();
+
+	assert_eq!(answer, remove_comments(given));
+    }
+
+    // Testing remove_comments()
+    #[test]
+    fn rm_cmts_3() {
+	let given:String = "00##0 PR##INT \"This is# a Dum#my program\"
+                            001 L##ET hat = \"the\"
+                            002 LET## BaBa########## = ##\"booey\"
+                            003 ##GOTO 0##00".to_string();
+	let answer:String = "000 PRINT \"This ismy program\"
+                            001 LET hat = \"the\"
+                            002 LET BaBa = \"booey\"
+                            003 GOTO 000".to_string();
 
 	assert_eq!(answer, remove_comments(given));
     }
