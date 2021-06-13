@@ -1,0 +1,4 @@
+[package]
+name = "dummy_compiler"   # Name of the package
+version = "0.1.0"         # Current version, obeying semver
+authors = ["Timothy Day"]
