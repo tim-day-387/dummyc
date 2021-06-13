@@ -89,3 +89,12 @@ fn tokenize(file_string:String) -> Vec<String> {
 
     return output;
 }
+
+// Basic lexer test
+#[test]
+fn rm_cmts_1() {
+    let given:String = "001 GOTO 001 #This is an example comment#".to_string();
+    let answer:String = "001 GOTO 001 ".to_string();
+
+    assert_eq!(answer, remove_comments(given));
+}
