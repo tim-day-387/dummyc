@@ -165,4 +165,42 @@ pub mod lexer {
 mod test {
     // File Imports
     use super::lexer::*;
+
+    // Testing perform_lexing()
+    #[test]
+    fn lex_1() {
+	let given:String = "001 GOTO 001 #This is an example comment#".to_string();
+	let answer:Vec<String> = vec!["001".to_string(),"GOTO".to_string(),"001".to_string()];
+
+	assert_eq!(answer, perform_lexing(given));
+    }
+
+    // Testing perform_lexing()
+    #[test]
+    fn lex_2() {
+	let given:String = "00##0 PR##INT \"This is# a Dum#my program\"
+                            001 L##ET hat = \"the\"
+                            002 LET## BaBa########## = ##\"booey\"
+                            003 ##GOTO 0##00".to_string();
+	let answer:Vec<String> = vec!["000".to_string(),"PRINT".to_string(),
+				      "\"This ismy program\"".to_string(),"001".to_string(),
+	                              "LET".to_string(), "hat".to_string(), "=".to_string(),
+	                              "\"the\"".to_string(), "002".to_string(), "LET".to_string(),
+	                              "BaBa".to_string(), "=".to_string(), "\"booey\"".to_string(),
+	                              "003".to_string(), "GOTO".to_string(), "000".to_string()];
+
+	assert_eq!(answer, perform_lexing(given));
+    }
+
+    // Testing perform_lexing()
+    #[test]
+    fn lex_3() {
+	let given:String = "001 002 
+                           345 #yuh#
+                           CAR     HAT".to_string();
+	let answer:Vec<String> = vec!["001".to_string(),"002".to_string(),"345".to_string(),
+	                              "CAR".to_string(),"HAT".to_string()];
+
+	assert_eq!(answer, perform_lexing(given));
+    }
 }
