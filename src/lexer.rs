@@ -1,4 +1,5 @@
 // Lexer module
+#![forbid(unsafe_code)]
 pub mod lexer {
     // Perform all lexer commands
     pub fn perform_lexing(file_string:String) -> Vec<String> {
