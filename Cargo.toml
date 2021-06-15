@@ -2,3 +2,6 @@
 name = "dummy_compiler"   # Name of the package
 version = "0.1.0"         # Current version, obeying semver
 authors = ["Timothy Day"]
+
+[dependencies]
+trees = "0.3.0"

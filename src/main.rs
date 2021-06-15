@@ -6,6 +6,9 @@ use std::fs;
 // File Imports
 mod lexer;
 use lexer::lexer::*;
+mod parser;
+use parser::parser::*;
+
 
 // Main function code
 fn main() {
