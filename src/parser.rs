@@ -9,13 +9,24 @@ pub mod parser {
     // Construct Abstract Syntax Tree
     fn construct_tree(tokens:Vec<String>) -> Tree<String> {
 	let mut output:Tree<String> = tr("MAIN".to_string());
+	let mut sub_tokens:Vec<String> = Vec::new();
 
+	// Make leaves
+	for t in tokens {
+	    if is_line_number(t.clone()) == true {
+		output.root_mut().append(construct_leaf(sub_tokens));
+		sub_tokens = Vec::new();
+	    } else {
+		sub_tokens.push(t.clone());
+	    }
+	}
+	
 	return output;
     }
 
     // Construct AST Leaf
-    fn construct_leaf(tokens:Vec<String>) -> Tree<String> {
-	let mut output:Tree<String> = tr("MAIN".to_string());
+    fn construct_leaf(tokens:Vec<String>) -> Forest<String> {
+	let output:Forest<String> = -tr("MAIN".to_string());
 
 	return output;
     }
