@@ -70,6 +70,18 @@ pub mod parser {
 	return output;
     }
 
+    // Testing construct_tree()
+    #[test]
+    fn con_tree_1() {
+	let given:Vec<String> = vec!["001".to_string(),"GOTO".to_string(),"002".to_string(),
+	                             "002".to_string(),"GOTO".to_string(),"001".to_string()];
+	let answer = (tr("MAIN".to_string())
+		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
+	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string())));
+
+	assert_eq!(answer, construct_tree(given));
+    }
+    
     // Testing construct_leaf()
     #[test]
     fn con_leaf_1() {
