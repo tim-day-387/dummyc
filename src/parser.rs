@@ -26,8 +26,27 @@ pub mod parser {
 
     // Construct AST Leaf
     fn construct_leaf(tokens:Vec<String>) -> Forest<String> {
-	let output:Forest<String> = -tr("MAIN".to_string());
+	let mut output:Forest<String> = -tr("".to_string());
+	let mut line_num:String = "".to_string();
+	let mut line_num_got:bool = true;
 
+	for i in 0..tokens.len() {
+	    if is_line_number(tokens.get(i).expect("DNE!").to_string()) == true & line_num_got {
+		line_num = tokens.get(i).expect("DNE!").to_string();
+		line_num_got == false;
+	    } else {
+		if tokens.get(i).expect("DNE!").to_string() == "GOTO".to_string() {
+		    output = -(tr(line_num.clone()) /tr(tokens.get(i).expect("DNE!").to_string())
+			                            /tr(tokens.get(i+1).expect("DNE!").to_string()));
+		} else if tokens.get(i).expect("DNE!").to_string() == "LET".to_string() {
+		    output = -(tr(line_num.clone()) /tr(tokens.get(i).expect("DNE!").to_string())
+			                            /tr(tokens.get(i+1).expect("DNE!").to_string())
+			                            /tr(tokens.get(i+2).expect("DNE!").to_string())
+		                                    /tr(tokens.get(i+3).expect("DNE!").to_string()));
+		}
+	    }
+	}
+	
 	return output;
     }
 
@@ -41,6 +60,26 @@ pub mod parser {
         }
 
 	return output;
+    }
+
+    // Testing construct_leaf()
+    #[test]
+    fn con_leaf_1() {
+	let given:Vec<String> = vec!["001".to_string(),"GOTO".to_string(),"001".to_string()];
+	let answer = -(tr("001".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()));
+
+	assert_eq!(answer, construct_leaf(given));
+    }
+
+    // Testing construct_leaf()
+    #[test]
+    fn con_leaf_2() {
+	let given:Vec<String> = vec!["345".to_string(),"LET".to_string(),"Bababooey".to_string(),
+	                             "=".to_string(),"\"Sandpaper\"".to_string()];
+	let answer = -(tr("345".to_string()) /tr("LET".to_string()) /tr("Bababooey".to_string())
+	                                     /tr("=".to_string()) /tr("\"Sandpaper\"".to_string()));
+
+	assert_eq!(answer, construct_leaf(given));
     }
 
     // Testing is_line_number()
