@@ -31,7 +31,7 @@ pub mod parser {
 	let mut line_num_got:bool = true;
 
 	for i in 0..tokens.len() {
-	    if is_line_number(tokens.get(i).expect("DNE!").to_string()) == true & line_num_got {
+	    if is_line_number(tokens.get(i).expect("DNE!").to_string()) == true && line_num_got {
 		line_num = tokens.get(i).expect("DNE!").to_string();
 		line_num_got == false;
 	    } else {
@@ -43,6 +43,10 @@ pub mod parser {
 			                            /tr(tokens.get(i+1).expect("DNE!").to_string())
 			                            /tr(tokens.get(i+2).expect("DNE!").to_string())
 		                                    /tr(tokens.get(i+3).expect("DNE!").to_string()));
+
+		} else if tokens.get(i).expect("DNE!").to_string() == "PRINT".to_string() {
+		    output = -(tr(line_num.clone()) /tr(tokens.get(i).expect("DNE!").to_string())
+			                            /tr(tokens.get(i+1).expect("DNE!").to_string()));
 		}
 	    }
 	}
@@ -53,10 +57,14 @@ pub mod parser {
     // Check if line number
     fn is_line_number(token:String) -> bool {
 	let char_vec:Vec<char> = token.chars().collect();
+	let mut num_cnt = 0;
 	let mut output = true;
 
 	for c in char_vec {
-            output = output && c.is_digit(10);
+	    if (num_cnt % 3 != 0) | (num_cnt == 0) {
+		output = output && c.is_digit(10);
+		num_cnt = num_cnt + 1; 
+	    }
         }
 
 	return output;
@@ -78,6 +86,17 @@ pub mod parser {
 	                             "=".to_string(),"\"Sandpaper\"".to_string()];
 	let answer = -(tr("345".to_string()) /tr("LET".to_string()) /tr("Bababooey".to_string())
 	                                     /tr("=".to_string()) /tr("\"Sandpaper\"".to_string()));
+
+	assert_eq!(answer, construct_leaf(given));
+    }
+
+    // Testing construct_leaf()
+    #[test]
+    fn con_leaf_3() {
+	let given:Vec<String> = vec!["045".to_string(),"PRINT".to_string(),
+				     "\"Yuh Lord\"".to_string()];
+	let answer = -(tr("045".to_string()) /tr("PRINT".to_string())
+		                             /tr("\"Yuh Lord\"".to_string()));
 
 	assert_eq!(answer, construct_leaf(given));
     }
@@ -105,6 +124,33 @@ pub mod parser {
     fn is_ln_3() {
 	let given:String = "387".to_string();
 	let answer:bool = true;
+
+	assert_eq!(answer, is_line_number(given));
+    }
+
+    // Testing is_line_number()
+    #[test]
+    fn is_ln_4() {
+	let given:String = "387_098".to_string();
+	let answer:bool = true;
+
+	assert_eq!(answer, is_line_number(given));
+    }
+
+    // Testing is_line_number()
+    #[test]
+    fn is_ln_5() {
+	let given:String = "345_123_890".to_string();
+	let answer:bool = true;
+
+	assert_eq!(answer, is_line_number(given));
+    }
+
+    // Testing is_line_number()
+    #[test]
+    fn is_ln_6() {
+	let given:String = "3f7_g98".to_string();
+	let answer:bool = false;
 
 	assert_eq!(answer, is_line_number(given));
     }
