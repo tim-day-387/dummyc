@@ -3,22 +3,31 @@
 pub mod parser {
     // General Imports
     extern crate trees;
-    use self::trees::{tr,Tree,Forest};
+    use self::trees::{tr,Tree,Forest,Node};
     use std::pin::Pin;
+    use std::fmt::Display;
     
     // Construct Abstract Syntax Tree
-    fn construct_tree(tokens:Vec<String>) -> Tree<String> {
+    fn construct_tree(tokens:Vec<(u32, String)>) -> Tree<String> {
 	let mut output:Tree<String> = tr("MAIN".to_string());
 	let mut sub_tokens:Vec<String> = Vec::new();
+	let mut line_num = 1;
 
 	// Make leaves
 	for t in tokens {
-	    if is_line_number(t.clone()) == true {
+	    if t.0 != line_num {
 		output.root_mut().append(construct_leaf(sub_tokens));
 		sub_tokens = Vec::new();
+		sub_tokens.push(t.1.clone());
+		line_num = line_num + 1;
 	    } else {
-		sub_tokens.push(t.clone());
+		sub_tokens.push(t.1.clone());
 	    }
+	}
+
+	// If we have a stray token, push it
+	if sub_tokens.len() > 0 {
+	    output.root_mut().append(construct_leaf(sub_tokens));
 	}
 	
 	return output;
@@ -70,12 +79,34 @@ pub mod parser {
 	return output;
     }
 
+    // Convert Tree to String
+    fn tree_to_string<T:Display>(node:&Node<T>) -> String {
+	if node.is_leaf() {
+            node.data.to_string()
+	} else {
+            format!( "{}( {})",
+            node.data, node.iter().fold(String::new(), |s,c| s + &tree_to_string(c) + &" " ))
+	}
+    }
+
     // Testing construct_tree()
     #[test]
     fn con_tree_1() {
-	let given:Vec<String> = vec!["001".to_string(),"GOTO".to_string(),"002".to_string(),
-	                             "002".to_string(),"GOTO".to_string(),"001".to_string()];
-	let answer = (tr("MAIN".to_string())
+	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
+					    (1, "002".to_string())];
+	let answer:Tree<String> = (tr("MAIN".to_string())
+		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string())));
+
+	assert_eq!(answer, construct_tree(given));
+    }
+
+    // Testing construct_tree()
+    #[test]
+    fn con_tree_2() {
+	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
+					    (1, "002".to_string()),(2, "002".to_string()),
+					    (2, "GOTO".to_string()),(2, "001".to_string())];
+	let answer:Tree<String> = (tr("MAIN".to_string())
 		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
 	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string())));
 
@@ -86,7 +117,8 @@ pub mod parser {
     #[test]
     fn con_leaf_1() {
 	let given:Vec<String> = vec!["001".to_string(),"GOTO".to_string(),"001".to_string()];
-	let answer = -(tr("001".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()));
+	let answer:Forest<String> = -(tr("001".to_string()) /tr("GOTO".to_string())
+				      /tr("001".to_string()));
 
 	assert_eq!(answer, construct_leaf(given));
     }
@@ -96,8 +128,9 @@ pub mod parser {
     fn con_leaf_2() {
 	let given:Vec<String> = vec!["345".to_string(),"LET".to_string(),"Bababooey".to_string(),
 	                             "=".to_string(),"\"Sandpaper\"".to_string()];
-	let answer = -(tr("345".to_string()) /tr("LET".to_string()) /tr("Bababooey".to_string())
-	                                     /tr("=".to_string()) /tr("\"Sandpaper\"".to_string()));
+	let answer:Forest<String> = -(tr("345".to_string()) /tr("LET".to_string())
+				      /tr("Bababooey".to_string()) /tr("=".to_string())
+				      /tr("\"Sandpaper\"".to_string()));
 
 	assert_eq!(answer, construct_leaf(given));
     }
@@ -107,7 +140,7 @@ pub mod parser {
     fn con_leaf_3() {
 	let given:Vec<String> = vec!["045".to_string(),"PRINT".to_string(),
 				     "\"Yuh Lord\"".to_string()];
-	let answer = -(tr("045".to_string()) /tr("PRINT".to_string())
+	let answer:Forest<String> = -(tr("045".to_string()) /tr("PRINT".to_string())
 		                             /tr("\"Yuh Lord\"".to_string()));
 
 	assert_eq!(answer, construct_leaf(given));

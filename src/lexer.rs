@@ -2,7 +2,7 @@
 #![forbid(unsafe_code)]
 pub mod lexer {
     // Perform all lexer commands
-    pub fn perform_lexing(file_string:String) -> Vec<String> {
+    pub fn perform_lexing(file_string:String) -> Vec<(u32, String)> {
 	return tokenize(remove_comments(file_string));
     }
 
@@ -39,11 +39,12 @@ pub mod lexer {
     }
 
     // Create a vector of tokens
-    fn tokenize(file_string:String) -> Vec<String> {
+    fn tokenize(file_string:String) -> Vec<(u32, String)> {
 	let file_bytes = file_string.as_bytes();
 	let mut token: Vec<u8> = Vec::new();
-	let mut output: Vec<String> = Vec::new();
+	let mut output: Vec<(u32, String)> = Vec::new();
 	let mut in_string = false;
+	let mut line_num = 1;
 
 	// Step through each char
 	for i in 0..file_string.len() {
@@ -56,14 +57,19 @@ pub mod lexer {
 	    if (file_bytes[i] != b' ' && file_bytes[i] != b'\n') | in_string {
 		token.push(file_bytes[i])
 	    } else if (token.len() > 0) && !in_string {
-		output.push(String::from_utf8_lossy(&token).to_string());
+		output.push((line_num, String::from_utf8_lossy(&token).to_string()));
 		token = Vec::new();
+	    }
+
+	    // Update line number
+	    if file_bytes[i] == b'\n' {
+		line_num = line_num + 1;
 	    }
 	}
 
 	// If we have a stray token, push it
 	if token.len() > 0 {
-		output.push(String::from_utf8_lossy(&token).to_string());
+	    output.push((line_num, String::from_utf8_lossy(&token).to_string()));
 	}
 
 	return output;
@@ -126,7 +132,8 @@ pub mod lexer {
     #[test]
     fn token_1() {
 	let given:String = "001 GOTO 001".to_string();
-	let answer:Vec<String> = vec!["001".to_string(),"GOTO".to_string(),"001".to_string()];
+	let answer:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
+				      (1, "001".to_string())];
 
 	assert_eq!(answer, tokenize(given));
     }
@@ -138,12 +145,16 @@ pub mod lexer {
                             001 LET hat = \"the\"
                             002 LET BaBa = \"booey\"
                             003 GOTO 000".to_string();
-	let answer:Vec<String> = vec!["000".to_string(),"PRINT".to_string(),
-				      "\"This ismy program\"".to_string(),"001".to_string(),
-	                              "LET".to_string(), "hat".to_string(), "=".to_string(),
-	                              "\"the\"".to_string(), "002".to_string(), "LET".to_string(),
-	                              "BaBa".to_string(), "=".to_string(), "\"booey\"".to_string(),
-	                              "003".to_string(), "GOTO".to_string(), "000".to_string()];
+	let answer:Vec<(u32, String)> = vec![(1, "000".to_string()),(1, "PRINT".to_string()),
+				      (1, "\"This ismy program\"".to_string()),
+				      (2, "001".to_string()),
+	                              (2, "LET".to_string()), (2, "hat".to_string()),
+				      (2, "=".to_string()), (2, "\"the\"".to_string()),
+				      (3, "002".to_string()), (3, "LET".to_string()),
+	                              (3, "BaBa".to_string()), (3, "=".to_string()),
+				      (3, "\"booey\"".to_string()),
+	                              (4, "003".to_string()), (4, "GOTO".to_string()),
+				      (4, "000".to_string())];
 
 	assert_eq!(answer, tokenize(given));
     }
@@ -154,8 +165,9 @@ pub mod lexer {
 	let given:String = "001 002 
                            345 #yuh#
                            CAR     HAT".to_string();
-	let answer:Vec<String> = vec!["001".to_string(),"002".to_string(),"345".to_string(),
-	                              "#yuh#".to_string(),"CAR".to_string(),"HAT".to_string()];
+	let answer:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "002".to_string()),
+				      (2, "345".to_string()),(2, "#yuh#".to_string()),
+				      (3, "CAR".to_string()),(3, "HAT".to_string())];
 
 	assert_eq!(answer, tokenize(given));
     }
@@ -171,8 +183,9 @@ mod test {
     #[test]
     fn lex_1() {
 	let given:String = "001 GOTO 001 #This is an example comment#".to_string();
-	let answer:Vec<String> = vec!["001".to_string(),"GOTO".to_string(),"001".to_string()];
-
+	let answer:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
+					     (1, "001".to_string())];
+	
 	assert_eq!(answer, perform_lexing(given));
     }
 
@@ -183,13 +196,17 @@ mod test {
                             001 L##ET hat = \"the\"
                             002 LET## BaBa########## = ##\"booey\"
                             003 ##GOTO 0##00".to_string();
-	let answer:Vec<String> = vec!["000".to_string(),"PRINT".to_string(),
-				      "\"This ismy program\"".to_string(),"001".to_string(),
-	                              "LET".to_string(), "hat".to_string(), "=".to_string(),
-	                              "\"the\"".to_string(), "002".to_string(), "LET".to_string(),
-	                              "BaBa".to_string(), "=".to_string(), "\"booey\"".to_string(),
-	                              "003".to_string(), "GOTO".to_string(), "000".to_string()];
-
+	let answer:Vec<(u32, String)> = vec![(1, "000".to_string()),(1, "PRINT".to_string()),
+				      (1, "\"This ismy program\"".to_string()),
+				      (2, "001".to_string()),
+	                              (2, "LET".to_string()), (2, "hat".to_string()),
+				      (2, "=".to_string()), (2, "\"the\"".to_string()),
+				      (3, "002".to_string()), (3, "LET".to_string()),
+	                              (3, "BaBa".to_string()), (3, "=".to_string()),
+				      (3, "\"booey\"".to_string()),
+	                              (4, "003".to_string()), (4, "GOTO".to_string()),
+					     (4, "000".to_string())];
+	
 	assert_eq!(answer, perform_lexing(given));
     }
 
@@ -199,8 +216,9 @@ mod test {
 	let given:String = "001 002 
                            345 #yuh#
                            CAR     HAT".to_string();
-	let answer:Vec<String> = vec!["001".to_string(),"002".to_string(),"345".to_string(),
-	                              "CAR".to_string(),"HAT".to_string()];
+	let answer:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "002".to_string()),
+					     (2, "345".to_string()),(3, "CAR".to_string()),
+					     (3, "HAT".to_string())];
 
 	assert_eq!(answer, perform_lexing(given));
     }
