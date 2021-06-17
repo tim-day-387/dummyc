@@ -39,6 +39,13 @@ pub mod parser {
 	let mut line_num:String = "".to_string();
 	let mut line_num_got:bool = true;
 
+	// Trivial case
+	if tokens.len() == 1 {
+	    output = -(tr(tokens.get(0).expect("DNE!").to_string()));
+	    return output;
+	}
+
+	// Remaining cases
 	for i in 0..tokens.len() {
 	    if is_line_number(tokens.get(i).expect("DNE!").to_string()) == true && line_num_got {
 		line_num = tokens.get(i).expect("DNE!").to_string();
@@ -47,15 +54,18 @@ pub mod parser {
 		if tokens.get(i).expect("DNE!").to_string() == "GOTO".to_string() {
 		    output = -(tr(line_num.clone()) /tr(tokens.get(i).expect("DNE!").to_string())
 			                            /tr(tokens.get(i+1).expect("DNE!").to_string()));
+		    break;
 		} else if tokens.get(i).expect("DNE!").to_string() == "LET".to_string() {
 		    output = -(tr(line_num.clone()) /tr(tokens.get(i).expect("DNE!").to_string())
 			                            /tr(tokens.get(i+1).expect("DNE!").to_string())
 			                            /tr(tokens.get(i+2).expect("DNE!").to_string())
 		                                    /tr(tokens.get(i+3).expect("DNE!").to_string()));
 
+		    break;
 		} else if tokens.get(i).expect("DNE!").to_string() == "PRINT".to_string() {
 		    output = -(tr(line_num.clone()) /tr(tokens.get(i).expect("DNE!").to_string())
 			                            /tr(tokens.get(i+1).expect("DNE!").to_string()));
+		    break;
 		}
 	    }
 	}
@@ -112,6 +122,22 @@ pub mod parser {
 
 	assert_eq!(answer, construct_tree(given));
     }
+
+    // Testing construct_tree()
+    #[test]
+    fn con_tree_3() {
+	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
+					    (1, "002".to_string()),(2, "002".to_string()),
+					    (3, "003".to_string()),(3, "GOTO".to_string()),
+					    (3, "001".to_string()),(4, "004".to_string())];
+	let answer:Tree<String> = (tr("MAIN".to_string())
+			/(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
+			/(tr("002".to_string()))
+			/(tr("003".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()))
+	                /(tr("004".to_string())));
+
+	assert_eq!(answer, construct_tree(given));
+    }
     
     // Testing construct_leaf()
     #[test]
@@ -131,7 +157,7 @@ pub mod parser {
 	let answer:Forest<String> = -(tr("345".to_string()) /tr("LET".to_string())
 				      /tr("Bababooey".to_string()) /tr("=".to_string())
 				      /tr("\"Sandpaper\"".to_string()));
-
+	
 	assert_eq!(answer, construct_leaf(given));
     }
 
@@ -142,6 +168,15 @@ pub mod parser {
 				     "\"Yuh Lord\"".to_string()];
 	let answer:Forest<String> = -(tr("045".to_string()) /tr("PRINT".to_string())
 		                             /tr("\"Yuh Lord\"".to_string()));
+
+	assert_eq!(answer, construct_leaf(given));
+    }
+
+    // Testing construct_leaf()
+    #[test]
+    fn con_leaf_4() {
+	let given:Vec<String> = vec!["045".to_string()];
+	let answer:Forest<String> = -(tr("045".to_string()));
 
 	assert_eq!(answer, construct_leaf(given));
     }
