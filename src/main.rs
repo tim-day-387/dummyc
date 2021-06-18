@@ -8,7 +8,8 @@ mod lexer;
 use lexer::lexer::*;
 mod parser;
 use parser::parser::*;
-
+mod generator;
+use generator::generator::*;
 
 // Main function code
 fn main() {
