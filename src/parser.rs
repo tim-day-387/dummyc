@@ -8,7 +8,7 @@ pub mod parser {
     use std::fmt::Display;
     
     // Construct Abstract Syntax Tree
-    fn construct_tree(tokens:Vec<(u32, String)>) -> Tree<String> {
+    pub fn construct_tree(tokens:Vec<(u32, String)>) -> Tree<String> {
 	let mut output:Tree<String> = tr("MAIN".to_string());
 	let mut sub_tokens:Vec<String> = Vec::new();
 	let mut line_num = 1;
@@ -66,7 +66,7 @@ pub mod parser {
 		    output = -(tr(line_num.clone()) /tr(tokens.get(i).expect("DNE!").to_string())
 			                            /tr(tokens.get(i+1).expect("DNE!").to_string()));
 		    break;
-		}
+		} 
 	    }
 	}
 	
@@ -97,46 +97,6 @@ pub mod parser {
             format!( "{}( {})",
             node.data, node.iter().fold(String::new(), |s,c| s + &tree_to_string(c) + &" " ))
 	}
-    }
-
-    // Testing construct_tree()
-    #[test]
-    fn con_tree_1() {
-	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
-					    (1, "002".to_string())];
-	let answer:Tree<String> = (tr("MAIN".to_string())
-		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string())));
-
-	assert_eq!(answer, construct_tree(given));
-    }
-
-    // Testing construct_tree()
-    #[test]
-    fn con_tree_2() {
-	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
-					    (1, "002".to_string()),(2, "002".to_string()),
-					    (2, "GOTO".to_string()),(2, "001".to_string())];
-	let answer:Tree<String> = (tr("MAIN".to_string())
-		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
-	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string())));
-
-	assert_eq!(answer, construct_tree(given));
-    }
-
-    // Testing construct_tree()
-    #[test]
-    fn con_tree_3() {
-	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
-					    (1, "002".to_string()),(2, "002".to_string()),
-					    (3, "003".to_string()),(3, "GOTO".to_string()),
-					    (3, "001".to_string()),(4, "004".to_string())];
-	let answer:Tree<String> = (tr("MAIN".to_string())
-			/(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
-			/(tr("002".to_string()))
-			/(tr("003".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()))
-	                /(tr("004".to_string())));
-
-	assert_eq!(answer, construct_tree(given));
     }
     
     // Testing construct_leaf()
@@ -239,5 +199,50 @@ pub mod parser {
 // Testing public methods
 #[cfg(test)]
 mod test {
+    // General Imports
+    extern crate trees;
+    use self::trees::{tr,Tree,Forest,Node};
 
+    // File Imports
+    use super::parser::*;
+    
+    // Testing construct_tree()
+    #[test]
+    fn con_tree_1() {
+	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
+					    (1, "002".to_string())];
+	let answer:Tree<String> = (tr("MAIN".to_string())
+		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string())));
+
+	assert_eq!(answer, construct_tree(given));
+    }
+
+    // Testing construct_tree()
+    #[test]
+    fn con_tree_2() {
+	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
+					    (1, "002".to_string()),(2, "002".to_string()),
+					    (2, "GOTO".to_string()),(2, "001".to_string())];
+	let answer:Tree<String> = (tr("MAIN".to_string())
+		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
+	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string())));
+
+	assert_eq!(answer, construct_tree(given));
+    }
+
+    // Testing construct_tree()
+    #[test]
+    fn con_tree_3() {
+	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
+					    (1, "002".to_string()),(2, "002".to_string()),
+					    (3, "003".to_string()),(3, "GOTO".to_string()),
+					    (3, "001".to_string()),(4, "004".to_string())];
+	let answer:Tree<String> = (tr("MAIN".to_string())
+			/(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
+			/(tr("002".to_string()))
+			/(tr("003".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()))
+	                /(tr("004".to_string())));
+
+	assert_eq!(answer, construct_tree(given));
+    }
 }
