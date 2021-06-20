@@ -44,7 +44,7 @@ fn main() {
     let code = generate(ast);
 
     // Create file
-    let path = Path::new("~Downloads/sample.rs");
+    let path = Path::new("../sample.rs");
     let display = path.display();
 
     // Open a file in write-only mode

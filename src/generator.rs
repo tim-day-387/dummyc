@@ -174,7 +174,7 @@ pub mod generator {
     fn main_2() {
 	let given:Tree<String> = (tr("MAIN".to_string())
 		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string())));
-	let answer = "fn main() {\n  line001();\n}";
+	let answer = "fn main() {\n  line001();\n}\n";
 	
 	assert_eq!(answer, create_main(given));
     }
@@ -187,7 +187,7 @@ pub mod generator {
 			/(tr("002".to_string()))
 			/(tr("003".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()))
 	                /(tr("004".to_string())));
-	let answer = "fn main() {\n  line001();\n  line002();\n  line003();\n  line004();\n}";
+	let answer = "fn main() {\n  line001();\n  line002();\n  line003();\n  line004();\n}\n";
 	
 	assert_eq!(answer, create_main(given));
     }
