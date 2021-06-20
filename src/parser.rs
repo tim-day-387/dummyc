@@ -37,7 +37,6 @@ pub mod parser {
     fn construct_leaf(tokens:Vec<String>) -> Forest<String> {
 	let mut output:Forest<String> = -tr("".to_string());
 	let mut line_num:String = "".to_string();
-	let mut line_num_got:bool = true;
 
 	// Trivial case
 	if tokens.len() == 1 {
@@ -47,9 +46,8 @@ pub mod parser {
 
 	// Remaining cases
 	for i in 0..tokens.len() {
-	    if is_line_number(tokens.get(i).expect("DNE!").to_string()) == true && line_num_got {
+	    if is_line_number(tokens.get(i).expect("DNE!").to_string()) {
 		line_num = tokens.get(i).expect("DNE!").to_string();
-		line_num_got == false;
 	    } else {
 		if tokens.get(i).expect("DNE!").to_string() == "GOTO".to_string() {
 		    output = -(tr(line_num.clone()) /tr(tokens.get(i).expect("DNE!").to_string())

@@ -24,7 +24,7 @@ fn main() {
 
     // Create handle for stdout
     let stdout = io::stdout();
-    let mut handle = stdout.lock();
+    let handle = stdout.lock();
 
     // Read file
     let contents = fs::read_to_string(&args[1])
@@ -38,9 +38,9 @@ fn main() {
     let ast = construct_tree(tokens);
 
     // Perform generation
-    let given:Tree<String> = (tr("MAIN".to_string())
+    let given:Tree<String> = tr("MAIN".to_string())
 		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
-	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string())));
+	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()));
 	
     create_main(given);
     

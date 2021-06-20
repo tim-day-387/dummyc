@@ -14,12 +14,12 @@ pub mod generator {
     // Create main body of the Rust code
     pub fn create_main(input:Tree<String>) -> String {
 	let mut output = "fn main() {\n".to_string();
-	let mut next_token = "".to_string();
+	let mut next_token;
 	let mut next_option; 
 	let mut i = 0;
 
 	// Iter through tree while constructing output
-	while true {
+	loop {
 	    next_option = input.iter().nth(i);
 	    match next_option {
 		Some(next_option) => next_token = next_option.to_string(),
