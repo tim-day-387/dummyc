@@ -38,10 +38,4 @@ fn main() {
     let ast = construct_tree(tokens);
 
     // Perform generation
-    let given:Tree<String> = tr("MAIN".to_string())
-		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
-	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()));
-	
-    create_main(given);
-    
 }
