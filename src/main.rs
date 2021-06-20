@@ -1,4 +1,7 @@
 // General Imports
+extern crate trees;
+use self::trees::{tr,Tree,Forest,Node};
+
 use std::io::{self, Write};
 use std::env;
 use std::fs;
@@ -26,11 +29,19 @@ fn main() {
     // Read file
     let contents = fs::read_to_string(&args[1])
 	.expect("Something went wrong reading the file!");
+    println!("Compiling {}", args[1]);
 
-    println!("Running {}", args[1]);
-
-    // Test
+    // Perform lexing
     let tokens = perform_lexing(contents.clone());
-    handle.write_all(contents.as_bytes()).expect("Error writing out!");
-    println!("{:?}", tokens)
+
+    // Perform parsing
+    let ast = construct_tree(tokens);
+
+    // Perform generation
+    let given:Tree<String> = (tr("MAIN".to_string())
+		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
+	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string())));
+	
+    create_main(given);
+    
 }
