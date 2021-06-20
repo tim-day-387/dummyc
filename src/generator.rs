@@ -3,14 +3,12 @@
 pub mod generator {
     // General Imports
     extern crate trees;
-    use self::trees::{tr,Tree,Forest,Node};
-    use std::io::Write;
+    use self::trees::{Tree};
 
     // Create Rust code from the abstract syntax tree
     pub fn generate(input:Tree<String>) -> String {
 	let mut output:String;
 	let mut next_tree:Tree<String>;
-	let mut next_line:String;
 	let mut next_option;
 	let mut i = 0;
 
@@ -66,7 +64,6 @@ pub mod generator {
     fn create_function(subtree:Tree<String>) -> String {
 	let mut output = ["fn line".to_string(), remove_children(subtree.root().to_string()), "() {\n".to_string()].concat();
 	let mut next_token:String;
-	let mut next_line:String;
 	let mut next_option;
 	let mut children:Vec<String> = Vec::new();
 	let mut i = 0;
@@ -161,9 +158,10 @@ pub mod generator {
     // Testing create_main()
     #[test]
     fn main_1() {
-	let given:Tree<String> = (tr("MAIN".to_string())
+	use self::trees::{tr};
+	let given:Tree<String> = tr("MAIN".to_string())
 		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
-	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string())));
+	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()));
 	let answer = "fn main() {\n  line001();\n  line002();\n}\n";
 	
 	assert_eq!(answer, create_main(given));
@@ -172,8 +170,9 @@ pub mod generator {
     // Testing create_main()
     #[test]
     fn main_2() {
-	let given:Tree<String> = (tr("MAIN".to_string())
-		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string())));
+	use self::trees::{tr};
+	let given:Tree<String> = tr("MAIN".to_string())
+		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()));
 	let answer = "fn main() {\n  line001();\n}\n";
 	
 	assert_eq!(answer, create_main(given));
@@ -182,11 +181,12 @@ pub mod generator {
     // Testing create_main()
     #[test]
     fn main_3() {
-	let given:Tree<String> = (tr("MAIN".to_string())
+	use self::trees::{tr};
+	let given:Tree<String> = tr("MAIN".to_string())
 			/(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
 			/(tr("002".to_string()))
 			/(tr("003".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()))
-	                /(tr("004".to_string())));
+	                /(tr("004".to_string()));
 	let answer = "fn main() {\n  line001();\n  line002();\n  line003();\n  line004();\n}\n";
 	
 	assert_eq!(answer, create_main(given));
@@ -198,9 +198,9 @@ pub mod generator {
 mod test {
     // General Imports
     extern crate trees;
-    use self::trees::{tr,Tree,Forest,Node};
+    // use self::trees::{tr,Tree,Forest,Node};
 
     // File Imports
-    use super::generator::*;
+    // use super::generator::*;
 
 }
