@@ -87,16 +87,6 @@ pub mod parser {
 	return output;
     }
 
-    // Convert Tree to String
-    fn tree_to_string<T:Display>(node:&Node<T>) -> String {
-	if node.is_leaf() {
-            node.data.to_string()
-	} else {
-            format!( "{}( {})",
-            node.data, node.iter().fold(String::new(), |s,c| s + &tree_to_string(c) + &" " ))
-	}
-    }
-    
     // Testing construct_leaf()
     #[test]
     fn con_leaf_1() {
