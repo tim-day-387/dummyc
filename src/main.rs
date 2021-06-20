@@ -5,6 +5,9 @@ use self::trees::{tr,Tree,Forest,Node};
 use std::io::{self, Write};
 use std::env;
 use std::fs;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
 
 // File Imports
 mod lexer;
@@ -38,4 +41,21 @@ fn main() {
     let ast = construct_tree(tokens);
 
     // Perform generation
+    let code = generate(ast);
+
+    // Create file
+    let path = Path::new("~Downloads/sample.rs");
+    let display = path.display();
+
+    // Open a file in write-only mode
+    let mut file = match File::create(&path) {
+        Err(why) => panic!("Couldn't create file!"),
+        Ok(file) => file,
+    };
+
+    // Write the code string
+    match file.write_all(code.as_bytes()) {
+        Err(why) => panic!("Couldn't read file!"),
+        Ok(_) => println!("Successfully wrote to file!"),
+    }
 }
