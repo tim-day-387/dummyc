@@ -34,34 +34,36 @@ pub mod parser {
     // Construct AST Leaf
     fn construct_leaf(tokens:Vec<String>) -> Forest<(String, String)> {
 	let mut output:Forest<(String, String)> = -(tr(("".to_string(), "".to_string())));
-	let line_num:String;
 
 	// Trivial case, or set line_num
 	if tokens.len() == 1 {
 	    output = -(tr(("line_num".to_string(), tokens.get(0).expect("DNE!").to_string())));
 	    return output;
-	} else {
-	    line_num = tokens.get(0).expect("DNE!").to_string();
 	}
 
-	// Get first token
-	let first = tokens.get(1).expect("DNE!").to_string();
+	// Save first tokenss
+	let line_num:String = tokens.get(0).expect("DNE!").to_string();
+	let keyword:String = tokens.get(1).expect("DNE!").to_string();
+	let line_num_pair:(String, String) = ("line_num".to_string(),
+					      line_num.clone());
+	let keyword_pair:(String, String) = ("res".to_string(),
+					     tokens.get(1).expect("DNE!").to_string());
 	
 	// Parse remaining tokens
-	if first == "GOTO".to_string() {
-	    output = -(tr(("line_num".to_string(),line_num.clone()))
-		/tr(("res".to_string(), tokens.get(1).expect("DNE!").to_string()))
+	if keyword == "GOTO".to_string() {
+	    output = -(tr(line_num_pair)
+		/tr(keyword_pair)
 		/tr(("line_num".to_string(), tokens.get(1+1).expect("DNE!").to_string())));
-	} else if first == "LET".to_string() {
-	    output = -(tr(("line_num".to_string(),line_num.clone()))
-		/tr(("res".to_string(), tokens.get(1).expect("DNE!").to_string()))
+	} else if keyword == "LET".to_string() {
+	    output = -(tr(line_num_pair)
+		/tr(keyword_pair)
 		/tr(("var".to_string(), tokens.get(1+1).expect("DNE!").to_string()))
 		/tr(("relate".to_string(), tokens.get(1+2).expect("DNE!").to_string()))
 		/tr((find_token(tokens.get(1+3).expect("DNE!").to_string()),
 		     tokens.get(1+3).expect("DNE!").to_string())));
-	} else if first == "PRINT".to_string() {
-	    output = -(tr(("line_num".to_string(),line_num.clone()))
-		/tr(("res".to_string(), tokens.get(1).expect("DNE!").to_string()))
+	} else if keyword == "PRINT".to_string() {
+	    output = -(tr(line_num_pair)
+		/tr(keyword_pair)
 		/tr((find_token(tokens.get(1+1).expect("DNE!").to_string()),
 		     tokens.get(1+1).expect("DNE!").to_string())));
 	} 
