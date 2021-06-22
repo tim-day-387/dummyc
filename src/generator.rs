@@ -41,7 +41,7 @@ pub mod generator {
 
     // Create main body of the Rust code
     fn create_main(input:Tree<(String, String)>) -> String {
-	let mut output = "fn main() {\n".to_string();
+	let mut output = "use std::collections::HashMap;\nfn main() {\n".to_string();
 	let mut next_line:String;
 	let next_token:String;
 	let next_option;
@@ -54,7 +54,7 @@ pub mod generator {
 	}
 
 	// Define hash map
-        next_line = ["  let mut vars:HashMap<String,(String,String)> 
+        next_line = ["  let vars:HashMap<String,(String,String)> 
                      = HashMap::new();\n".to_string()].concat();
 	output = [output, next_line].concat();
 	
@@ -156,7 +156,7 @@ pub mod generator {
 	    /(tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "GOTO".to_string()))
 	    /tr(("line_num".to_string(), "002".to_string())));
-	let main = "fn main() {\n  let mut vars:HashMap<String,(String,String)> 
+	let main = "use std::collections::HashMap;\nfn main() {\n  let vars:HashMap<String,(String,String)> 
                      = HashMap::new();\n  line001(vars.clone());\n}\n".to_string();
 	let func1 = "fn line001(vars:HashMap<String,(String,String)>) {\n  line002(vars.clone());\n}\n".to_string();
 	let answer = [main, func1].concat();
@@ -238,7 +238,7 @@ pub mod generator {
 	    /(tr(("line_num".to_string(), "002".to_string()))
 	    /tr(("res".to_string(), "GOTO".to_string()))
 	    /tr(("line_num".to_string(), "001".to_string())));
-	let answer = "fn main() {\n  let mut vars:HashMap<String,(String,String)> 
+	let answer = "use std::collections::HashMap;\nfn main() {\n  let vars:HashMap<String,(String,String)> 
                      = HashMap::new();\n  line001(vars.clone());\n}\n";
 	
 	assert_eq!(answer, create_main(given));
@@ -252,7 +252,7 @@ pub mod generator {
 	    /(tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "GOTO".to_string()))
 	    /tr(("line_num".to_string(), "002".to_string())));
-	let answer = "fn main() {\n  let mut vars:HashMap<String,(String,String)> 
+	let answer = "use std::collections::HashMap;\nfn main() {\n  let vars:HashMap<String,(String,String)> 
                      = HashMap::new();\n  line001(vars.clone());\n}\n";
 	
 	assert_eq!(answer, create_main(given));
@@ -271,7 +271,7 @@ pub mod generator {
 	    /tr(("res".to_string(), "GOTO".to_string()))
 	    /tr(("line_num".to_string(), "10".to_string())))
 	    /(tr(("line_num".to_string(), "40".to_string())));
-	let answer = "fn main() {\n  let mut vars:HashMap<String,(String,String)> 
+	let answer = "use std::collections::HashMap;\nfn main() {\n  let vars:HashMap<String,(String,String)> 
                      = HashMap::new();\n  line10(vars.clone());\n}\n";
 	
 	assert_eq!(answer, create_main(given));
