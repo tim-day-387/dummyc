@@ -39,20 +39,22 @@ pub mod generator {
 	let mut next_option;
 	let mut i = 0;
 
-	// Iter through tree while constructing output
-	loop {
-	    // Get next child in tree
-	    next_option = input.iter().nth(i);
-	    match next_option {
-		Some(next_option) => next_token = next_option.to_string(),
-		None => break,
-	    }
-	    
-	    // Iterate and concatenate
-	    i = i + 1;
-	    next_line = ["  line".to_string(), remove_children(next_token), "();\n".to_string()].concat();
-	    output = [output, next_line].concat();
+	// Get next child in tree
+	next_option = input.iter().nth(0);
+	match next_option {
+	    Some(next_option) => next_token = next_option.to_string(),
+	    None => return [output, "}\n".to_string()].concat(),
 	}
+
+	// Define hash map
+        next_line = ["  let mut vars:HashMap<String,(String,String)> 
+                     = HashMap::new();\n".to_string()].concat();
+	output = [output, next_line].concat();
+	
+	// Function call
+	next_line = ["  line".to_string(), remove_children(next_token),
+		     "(vars.clone());\n".to_string()].concat();
+	output = [output, next_line].concat();
 
 	// Add last bracket
 	output = [output, "}\n".to_string()].concat();
@@ -162,7 +164,8 @@ pub mod generator {
 	let given:Tree<String> = tr("MAIN".to_string())
 		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
 	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()));
-	let answer = "fn main() {\n  line001();\n  line002();\n}\n";
+	let answer = "fn main() {\n  let mut vars:HashMap<String,(String,String)> 
+                     = HashMap::new();\n  line001(vars.clone());\n}\n";
 	
 	assert_eq!(answer, create_main(given));
     }
@@ -173,7 +176,8 @@ pub mod generator {
 	use self::trees::{tr};
 	let given:Tree<String> = tr("MAIN".to_string())
 		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()));
-	let answer = "fn main() {\n  line001();\n}\n";
+	let answer = "fn main() {\n  let mut vars:HashMap<String,(String,String)> 
+                     = HashMap::new();\n  line001(vars.clone());\n}\n";
 	
 	assert_eq!(answer, create_main(given));
     }
@@ -183,11 +187,12 @@ pub mod generator {
     fn main_3() {
 	use self::trees::{tr};
 	let given:Tree<String> = tr("MAIN".to_string())
-			/(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
-			/(tr("002".to_string()))
-			/(tr("003".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()))
-	                /(tr("004".to_string()));
-	let answer = "fn main() {\n  line001();\n  line002();\n  line003();\n  line004();\n}\n";
+			/(tr("10".to_string()) /tr("GOTO".to_string()) /tr("20".to_string()))
+			/(tr("20".to_string()))
+			/(tr("30".to_string()) /tr("GOTO".to_string()) /tr("10".to_string()))
+	                /(tr("40".to_string()));
+	let answer = "fn main() {\n  let mut vars:HashMap<String,(String,String)> 
+                     = HashMap::new();\n  line10(vars.clone());\n}\n";
 	
 	assert_eq!(answer, create_main(given));
     }
