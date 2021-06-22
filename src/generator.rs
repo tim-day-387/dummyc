@@ -7,7 +7,7 @@ pub mod generator {
 
     // Create Rust code from the abstract syntax tree
     pub fn generate(input:Tree<(String, String)>) -> String {
-	let mut output:String = "".to_string();
+	let mut output:String;
 	let mut next_tree:Tree<(String, String)>;
 	let mut next_line:String;
 	let mut next_option;
@@ -43,9 +43,8 @@ pub mod generator {
     fn create_main(input:Tree<(String, String)>) -> String {
 	let mut output = "fn main() {\n".to_string();
 	let mut next_line:String;
-	let mut next_token:String;
-	let mut next_option;
-	let mut i = 0;
+	let next_token:String;
+	let next_option;
 
 	// Get next child in tree
 	next_option = input.iter().nth(0);
@@ -76,7 +75,7 @@ pub mod generator {
 			  remove_children(subtree.root().data.1.to_string()),
 			  "(vars:HashMap<String,(String,String)>) {\n".to_string()].concat();
 	let mut next_token:String;
-	let mut next_line:String;
+	let next_line:String;
 	let mut next_line_num:String = line_num;
 	let mut next_option;
 	let mut children:Vec<String> = Vec::new();

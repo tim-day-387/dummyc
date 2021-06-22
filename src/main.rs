@@ -33,7 +33,7 @@ fn main() {
     let ast = construct_tree(tokens);
 
     // Perform generation
-    //let code = generate(ast);
+    let code = generate(ast);
 
     // Create file
     let path = Path::new("../sample.rs");
@@ -45,8 +45,8 @@ fn main() {
     };
 
     // Write the code string
-    //match file.write_all(code.as_bytes()) {
-    //    Err(_) => panic!("Couldn't read file!"),
-    //    Ok(_) => println!("Successfully wrote to file!"),
-    //}
+    match file.write_all(code.as_bytes()) {
+        Err(_) => panic!("Couldn't read file!"),
+        Ok(_) => println!("Successfully wrote to file!"),
+    }
 }
