@@ -6,9 +6,10 @@ pub mod generator {
     use self::trees::{Tree};
 
     // Create Rust code from the abstract syntax tree
-    pub fn generate(input:Tree<String>) -> String {
-	let mut output:String;
-	let mut next_tree:Tree<String>;
+    pub fn generate(input:Tree<(String, String)>) -> String {
+	let mut output:String = "".to_string();
+	let mut next_tree:Tree<(String, String)>;
+	let mut next_line:String;
 	let mut next_option;
 	let mut i = 0;
 
@@ -22,17 +23,24 @@ pub mod generator {
 		Some(next_option) => next_tree = next_option.to_owned(),
 		None => break,
 	    }
+
+	    // Get next child in tree
+	    next_option = input.iter().nth(i+1);
+	    match next_option {
+		Some(next_option) => next_line = next_option.data.1.to_string(),
+		None => next_line = "".to_string(),
+	    }
 	    
 	    // Iterate and concatenate
 	    i = i + 1;
-	    output = [output, create_function(next_tree.clone())].concat();
+	    output = [output, create_function(next_tree.clone(), next_line)].concat();
 	}
 	
 	return output;
     }
 
     // Create main body of the Rust code
-    fn create_main(input:Tree<String>) -> String {
+    fn create_main(input:Tree<(String, String)>) -> String {
 	let mut output = "fn main() {\n".to_string();
 	let mut next_line:String;
 	let mut next_token:String;
@@ -42,7 +50,7 @@ pub mod generator {
 	// Get next child in tree
 	next_option = input.iter().nth(0);
 	match next_option {
-	    Some(next_option) => next_token = next_option.to_string(),
+	    Some(next_option) => next_token = next_option.data.1.to_string(),
 	    None => return [output, "}\n".to_string()].concat(),
 	}
 
@@ -63,9 +71,13 @@ pub mod generator {
     }
 
     // Create Rust from given subtree
-    fn create_function(subtree:Tree<String>) -> String {
-	let mut output = ["fn line".to_string(), remove_children(subtree.root().to_string()), "() {\n".to_string()].concat();
+    fn create_function(subtree:Tree<(String, String)>, line_num:String) -> String {
+	let mut output = ["fn line".to_string(),
+			  remove_children(subtree.root().data.1.to_string()),
+			  "(vars:HashMap<String,(String,String)>) {\n".to_string()].concat();
 	let mut next_token:String;
+	let mut next_line:String;
+	let mut next_line_num:String = line_num;
 	let mut next_option;
 	let mut children:Vec<String> = Vec::new();
 	let mut i = 0;
@@ -75,7 +87,7 @@ pub mod generator {
 	    // Get next child in tree
 	    next_option = subtree.iter().nth(i);
 	    match next_option {
-		Some(next_option) => next_token = next_option.to_string(),
+		Some(next_option) => next_token = next_option.data.1.to_string(),
 		None => break,
 	    }
 	    
@@ -89,13 +101,20 @@ pub mod generator {
 	// Decide on function
 	if children.len() == 0 {
 	} else if children.get(0).expect("DNE!").to_string() == "PRINT".to_string() {
-	    output = [output, "  println!(".to_string(), children.get(1).expect("DNE!").to_string(), ");\n".to_string()].concat(); 
+	    output = [output, "  println!(".to_string(),
+		      children.get(1).expect("DNE!").to_string(), ");\n".to_string()].concat(); 
 	} else if children.get(0).expect("DNE!").to_string() == "GOTO".to_string() {
-	    output = [output, "  line".to_string(), children.get(1).expect("DNE!").to_string(), "();\n".to_string()].concat();
+	    next_line_num = children.get(1).expect("DNE!").to_string();
 	}
-	    
-	// Add last bracket
-	output = [output, "}\n".to_string()].concat();
+
+	// Function call
+	if next_line_num != "".to_string() {
+	    next_line = ["  line".to_string(), next_line_num,
+			 "(vars.clone());\n".to_string(), "}\n".to_string()].concat();
+	} else {
+	    next_line = "}\n".to_string();
+	}
+	output = [output, next_line].concat();
 	
 	return output;
     }
@@ -130,6 +149,58 @@ pub mod generator {
 	return String::from_utf8_lossy(&output).to_string();
     }
 
+    // Testing generate()
+    #[test]
+    fn gen_1() {
+	use self::trees::{tr};
+	let given:Tree<(String, String)> = tr(("start".to_string(), "MAIN".to_string()))
+	    /(tr(("line_num".to_string(), "001".to_string()))
+	    /tr(("res".to_string(), "GOTO".to_string()))
+	    /tr(("line_num".to_string(), "002".to_string())));
+	let main = "fn main() {\n  let mut vars:HashMap<String,(String,String)> 
+                     = HashMap::new();\n  line001(vars.clone());\n}\n".to_string();
+	let func1 = "fn line001(vars:HashMap<String,(String,String)>) {\n  line002(vars.clone());\n}\n".to_string();
+	let answer = [main, func1].concat();
+	
+	assert_eq!(answer, generate(given));
+    }
+    
+    // Testing create_function()
+    #[test]
+    fn func_1() {
+	use self::trees::{tr};
+	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
+	    /tr(("res".to_string(), "PRINT".to_string()))
+	    /tr(("string".to_string(), "\"This is a sample\"".to_string()));
+	let answer = "fn line001(vars:HashMap<String,(String,String)>) {\n  println!(\"This is a sample\");\n  line002(vars.clone());\n}\n".to_string();
+	
+	assert_eq!(answer, create_function(given, "002".to_string()));
+    }
+
+    // Testing create_function()
+    #[test]
+    fn func_2() {
+	use self::trees::{tr};
+	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
+	    /tr(("res".to_string(), "GOTO".to_string()))
+	    /tr(("line_num".to_string(), "002".to_string()));
+	let answer = "fn line001(vars:HashMap<String,(String,String)>) {\n  line002(vars.clone());\n}\n".to_string();
+	
+	assert_eq!(answer, create_function(given, "345".to_string()));
+    }
+
+    // Testing create_function()
+    #[test]
+    fn func_3() {
+	use self::trees::{tr};
+	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
+	    /tr(("res".to_string(), "PRINT".to_string()))
+	    /tr(("string".to_string(), "\"This is a sample\"".to_string()));
+	let answer = "fn line001(vars:HashMap<String,(String,String)>) {\n  println!(\"This is a sample\");\n}\n".to_string();
+	
+	assert_eq!(answer, create_function(given, "".to_string()));
+    }
+
     // Testing remove_children()
     #[test]
     fn rm_ch_1() {
@@ -161,9 +232,13 @@ pub mod generator {
     #[test]
     fn main_1() {
 	use self::trees::{tr};
-	let given:Tree<String> = tr("MAIN".to_string())
-		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()))
-	              /(tr("002".to_string()) /tr("GOTO".to_string()) /tr("001".to_string()));
+	let given:Tree<(String, String)> = tr(("start".to_string(), "MAIN".to_string()))
+	    /(tr(("line_num".to_string(), "001".to_string()))
+	    /tr(("res".to_string(), "GOTO".to_string()))
+	    /tr(("line_num".to_string(), "002".to_string())))
+	    /(tr(("line_num".to_string(), "002".to_string()))
+	    /tr(("res".to_string(), "GOTO".to_string()))
+	    /tr(("line_num".to_string(), "001".to_string())));
 	let answer = "fn main() {\n  let mut vars:HashMap<String,(String,String)> 
                      = HashMap::new();\n  line001(vars.clone());\n}\n";
 	
@@ -174,8 +249,10 @@ pub mod generator {
     #[test]
     fn main_2() {
 	use self::trees::{tr};
-	let given:Tree<String> = tr("MAIN".to_string())
-		      /(tr("001".to_string()) /tr("GOTO".to_string()) /tr("002".to_string()));
+	let given:Tree<(String, String)> = tr(("start".to_string(), "MAIN".to_string()))
+	    /(tr(("line_num".to_string(), "001".to_string()))
+	    /tr(("res".to_string(), "GOTO".to_string()))
+	    /tr(("line_num".to_string(), "002".to_string())));
 	let answer = "fn main() {\n  let mut vars:HashMap<String,(String,String)> 
                      = HashMap::new();\n  line001(vars.clone());\n}\n";
 	
@@ -186,11 +263,15 @@ pub mod generator {
     #[test]
     fn main_3() {
 	use self::trees::{tr};
-	let given:Tree<String> = tr("MAIN".to_string())
-			/(tr("10".to_string()) /tr("GOTO".to_string()) /tr("20".to_string()))
-			/(tr("20".to_string()))
-			/(tr("30".to_string()) /tr("GOTO".to_string()) /tr("10".to_string()))
-	                /(tr("40".to_string()));
+	let given:Tree<(String, String)> = tr(("start".to_string(), "MAIN".to_string()))
+	    /(tr(("line_num".to_string(), "10".to_string()))
+	    /tr(("res".to_string(), "GOTO".to_string()))
+	    /tr(("line_num".to_string(), "20".to_string())))
+	    /(tr(("line_num".to_string(), "20".to_string())))
+	    /(tr(("line_num".to_string(), "30".to_string()))
+	    /tr(("res".to_string(), "GOTO".to_string()))
+	    /tr(("line_num".to_string(), "10".to_string())))
+	    /(tr(("line_num".to_string(), "40".to_string())));
 	let answer = "fn main() {\n  let mut vars:HashMap<String,(String,String)> 
                      = HashMap::new();\n  line10(vars.clone());\n}\n";
 	
