@@ -36,7 +36,7 @@ fn main() {
     let code = generate(ast);
 
     // Create file
-    let path = Path::new("../sample.rs");
+    let path = Path::new("./inter.rs");
 
     // Open a file in write-only mode
     let mut file = match File::create(&path) {

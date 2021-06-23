@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Run file through compiler
+FILE=$1
+./target/debug/dummy_compiler $FILE
+
+# Compile the Rust file
+rustc inter.rs
+
+# Remove the Rust file
+rm inter.rs
