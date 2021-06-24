@@ -17,6 +17,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      run: cargo build
+    - name: Mkdir
+      run: mkdir -p dummy/DEBIAN
+    - name: Control
+      run: echo "Package: dummy\nVersion: 0.1\nSection: custom\nPriority: optional\nArchitecture: all\nEssential: no\nInstalled-Size: 1024\nMaintainer: tday141@gmail.com\nDescription: Compiler for Minimal Basic (EMCA-55)\n" > dummy/DEBIAN/control
+    - name: Codes
+      run: mkdir dummy/usr/bin
+      run: cp dummy_compiler/target/debug/dummy_compiler dummy/usr/bin/dummy_compiler
+      run: cp dummy_compiler/dummyc dummy/usr/bin/dummyc
+    - name: Package
+      run: dpkg-deb --build dummy
+      run: dpkg -i dummy.deb
