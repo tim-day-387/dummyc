@@ -2,10 +2,8 @@
 
 # Run file through compiler
 FILE=$1
-./target/debug/dummy_compiler $FILE
+./dummy_compiler $FILE
 
 # Compile the Rust file
-rustc inter.rs
+rustc /tmp/dummy_program.rs
 
-# Remove the Rust file
-rm inter.rs
