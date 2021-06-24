@@ -25,9 +25,9 @@ jobs:
     - name: Codes
       run: mkdir -p dummy/usr/bin
     - name: Copy
-      run: cp dummy_compiler/target/debug/dummy_compiler dummy/usr/bin/dummy_compiler
+      run: cp home/runner/work/dummy_compiler/dummy_compiler dummy/usr/bin/dummy_compiler
     - name: Copy
-      run: cp dummy_compiler/dummyc dummy/usr/bin/dummyc
+      run: cp home/runner/work/dummy_compiler/dummyc dummy/usr/bin/dummyc
     - name: Package
       run: dpkg-deb --build dummy
     - name: Install
