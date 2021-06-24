@@ -2,7 +2,7 @@
 
 # Run file through compiler
 FILE=$1
-./dummy_compiler $FILE
+/usr/bin/dummy_compiler $FILE
 
 # Compile the Rust file
 rustc /tmp/dummy_program.rs
