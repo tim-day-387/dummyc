@@ -21,7 +21,7 @@ jobs:
     - name: Mkdir
       run: mkdir -p dummy/DEBIAN
     - name: Control
-      run: 'echo "Package: dummy \n Version: 0.1 \n Section: custom \n Priority: optional \n Architecture: all \n Essential: no \n Installed-Size: 1024 \n Maintainer: tday141@gmail.com \n Description: Compiler for Minimal Basic (EMCA-55) \n" > ./dummy/DEBIAN/control'
+      run: 'printf "Package: dummy\nVersion: 0.1\nSection: custom\nPriority: optional\nArchitecture: all\nEssential: no\nInstalled-Size: 1024\nMaintainer: tday141@gmail.com\nDescription: Compiler for Minimal Basic (EMCA-55)\n" > ./dummy/DEBIAN/control'
     - name: Codes
       run: mkdir -p dummy/usr/bin
     - name: Copy
