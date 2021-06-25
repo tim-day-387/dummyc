@@ -112,7 +112,7 @@ pub mod generator {
 	} else if children.get(0).expect("DNE!").to_string() == "GOTO".to_string() {
 	    next_line_num = children.get(1).expect("DNE!").to_string();
 	} else if children.get(0).expect("DNE!").to_string() == "LET".to_string() {
-	    output = [output, "  vars.insert(\"".to_string(), children.get(1).expect("DNE!").to_string(), "\",(\"string\",".to_string(), children.get(3).expect("DNE!").to_string(), "));\n".to_string()].concat();   
+	    output = [output, "  vars.insert(\"".to_string(), children.get(1).expect("DNE!").to_string(), "\".to_string(),(\"string\".to_string(),".to_string(), children.get(3).expect("DNE!").to_string(), ".to_string()));\n".to_string()].concat();   
 	}    
 
 	// Function call
