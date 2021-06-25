@@ -79,6 +79,8 @@ pub mod parser {
 	    output = "int".to_string();
 	} else if is_string(token.clone()) {
 	    output = "string".to_string();
+	} else {
+	    output = "var".to_string();
 	}
 
 	return output;
