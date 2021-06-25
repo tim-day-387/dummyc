@@ -74,11 +74,12 @@ pub mod generator {
 	let mut output = ["fn line".to_string(),
 			  remove_children(subtree.root().data.1.to_string()),
 			  "(vars:HashMap<String,(String,String)>) {\n".to_string()].concat();
-	let mut next_token:String;
+	let mut next_token:(String, String);
 	let next_line:String;
 	let mut next_line_num:String = line_num;
 	let mut next_option;
 	let mut children:Vec<String> = Vec::new();
+	let mut children_type:Vec<String> = Vec::new();
 	let mut i = 0;
 
 	// Iter through tree while constructing vector
@@ -86,7 +87,7 @@ pub mod generator {
 	    // Get next child in tree
 	    next_option = subtree.iter().nth(i);
 	    match next_option {
-		Some(next_option) => next_token = next_option.data.1.to_string(),
+		Some(next_option) => next_token = next_option.data.clone(),
 		None => break,
 	    }
 	    
@@ -94,17 +95,25 @@ pub mod generator {
 	    i = i + 1;
 
 	    // Push each token
-	    children.push(next_token);
+	    children.push(next_token.1.to_string());
+	    children_type.push(next_token.0.to_string());
 	}
 
 	// Decide on function
 	if children.len() == 0 {
 	} else if children.get(0).expect("DNE!").to_string() == "PRINT".to_string() {
-	    output = [output, "  println!(".to_string(),
+	    if children_type.get(1).expect("DNE!").to_string() == "string" {
+		output = [output, "  println!(".to_string(),
 		      children.get(1).expect("DNE!").to_string(), ");\n".to_string()].concat(); 
+            } else if children_type.get(1).expect("DNE!").to_string() == "string" {
+		output = [output, "  println!(vars.get(".to_string(),
+		      children.get(1).expect("DNE!").to_string(), "));\n".to_string()].concat(); 
+	    }
 	} else if children.get(0).expect("DNE!").to_string() == "GOTO".to_string() {
 	    next_line_num = children.get(1).expect("DNE!").to_string();
-	}
+	} else if children.get(0).expect("DNE!").to_string() == "LET".to_string() {
+	    output = [output, "  vars.insert(".to_string(), children.get(1).expect("DNE!").to_string(), ",".to_string(), children.get(3).expect("DNE!").to_string(), ");\n".to_string()].concat();   
+	}    
 
 	// Function call
 	if next_line_num != "".to_string() {

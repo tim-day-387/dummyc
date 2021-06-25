@@ -73,7 +73,7 @@ pub mod parser {
 
     // Classify token
     fn find_token(token:String) -> String {
-	let mut output:String = "".to_string();
+	let output:String;
 
 	if is_number(token.clone()) {
 	    output = "int".to_string();
@@ -181,7 +181,7 @@ pub mod parser {
     #[test]
     fn find_3() {
 	let given:String = "G3gedg444".to_string();
-	let answer:String = "".to_string();
+	let answer:String = "var".to_string();
 
 	assert_eq!(answer, find_token(given));
     }
