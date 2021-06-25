@@ -73,7 +73,7 @@ pub mod generator {
     fn create_function(subtree:Tree<(String, String)>, line_num:String) -> String {
 	let mut output = ["fn line".to_string(),
 			  remove_children(subtree.root().data.1.to_string()),
-			  "(vars:HashMap<String,(String,String)>) {\n".to_string()].concat();
+			  "(mut vars:HashMap<String,(String,String)>) {\n".to_string()].concat();
 	let mut next_token:(String, String);
 	let next_line:String;
 	let mut next_line_num:String = line_num;
@@ -105,9 +105,9 @@ pub mod generator {
 	    if children_type.get(1).expect("DNE!").to_string() == "string" {
 		output = [output, "  println!(".to_string(),
 		      children.get(1).expect("DNE!").to_string(), ");\n".to_string()].concat(); 
-            } else if children_type.get(1).expect("DNE!").to_string() == "string" {
-		output = [output, "  println!(vars.get(".to_string(),
-		      children.get(1).expect("DNE!").to_string(), ".1));\n".to_string()].concat(); 
+            } else if children_type.get(1).expect("DNE!").to_string() == "var" {
+		output = [output, "  println!(\"{}\", vars.get(".to_string(),
+		      children.get(1).expect("DNE!").to_string(), ".expect(\"DNE!\").1));\n".to_string()].concat(); 
 	    }
 	} else if children.get(0).expect("DNE!").to_string() == "GOTO".to_string() {
 	    next_line_num = children.get(1).expect("DNE!").to_string();
@@ -167,7 +167,7 @@ pub mod generator {
 	    /tr(("line_num".to_string(), "002".to_string())));
 	let main = "use std::collections::HashMap;\nfn main() {\n  let vars:HashMap<String,(String,String)> 
                      = HashMap::new();\n  line001(vars.clone());\n}\n".to_string();
-	let func1 = "fn line001(vars:HashMap<String,(String,String)>) {\n  line002(vars.clone());\n}\n".to_string();
+	let func1 = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  line002(vars.clone());\n}\n".to_string();
 	let answer = [main, func1].concat();
 	
 	assert_eq!(answer, generate(given));
@@ -180,7 +180,7 @@ pub mod generator {
 	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "PRINT".to_string()))
 	    /tr(("string".to_string(), "\"This is a sample\"".to_string()));
-	let answer = "fn line001(vars:HashMap<String,(String,String)>) {\n  println!(\"This is a sample\");\n  line002(vars.clone());\n}\n".to_string();
+	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  println!(\"This is a sample\");\n  line002(vars.clone());\n}\n".to_string();
 	
 	assert_eq!(answer, create_function(given, "002".to_string()));
     }
@@ -192,7 +192,7 @@ pub mod generator {
 	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "GOTO".to_string()))
 	    /tr(("line_num".to_string(), "002".to_string()));
-	let answer = "fn line001(vars:HashMap<String,(String,String)>) {\n  line002(vars.clone());\n}\n".to_string();
+	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  line002(vars.clone());\n}\n".to_string();
 	
 	assert_eq!(answer, create_function(given, "345".to_string()));
     }
@@ -204,7 +204,7 @@ pub mod generator {
 	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "PRINT".to_string()))
 	    /tr(("string".to_string(), "\"This is a sample\"".to_string()));
-	let answer = "fn line001(vars:HashMap<String,(String,String)>) {\n  println!(\"This is a sample\");\n}\n".to_string();
+	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  println!(\"This is a sample\");\n}\n".to_string();
 	
 	assert_eq!(answer, create_function(given, "".to_string()));
     }
