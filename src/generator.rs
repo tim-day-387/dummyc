@@ -107,7 +107,7 @@ pub mod generator {
 		      children.get(1).expect("DNE!").to_string(), ");\n".to_string()].concat(); 
             } else if children_type.get(1).expect("DNE!").to_string() == "var" {
 		output = [output, "  println!(\"{}\", vars.get(".to_string(),
-		      children.get(1).expect("DNE!").to_string(), ".expect(\"DNE!\").1));\n".to_string()].concat(); 
+		      children.get(1).expect("DNE!").to_string(), ").expect(\"DNE!\").1);\n".to_string()].concat(); 
 	    }
 	} else if children.get(0).expect("DNE!").to_string() == "GOTO".to_string() {
 	    next_line_num = children.get(1).expect("DNE!").to_string();
