@@ -25,12 +25,10 @@ pub mod lexer {
 
 	// Del chars
 	let mut output: Vec<u8> = Vec::new();
-	let mut counter = 0;
 	for i in 0..file_string.len() {
 	    // If slated for del, delete
 	    if !to_del.contains(&i) {
 		output.push(file_bytes[i]);
-		counter = counter + 1;
 	    }
 	}
 

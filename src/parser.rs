@@ -13,12 +13,15 @@ pub mod parser {
 
 	// Make leaves
 	for t in tokens {
+	    // If the line number changed, make leaf - otherwise, push token
 	    if t.0 != line_num {
+		// Make leaf, clear subtokens, change line number
 		output.root_mut().append(construct_leaf(sub_tokens));
 		sub_tokens = Vec::new();
 		sub_tokens.push(t.1.clone());
 		line_num = line_num + 1;
 	    } else {
+		// Push token to subtokens
 		sub_tokens.push(t.1.clone());
 	    }
 	}
@@ -35,13 +38,13 @@ pub mod parser {
     fn construct_leaf(tokens:Vec<String>) -> Forest<(String, String)> {
 	let mut output:Forest<(String, String)> = -(tr(("".to_string(), "".to_string())));
 
-	// Trivial case, or set line_num
+	// Trivial case (only line number)
 	if tokens.len() == 1 {
 	    output = -(tr(("line_num".to_string(), tokens.get(0).expect("DNE!").to_string())));
 	    return output;
 	}
 
-	// Save first tokenss
+	// Save first tokens, create pairs
 	let line_num:String = tokens.get(0).expect("DNE!").to_string();
 	let keyword:String = tokens.get(1).expect("DNE!").to_string();
 	let line_num_pair:(String, String) = ("line_num".to_string(),
@@ -51,10 +54,12 @@ pub mod parser {
 	
 	// Parse remaining tokens
 	if keyword == "GOTO".to_string() {
+	    // Create GOTO leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
 		/tr(("line_num".to_string(), tokens.get(1+1).expect("DNE!").to_string())));
 	} else if keyword == "LET".to_string() {
+	    // Create LET leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
 		/tr(("var".to_string(), tokens.get(1+1).expect("DNE!").to_string()))
@@ -62,6 +67,7 @@ pub mod parser {
 		/tr((find_token(tokens.get(1+3).expect("DNE!").to_string()),
 		     tokens.get(1+3).expect("DNE!").to_string())));
 	} else if keyword == "PRINT".to_string() {
+	    // Create PRINT leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
 		/tr((find_token(tokens.get(1+1).expect("DNE!").to_string()),
@@ -75,6 +81,7 @@ pub mod parser {
     fn find_token(token:String) -> String {
 	let output:String;
 
+	// Find what find of token we're looking at
 	if is_number(token.clone()) {
 	    output = "int".to_string();
 	} else if is_string(token.clone()) {
@@ -93,6 +100,7 @@ pub mod parser {
 	let char_vec:Vec<char> = token.chars().collect();
 	let mut output = true;
 
+	// If every char is a digit, we have a number
 	for c in char_vec {
 	    output = output && c.is_digit(10);
         }
@@ -106,6 +114,7 @@ pub mod parser {
 	let last = char_vec.len()-1;
 	let mut output = false;
 
+	// If the first and last chars are ", we have a string
 	if char_vec.get(0).expect("DNE!") == &'"' && char_vec.get(last).expect("DNE!") == &'"' {
 	    output = true;
 	}
