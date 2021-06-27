@@ -79,6 +79,70 @@ pub mod lexer {
 	return output;
     }
 
+    // Create a vector of tokens
+    fn classify(tokens:Vec<(u32, String)>) -> Vec<(u32, String, String)> {
+	let mut output: Vec<(u32, String, String)> = Vec::new();
+	let mut line_num = 1;
+
+	// Find each token
+	for t in tokens {
+	    // Update line number, identify line number token
+	    if line_num != t.0.clone() {
+		line_num = t.0.clone();
+		output.push((t.0.clone(), t.1.clone(), "line_num".to_string()));
+		continue;
+            }
+
+	    // Identify non-line number tokens
+	    output.push((t.0.clone(), t.1.clone(), find_token(t.1.clone())));
+	}
+	
+	return output;
+    }
+
+    // Classify token
+    fn find_token(token:String) -> String {
+	let output:String;
+
+	// Find what find of token we're looking at
+	if is_number(token.clone()) {
+	    output = "line_num".to_string();
+	} else if is_string(token.clone()) {
+	    output = "string".to_string();
+	} else {
+	    output = "var".to_string();
+	}
+
+	return output;
+    }
+    
+    // Check if number
+    fn is_number(token:String) -> bool {
+	let char_vec:Vec<char> = token.chars().collect();
+	let mut output = true;
+
+	// If every char is a digit, we have a number
+	for c in char_vec {
+	    output = output && c.is_digit(10);
+        }
+
+	return output;
+    }
+
+    // Check if string
+    fn is_string(token:String) -> bool {
+	let char_vec:Vec<char> = token.chars().collect();
+	let last = char_vec.len()-1;
+	let mut output = false;
+
+	// If the first and last chars are ", we have a string
+	if char_vec.get(0).expect("DNE!") == &'"' && char_vec.get(last).expect("DNE!") == &'"' {
+	    output = true;
+	}
+
+	return output;
+    }
+    
     // Testing remove_comments()
     #[test]
     fn rm_cmts_1() {
@@ -223,6 +287,114 @@ pub mod lexer {
 	                                     (2, "\"N,;,;,OUND\"".to_string())];
 
 	assert_eq!(answer, tokenize(given));
+    }
+	
+    // Testing find_token()
+    #[test]
+    fn find_1() {
+	let given:String = "031".to_string();
+	let answer:String = "line_num".to_string();
+
+	assert_eq!(answer, find_token(given));
+    }
+
+    // Testing find_token()
+    #[test]
+    fn find_2() {
+	let given:String = "\"This is a sample\"".to_string();
+	let answer:String = "string".to_string();
+
+	assert_eq!(answer, find_token(given));
+    }
+
+    // Testing find_token()
+    #[test]
+    fn find_3() {
+	let given:String = "G3gedg444".to_string();
+	let answer:String = "var".to_string();
+
+	assert_eq!(answer, find_token(given));
+    }
+    
+    // Testing is_string()
+    #[test]
+    fn is_s_1() {
+	let given:String = "0F1".to_string();
+	let answer:bool = false;
+
+	assert_eq!(answer, is_string(given));
+    }
+
+    // Testing is_string()
+    #[test]
+    fn is_s_2() {
+	let given:String = "\"0F1\"".to_string();
+	let answer:bool = true;
+
+	assert_eq!(answer, is_string(given));
+    }
+
+    // Testing is_string()
+    #[test]
+    fn is_s_3() {
+	let given:String = "\"This is a sample string\"".to_string();
+	let answer:bool = true;
+
+	assert_eq!(answer, is_string(given));
+    }
+    
+    // Testing is_number()
+    #[test]
+    fn is_n_1() {
+	let given:String = "0F1".to_string();
+	let answer:bool = false;
+
+	assert_eq!(answer, is_number(given));
+    }
+
+    // Testing is_number()
+    #[test]
+    fn is_n_2() {
+	let given:String = "LET".to_string();
+	let answer:bool = false;
+
+	assert_eq!(answer, is_number(given));
+    }
+
+    // Testing is_number()
+    #[test]
+    fn is_n_3() {
+	let given:String = "387".to_string();
+	let answer:bool = true;
+
+	assert_eq!(answer, is_number(given));
+    }
+
+    // Testing is_number()
+    #[test]
+    fn is_n_4() {
+	let given:String = "3".to_string();
+	let answer:bool = true;
+
+	assert_eq!(answer, is_number(given));
+    }
+
+    // Testing is_number()
+    #[test]
+    fn is_n_5() {
+	let given:String = "900".to_string();
+	let answer:bool = true;
+
+	assert_eq!(answer, is_number(given));
+    }
+
+    // Testing is_number()
+    #[test]
+    fn is_n_6() {
+	let given:String = "3f7_g98".to_string();
+	let answer:bool = false;
+
+	assert_eq!(answer, is_number(given));
     }    
 }
 
