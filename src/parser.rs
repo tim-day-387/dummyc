@@ -5,10 +5,10 @@ pub mod parser {
     extern crate trees;
     use self::trees::{tr,Tree,Forest};
     
-    // Construct Abstract Syntax Tree
-    pub fn construct_tree(tokens:Vec<(u32, String)>) -> Tree<(String, String)> {
+    // Construct Abstract Syntax Tree (line_num, name, type) -> (type, name)
+    pub fn construct_tree(tokens:Vec<(u32, String, String)>) -> Tree<(String, String)> {
 	let mut output:Tree<(String, String)> = tr(("start".to_string(), "MAIN".to_string()));
-	let mut sub_tokens:Vec<String> = Vec::new();
+	let mut sub_tokens:Vec<(String, String)> = Vec::new();
 	let mut line_num = 1;
 
 	// Make leaves
@@ -18,11 +18,11 @@ pub mod parser {
 		// Make leaf, clear subtokens, change line number
 		output.root_mut().append(construct_leaf(sub_tokens));
 		sub_tokens = Vec::new();
-		sub_tokens.push(t.1.clone());
+		sub_tokens.push((t.1.clone(), t.2.clone()));
 		line_num = line_num + 1;
 	    } else {
 		// Push token to subtokens
-		sub_tokens.push(t.1.clone());
+		sub_tokens.push((t.1.clone(), t.2.clone()));
 	    }
 	}
 
@@ -34,101 +34,58 @@ pub mod parser {
 	return output;
     }
 
-    // Construct AST Leaf
-    fn construct_leaf(tokens:Vec<String>) -> Forest<(String, String)> {
+    // Construct AST Leaf (name, type) -> (type, name)
+    fn construct_leaf(tokens:Vec<(String, String)>) -> Forest<(String, String)> {
 	let mut output:Forest<(String, String)> = -(tr(("".to_string(), "".to_string())));
 
 	// Trivial case (only line number)
 	if tokens.len() == 1 {
-	    output = -(tr(("line_num".to_string(), tokens.get(0).expect("DNE!").to_string())));
+	    output = -(tr((tokens.get(0).expect("DNE!").1.to_string(),
+			   tokens.get(0).expect("DNE!").0.to_string())));
 	    return output;
 	}
 
 	// Save first tokens, create pairs
-	let line_num:String = tokens.get(0).expect("DNE!").to_string();
-	let keyword:String = tokens.get(1).expect("DNE!").to_string();
-	let line_num_pair:(String, String) = ("line_num".to_string(),
+	let line_num:String = tokens.get(0).expect("DNE!").0.to_string();
+	let keyword:String = tokens.get(1).expect("DNE!").0.to_string();
+	let line_num_pair:(String, String) = (tokens.get(0).expect("DNE!").1.to_string(),
 					      line_num.clone());
-	let keyword_pair:(String, String) = ("res".to_string(),
-					     tokens.get(1).expect("DNE!").to_string());
+	let keyword_pair:(String, String) = (tokens.get(1).expect("DNE!").1.to_string(),
+					     keyword.clone());
 	
 	// Parse remaining tokens
 	if keyword == "GOTO".to_string() {
 	    // Create GOTO leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
-		/tr(("line_num".to_string(), tokens.get(1+1).expect("DNE!").to_string())));
+		/tr((tokens.get(1+1).expect("DNE!").1.to_string(),
+	             tokens.get(1+1).expect("DNE!").0.to_string())));
 	} else if keyword == "LET".to_string() {
 	    // Create LET leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
-		/tr(("var".to_string(), tokens.get(1+1).expect("DNE!").to_string()))
-		/tr(("relate".to_string(), tokens.get(1+2).expect("DNE!").to_string()))
-		/tr((find_token(tokens.get(1+3).expect("DNE!").to_string()),
-		     tokens.get(1+3).expect("DNE!").to_string())));
+		/tr((tokens.get(1+1).expect("DNE!").1.to_string(),
+		     tokens.get(1+1).expect("DNE!").0.to_string())));
 	} else if keyword == "PRINT".to_string() {
 	    // Create PRINT leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
-		/tr((find_token(tokens.get(1+1).expect("DNE!").to_string()),
-		     tokens.get(1+1).expect("DNE!").to_string())));
+		/tr((tokens.get(1+1).expect("DNE!").1.to_string(),
+		     tokens.get(1+1).expect("DNE!").0.to_string())));
 	} 
 	
-	return output;
-    }
-
-    // Classify token
-    fn find_token(token:String) -> String {
-	let output:String;
-
-	// Find what find of token we're looking at
-	if is_number(token.clone()) {
-	    output = "int".to_string();
-	} else if is_string(token.clone()) {
-	    output = "string".to_string();
-	} else {
-	    output = "var".to_string();
-	}
-
-	return output;
-    }
-
-    
-    
-    // Check if number
-    fn is_number(token:String) -> bool {
-	let char_vec:Vec<char> = token.chars().collect();
-	let mut output = true;
-
-	// If every char is a digit, we have a number
-	for c in char_vec {
-	    output = output && c.is_digit(10);
-        }
-
-	return output;
-    }
-
-    // Check if string
-    fn is_string(token:String) -> bool {
-	let char_vec:Vec<char> = token.chars().collect();
-	let last = char_vec.len()-1;
-	let mut output = false;
-
-	// If the first and last chars are ", we have a string
-	if char_vec.get(0).expect("DNE!") == &'"' && char_vec.get(last).expect("DNE!") == &'"' {
-	    output = true;
-	}
-
 	return output;
     }
 
     // Testing construct_leaf()
     #[test]
     fn con_leaf_1() {
-	let given:Vec<String> = vec!["001".to_string(),"GOTO".to_string(),"001".to_string()];
+	let given:Vec<(String, String)> = vec![("001".to_string(), "line_num".to_string()),
+				     ("GOTO".to_string(), "res".to_string()),
+				     ("001".to_string(), "int".to_string())];
 	let answer:Forest<(String, String)> = -(tr(("line_num".to_string(), "001".to_string()))
 				      /tr(("res".to_string(), "GOTO".to_string()))
-				      /tr(("line_num".to_string(), "001".to_string())));
+				      /tr(("int".to_string(), "001".to_string())));
 
 	assert_eq!(answer, construct_leaf(given));
     }
@@ -136,13 +93,13 @@ pub mod parser {
     // Testing construct_leaf()
     #[test]
     fn con_leaf_2() {
-	let given:Vec<String> = vec!["345".to_string(),"LET".to_string(),"Bababooey".to_string(),
-	                             "=".to_string(),"\"Sandpaper\"".to_string()];
+	let given:Vec<(String, String)> = vec![("345".to_string(), "line_num".to_string()),
+				     ("LET".to_string(), "res".to_string()),
+				     ("Bababooey=\"Sandpaper\"".to_string(), "eval".to_string())];
 	let answer:Forest<(String, String)> = -(tr(("line_num".to_string(), "345".to_string()))
 				      /tr(("res".to_string(), "LET".to_string()))
-				      /tr(("var".to_string(), "Bababooey".to_string()))
-				      /tr(("relate".to_string(), "=".to_string()))
-				      /tr(("string".to_string(), "\"Sandpaper\"".to_string())));
+				      /tr(("eval".to_string(),
+				           "Bababooey=\"Sandpaper\"".to_string())));
 	
 	assert_eq!(answer, construct_leaf(given));
     }
@@ -150,8 +107,9 @@ pub mod parser {
     // Testing construct_leaf()
     #[test]
     fn con_leaf_3() {
-	let given:Vec<String> = vec!["045".to_string(),"PRINT".to_string(),
-				     "\"Yuh Lord\"".to_string()];
+	let given:Vec<(String, String)> = vec![("045".to_string(), "line_num".to_string()),
+				     ("PRINT".to_string(), "res".to_string()),
+				     ("\"Yuh Lord\"".to_string(), "string".to_string())];
 	let answer:Forest<(String, String)> = -(tr(("line_num".to_string(), "045".to_string()))
 				      /tr(("res".to_string(), "PRINT".to_string()))
 		                      /tr(("string".to_string(), "\"Yuh Lord\"".to_string())));
@@ -162,118 +120,10 @@ pub mod parser {
     // Testing construct_leaf()
     #[test]
     fn con_leaf_4() {
-	let given:Vec<String> = vec!["045".to_string()];
+	let given:Vec<(String, String)> = vec![("045".to_string(), "line_num".to_string())];
 	let answer:Forest<(String, String)> = -(tr(("line_num".to_string(), "045".to_string())));
 
 	assert_eq!(answer, construct_leaf(given));
-    }
-
-    // Testing find_token()
-    #[test]
-    fn find_1() {
-	let given:String = "031".to_string();
-	let answer:String = "int".to_string();
-
-	assert_eq!(answer, find_token(given));
-    }
-
-    // Testing find_token()
-    #[test]
-    fn find_2() {
-	let given:String = "\"This is a sample\"".to_string();
-	let answer:String = "string".to_string();
-
-	assert_eq!(answer, find_token(given));
-    }
-
-    // Testing find_token()
-    #[test]
-    fn find_3() {
-	let given:String = "G3gedg444".to_string();
-	let answer:String = "var".to_string();
-
-	assert_eq!(answer, find_token(given));
-    }
-    
-    // Testing is_string()
-    #[test]
-    fn is_s_1() {
-	let given:String = "0F1".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_string(given));
-    }
-
-    // Testing is_string()
-    #[test]
-    fn is_s_2() {
-	let given:String = "\"0F1\"".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_string(given));
-    }
-
-    // Testing is_string()
-    #[test]
-    fn is_s_3() {
-	let given:String = "\"This is a sample string\"".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_string(given));
-    }
-    
-    // Testing is_number()
-    #[test]
-    fn is_n_1() {
-	let given:String = "0F1".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_number(given));
-    }
-
-    // Testing is_number()
-    #[test]
-    fn is_n_2() {
-	let given:String = "LET".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_number(given));
-    }
-
-    // Testing is_number()
-    #[test]
-    fn is_n_3() {
-	let given:String = "387".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_number(given));
-    }
-
-    // Testing is_number()
-    #[test]
-    fn is_n_4() {
-	let given:String = "3".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_number(given));
-    }
-
-    // Testing is_number()
-    #[test]
-    fn is_n_5() {
-	let given:String = "900".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_number(given));
-    }
-
-    // Testing is_number()
-    #[test]
-    fn is_n_6() {
-	let given:String = "3f7_g98".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_number(given));
     }
 }
 
@@ -290,12 +140,13 @@ mod test {
     // Testing construct_tree()
     #[test]
     fn con_tree_1() {
-	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
-					    (1, "002".to_string())];
+	let given:Vec<(u32, String, String)> = vec![(1, "001".to_string(), "line_num".to_string()),
+					    (1, "GOTO".to_string(), "res".to_string()),
+					    (1, "002".to_string(), "int".to_string())];
 	let answer:Tree<(String, String)> = tr(("start".to_string(), "MAIN".to_string()))
 	    /(tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "GOTO".to_string()))
-	    /tr(("line_num".to_string(), "002".to_string())));
+	    /tr(("int".to_string(), "002".to_string())));
 
 	assert_eq!(answer, construct_tree(given));
     }
@@ -303,16 +154,19 @@ mod test {
     // Testing construct_tree()
     #[test]
     fn con_tree_2() {
-	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
-					    (1, "002".to_string()),(2, "002".to_string()),
-					    (2, "GOTO".to_string()),(2, "001".to_string())];
+	let given:Vec<(u32, String, String)> = vec![(1, "001".to_string(), "line_num".to_string()),
+					    (1, "GOTO".to_string(), "res".to_string()),
+					    (1, "002".to_string(), "int".to_string()),
+					    (2, "002".to_string(), "line_num".to_string()),
+					    (2, "GOTO".to_string(), "res".to_string()),
+					    (2, "001".to_string(), "int".to_string())];
 	let answer:Tree<(String, String)> = tr(("start".to_string(), "MAIN".to_string()))
 	    /(tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "GOTO".to_string()))
-	    /tr(("line_num".to_string(), "002".to_string())))
+	    /tr(("int".to_string(), "002".to_string())))
 	    /(tr(("line_num".to_string(), "002".to_string()))
 	    /tr(("res".to_string(), "GOTO".to_string()))
-	    /tr(("line_num".to_string(), "001".to_string())));
+	    /tr(("int".to_string(), "001".to_string())));
 
 	assert_eq!(answer, construct_tree(given));
     }
@@ -320,18 +174,22 @@ mod test {
     // Testing construct_tree()
     #[test]
     fn con_tree_3() {
-	let given:Vec<(u32, String)> = vec![(1, "001".to_string()),(1, "GOTO".to_string()),
-					    (1, "002".to_string()),(2, "002".to_string()),
-					    (3, "003".to_string()),(3, "GOTO".to_string()),
-					    (3, "001".to_string()),(4, "004".to_string())];
+	let given:Vec<(u32, String, String)> = vec![(1, "001".to_string(), "line_num".to_string()),
+					    (1, "GOTO".to_string(), "res".to_string()),
+					    (1, "002".to_string(), "int".to_string()),
+					    (2, "002".to_string(), "line_num".to_string()),
+					    (3, "003".to_string(), "line_num".to_string()),
+					    (3, "GOTO".to_string(), "res".to_string()),
+					    (3, "001".to_string(), "int".to_string()),
+					    (4, "004".to_string(), "line_num".to_string())];
 	let answer:Tree<(String, String)> = tr(("start".to_string(), "MAIN".to_string()))
 	    /(tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "GOTO".to_string()))
-	    /tr(("line_num".to_string(), "002".to_string())))
+	    /tr(("int".to_string(), "002".to_string())))
 	    /(tr(("line_num".to_string(), "002".to_string())))
 	    /(tr(("line_num".to_string(), "003".to_string()))
 	    /tr(("res".to_string(), "GOTO".to_string()))
-	    /tr(("line_num".to_string(), "001".to_string())))
+	    /tr(("int".to_string(), "001".to_string())))
 	    /(tr(("line_num".to_string(), "004".to_string())));
 
 	assert_eq!(answer, construct_tree(given));
