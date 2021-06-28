@@ -82,7 +82,7 @@ pub mod lexer {
     // Create a vector of tokens
     fn classify(tokens:Vec<(u32, String)>) -> Vec<(u32, String, String)> {
 	let mut output: Vec<(u32, String, String)> = Vec::new();
-	let mut line_num = 1;
+	let mut line_num = 0;
 
 	// Find each token
 	for t in tokens {
@@ -106,11 +106,13 @@ pub mod lexer {
 
 	// Find what find of token we're looking at
 	if is_number(token.clone()) {
-	    output = "line_num".to_string();
+	    output = "int".to_string();
 	} else if is_string(token.clone()) {
 	    output = "string".to_string();
+	} else if is_res(token.clone()) {
+	    output = "res".to_string();
 	} else {
-	    output = "var".to_string();
+	    output = "eval".to_string();
 	}
 
 	return output;
@@ -141,6 +143,25 @@ pub mod lexer {
 	}
 
 	return output;
+    }
+
+    // Check if a reserved token
+    fn is_res(token:String) -> bool {
+	let reserved_tokens:Vec<String> = vec!["IF".to_string(), "THEN".to_string(),
+					       "GOTO".to_string(), "FOR".to_string(),
+					       "TO".to_string(), "NEXT".to_string(),
+					       "RETURN".to_string(), "GOSUB".to_string(),
+					       "PRINT".to_string(), "LET".to_string(),
+					       "DIM".to_string(), "INPUT".to_string(),
+					       "READ".to_string(), "DATA".to_string(),
+					       "END".to_string()];
+
+	// Check if token is one of the reserved_tokens
+	if reserved_tokens.contains(&token) {
+	    return true;
+	} else {
+	    return false;
+	}
     }
     
     // Testing remove_comments()
@@ -288,12 +309,74 @@ pub mod lexer {
 
 	assert_eq!(answer, tokenize(given));
     }
+
+    // Testing classify()
+    #[test]
+    fn class_1() {
+	let given:Vec<(u32, String)> = vec![(1, "80".to_string()),(1, "IF".to_string()),
+				             (1, "F=1".to_string()),(1, "THEN".to_string()),
+					     (1, "110".to_string()),(2, "90".to_string()),
+	                                     (2, "PRINT".to_string()),(2, "X".to_string()),
+	                                     (2, "\"N,;,;,OUND\"".to_string())];
+	let answer:Vec<(u32, String, String)> = vec![(1, "80".to_string(), "line_num".to_string()),
+					     (1, "IF".to_string(), "res".to_string()),
+					     (1, "F=1".to_string(), "eval".to_string()),
+					     (1, "THEN".to_string(), "res".to_string()),
+					     (1, "110".to_string(), "int".to_string()),
+					     (2, "90".to_string(), "line_num".to_string()),
+					     (2, "PRINT".to_string(), "res".to_string()),
+					     (2, "X".to_string(), "eval".to_string()),
+				             (2, "\"N,;,;,OUND\"".to_string(),
+						      "string".to_string())];
+
+	assert_eq!(answer, classify(given));
+    }
+
+    // Testing classify()
+    #[test]
+    fn class_2() {
+	let given:Vec<(u32, String)> = vec![(1, "9000".to_string()),(1, "DATA".to_string()),
+				             (1, "9".to_string()),(1, "1".to_string()),
+					     (1, "5".to_string()),(1, "5".to_string())]; 
+	let answer:Vec<(u32, String, String)> = vec![(1, "9000".to_string(), "line_num".to_string()),
+					     (1, "DATA".to_string(), "res".to_string()),
+					     (1, "9".to_string(), "int".to_string()),
+					     (1, "1".to_string(), "int".to_string()),
+					     (1, "5".to_string(), "int".to_string()),
+					     (1, "5".to_string(), "int".to_string())];
+
+	assert_eq!(answer, classify(given));
+    }
+
+    // Testing classify()
+    #[test]
+    fn class_3() {
+	let given:Vec<(u32, String)> = vec![(1, "1010".to_string()),(1, "PRINT".to_string()),
+				             (1, "\"A HAS\"".to_string()),
+					     (1, "N".to_string()),(1, "\"ELEMENTS\"".to_string()),
+					     (2, "1030".to_string()),(2, "PRINT".to_string()),
+					     (2, "\"A(\"".to_string()),(2, "I".to_string()),
+	                                     (2, "\")=\"".to_string()),(2, "A(I)".to_string())];
+	let answer:Vec<(u32, String, String)> = vec![(1, "1010".to_string(), "line_num".to_string()),
+					     (1, "PRINT".to_string(), "res".to_string()),
+					     (1, "\"A HAS\"".to_string(), "string".to_string()),
+					     (1, "N".to_string(), "eval".to_string()),
+					     (1, "\"ELEMENTS\"".to_string(), "string".to_string()),
+				             (2, "1030".to_string(), "line_num".to_string()),
+				             (2, "PRINT".to_string(), "res".to_string()),
+					     (2, "\"A(\"".to_string(), "string".to_string()),
+					     (2, "I".to_string(), "eval".to_string()),
+					     (2, "\")=\"".to_string(), "string".to_string()),
+	                                     (2, "A(I)".to_string(), "eval".to_string())];
+
+	assert_eq!(answer, classify(given));
+    }
 	
     // Testing find_token()
     #[test]
     fn find_1() {
 	let given:String = "031".to_string();
-	let answer:String = "line_num".to_string();
+	let answer:String = "int".to_string();
 
 	assert_eq!(answer, find_token(given));
     }
@@ -311,7 +394,7 @@ pub mod lexer {
     #[test]
     fn find_3() {
 	let given:String = "G3gedg444".to_string();
-	let answer:String = "var".to_string();
+	let answer:String = "eval".to_string();
 
 	assert_eq!(answer, find_token(given));
     }
@@ -370,31 +453,31 @@ pub mod lexer {
 	assert_eq!(answer, is_number(given));
     }
 
-    // Testing is_number()
+    // Testing is_res()
     #[test]
-    fn is_n_4() {
+    fn is_r_1() {
 	let given:String = "3".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_number(given));
-    }
-
-    // Testing is_number()
-    #[test]
-    fn is_n_5() {
-	let given:String = "900".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_number(given));
-    }
-
-    // Testing is_number()
-    #[test]
-    fn is_n_6() {
-	let given:String = "3f7_g98".to_string();
 	let answer:bool = false;
 
-	assert_eq!(answer, is_number(given));
+	assert_eq!(answer, is_res(given));
+    }
+
+    // Testing is_res()
+    #[test]
+    fn is_r_2() {
+	let given:String = "LET".to_string();
+	let answer:bool = true;
+
+	assert_eq!(answer, is_res(given));
+    }
+
+    // Testing is_res()
+    #[test]
+    fn is_r_3() {
+	let given:String = "IFAND".to_string();
+	let answer:bool = false;
+
+	assert_eq!(answer, is_res(given));
     }    
 }
 
