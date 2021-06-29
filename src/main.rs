@@ -27,13 +27,13 @@ fn main() {
     println!("Compiling {}", args[1]);
 
     // Perform lexing
-//    let tokens = perform_lexing(contents.clone());
+    let tokens = perform_lexing(contents.clone());
 
     // Perform parsing
-//    let ast = construct_tree(tokens);
+    let ast = construct_tree(tokens);
 
     // Perform generation
-//    let code = generate(ast);
+    let code = generate(ast);
 
     // Create file
     let path = Path::new("/tmp/dummy_program.rs");
@@ -45,8 +45,8 @@ fn main() {
     };
 
     // Write the code string
-//    match file.write_all(code.as_bytes()) {
-//        Err(_) => panic!("Couldn't read file!"),
-//        Ok(_) => println!("Successfully wrote to file!"),
-//    }
+    match file.write_all(code.as_bytes()) {
+        Err(_) => panic!("Couldn't read file!"),
+        Ok(_) => println!("Successfully wrote to file!"),
+    }
 }
