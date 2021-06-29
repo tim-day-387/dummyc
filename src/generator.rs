@@ -5,6 +5,9 @@ pub mod generator {
     extern crate trees;
     use self::trees::{Tree};
 
+    // File Imports
+    use crate::evaluator::*;
+
     // Create Rust code from the abstract syntax tree
     pub fn generate(input:Tree<(String, String)>) -> String {
 	let mut output:String;
