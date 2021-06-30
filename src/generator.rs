@@ -123,11 +123,12 @@ pub mod generator {
 	    next_line_num = children.get(1).expect("DNE!").to_string();
 	} else if children.get(0).expect("DNE!").to_string() == "LET".to_string() {
 	    // Create LET code
+	    let eval:(String, String, String, String) =
+		crate::evaluator::evaluator::evaluate(children.get(1).expect("DNE!").to_string());
 	    output = [output, "  vars.insert(\"".to_string(),
-		      children.get(1).expect("DNE!").to_string(),
-		      "\".to_string(),(\"string\".to_string(),".to_string(),
-		      children.get(3).expect("DNE!").to_string(),
-		      ".to_string()));\n".to_string()].concat();   
+		      eval.0, "\".to_string(),(".to_string(), eval.3,
+		      ".to_string(),".to_string(),
+		      eval.2, ".to_string()));\n".to_string()].concat();   
 	}    
 
 	// Create code to call next method and add to end

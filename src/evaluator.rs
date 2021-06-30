@@ -1,16 +1,8 @@
 // Evaluator module
 #![forbid(unsafe_code)]
-pub mod evaluator {
-}
-
-// Testing public methods
-#[cfg(test)]
-mod test {
-    // File Imports
-    use super::evaluator::*;
-
+pub mod evaluator { 
     // Evaluate the given token and return a tuple
-    fn evaluate(token:String) -> (String, String, String, String) {
+    pub fn evaluate(token:String) -> (String, String, String, String) {
 	let char_vec:Vec<char> = token.chars().collect();
 	let mut output:(String, String, String, String) =
 	    ("".to_string(), "".to_string(), "".to_string(), "".to_string());
@@ -52,4 +44,11 @@ mod test {
 
 	assert_eq!(answer, evaluate(given));
     }
+}
+
+// Testing public methods
+#[cfg(test)]
+mod test {
+    // File Imports
+    use super::evaluator::*;
 }
