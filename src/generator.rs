@@ -117,7 +117,7 @@ pub mod generator {
             } else if eval.3 == "eval" {
 		// Code for print variables
 		output = [output, "  println!(\"{}\", vars.get(\"".to_string(),
-			  eval.2, "\".to_string()).expect(\"DNE!\").1);\n".to_string()].concat(); 
+			  eval.2, "\").expect(\"DNE!\").1);\n".to_string()].concat(); 
 	    }
 	} else if children.get(0).expect("DNE!").to_string() == "GOTO".to_string() {
 	    // Create GOTO code
