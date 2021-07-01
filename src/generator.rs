@@ -108,28 +108,13 @@ pub mod generator {
 	    // If there is no function, do nothing
 	} else if children.get(0).expect("DNE!").to_string() == "PRINT".to_string() {
 	    // Create PRINT code
-	    let eval:(String, String, String, String) =
-		evaluate(children.get(1).expect("DNE!").to_string());
-	    if eval.3 == "string" {
-		// Code for printing strings
-		output = [output, "  println!(".to_string(),
-		      eval.2, ");\n".to_string()].concat(); 
-            } else if eval.3 == "eval" {
-		// Code for print variables
-		output = [output, "  println!(\"{}\", vars.get(\"".to_string(),
-			  eval.2, "\").expect(\"DNE!\").1);\n".to_string()].concat(); 
-	    }
+	    output = [output, print_statement(children.get(1).expect("DNE!").to_string())].concat();
 	} else if children.get(0).expect("DNE!").to_string() == "GOTO".to_string() {
 	    // Create GOTO code
 	    next_line_num = children.get(1).expect("DNE!").to_string();
 	} else if children.get(0).expect("DNE!").to_string() == "LET".to_string() {
 	    // Create LET code
-	    let eval:(String, String, String, String) =
-		evaluate(children.get(1).expect("DNE!").to_string());
-	    output = [output, "  vars.insert(\"".to_string(),
-		      eval.0, "\".to_string(),(\"".to_string(), eval.3,
-		      "\".to_string(),".to_string(),
-		      eval.2, "));\n".to_string()].concat();   
+	    output = [output, let_statement(children.get(1).expect("DNE!").to_string())].concat();
 	}    
 
 	// Create code to call next method and add to end
@@ -141,6 +126,43 @@ pub mod generator {
 	}
 	output = [output, next_line_of_code].concat();
 	
+	return output;
+    }
+
+    // Create PRINT statement
+    fn print_statement(token:String) -> String {
+	let mut output:String = "".to_string();
+	
+	// Perform evaluation on token
+	let eval:(String, String, String, String) = evaluate(token);
+
+	// Choose what to output based on evaluation
+	if eval.3 == "string" {
+	    // Code for printing strings
+	    output = ["  println!(".to_string(),
+		      eval.2, ");\n".to_string()].concat(); 
+        } else if eval.3 == "eval" {
+	    // Code for print variables
+	    output = ["  println!(\"{}\", vars.get(\"".to_string(),
+		      eval.2, "\").expect(\"DNE!\").1);\n".to_string()].concat();
+	}
+
+	return output;
+    }
+
+    // Create LET statement
+    fn let_statement(token:String) -> String {
+	let output:String;
+	
+	// Perform evaluation on token
+	let eval:(String, String, String, String) = evaluate(token);
+
+	// Create ouput based on evaluation
+	output = ["  vars.insert(\"".to_string(),
+	          eval.0, "\".to_string(),(\"".to_string(), eval.3,
+	          "\".to_string(),".to_string(),
+	          eval.2, "));\n".to_string()].concat();
+
 	return output;
     }
     
@@ -203,7 +225,7 @@ pub mod generator {
 	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "PRINT".to_string()))
 	    /tr(("eval".to_string(), "Baba".to_string()));
-	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  println!(\"{}\", vars.get(\"Baba\".to_string()).expect(\"DNE!\").1);\n}\n".to_string();
+	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  println!(\"{}\", vars.get(\"Baba\").expect(\"DNE!\").1);\n}\n".to_string();
 	
 	assert_eq!(answer, create_function(given, "".to_string()));
     }
