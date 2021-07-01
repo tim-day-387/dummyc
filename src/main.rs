@@ -13,7 +13,6 @@ use parser::parser::*;
 mod generator;
 use generator::generator::*;
 mod evaluator;
-use evaluator::evaluator::*;
 
 // Main function code
 fn main() {

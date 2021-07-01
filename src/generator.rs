@@ -6,7 +6,7 @@ pub mod generator {
     use self::trees::{Tree};
 
     // File Imports
-    use crate::evaluator::*;
+    use crate::evaluator::evaluator::evaluate;
 
     // Create Rust code from the abstract syntax tree
     pub fn generate(input:Tree<(String, String)>) -> String {
@@ -108,15 +108,16 @@ pub mod generator {
 	    // If there is no function, do nothing
 	} else if children.get(0).expect("DNE!").to_string() == "PRINT".to_string() {
 	    // Create PRINT code
-	    if children_type.get(1).expect("DNE!").to_string() == "string" {
+	    let eval:(String, String, String, String) =
+		evaluate(children.get(1).expect("DNE!").to_string());
+	    if eval.3 == "string" {
 		// Code for printing strings
 		output = [output, "  println!(".to_string(),
-		      children.get(1).expect("DNE!").to_string(), ");\n".to_string()].concat(); 
-            } else if children_type.get(1).expect("DNE!").to_string() == "var" {
+		      eval.2, ");\n".to_string()].concat(); 
+            } else if eval.3 == "eval" {
 		// Code for print variables
 		output = [output, "  println!(\"{}\", vars.get(\"".to_string(),
-			  children.get(1).expect("DNE!").to_string(),
-			  "\").expect(\"DNE!\").1);\n".to_string()].concat(); 
+			  eval.2, "\".to_string()).expect(\"DNE!\").1);\n".to_string()].concat(); 
 	    }
 	} else if children.get(0).expect("DNE!").to_string() == "GOTO".to_string() {
 	    // Create GOTO code
@@ -124,11 +125,11 @@ pub mod generator {
 	} else if children.get(0).expect("DNE!").to_string() == "LET".to_string() {
 	    // Create LET code
 	    let eval:(String, String, String, String) =
-		crate::evaluator::evaluator::evaluate(children.get(1).expect("DNE!").to_string());
+		evaluate(children.get(1).expect("DNE!").to_string());
 	    output = [output, "  vars.insert(\"".to_string(),
-		      eval.0, "\".to_string(),(".to_string(), eval.3,
-		      ".to_string(),".to_string(),
-		      eval.2, ".to_string()));\n".to_string()].concat();   
+		      eval.0, "\".to_string(),(\"".to_string(), eval.3,
+		      "\".to_string(),".to_string(),
+		      eval.2, "));\n".to_string()].concat();   
 	}    
 
 	// Create code to call next method and add to end
@@ -165,7 +166,7 @@ pub mod generator {
 	use self::trees::{tr};
 	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "PRINT".to_string()))
-	    /tr(("string".to_string(), "\"This is a sample\"".to_string()));
+	    /tr(("eval".to_string(), "\"This is a sample\"".to_string()));
 	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  println!(\"This is a sample\");\n  line002(vars.clone());\n}\n".to_string();
 	
 	assert_eq!(answer, create_function(given, "002".to_string()));
@@ -177,7 +178,7 @@ pub mod generator {
 	use self::trees::{tr};
 	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "GOTO".to_string()))
-	    /tr(("line_num".to_string(), "002".to_string()));
+	    /tr(("int".to_string(), "002".to_string()));
 	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  line002(vars.clone());\n}\n".to_string();
 	
 	assert_eq!(answer, create_function(given, "345".to_string()));
@@ -189,8 +190,20 @@ pub mod generator {
 	use self::trees::{tr};
 	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "PRINT".to_string()))
-	    /tr(("string".to_string(), "\"This is a sample\"".to_string()));
+	    /tr(("eval".to_string(), "\"This is a sample\"".to_string()));
 	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  println!(\"This is a sample\");\n}\n".to_string();
+	
+	assert_eq!(answer, create_function(given, "".to_string()));
+    }
+
+    // Testing create_function()
+    #[test]
+    fn func_4() {
+	use self::trees::{tr};
+	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
+	    /tr(("res".to_string(), "PRINT".to_string()))
+	    /tr(("eval".to_string(), "Baba".to_string()));
+	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  println!(\"{}\", vars.get(\"Baba\".to_string()).expect(\"DNE!\").1);\n}\n".to_string();
 	
 	assert_eq!(answer, create_function(given, "".to_string()));
     }
