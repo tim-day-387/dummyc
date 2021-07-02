@@ -117,11 +117,15 @@ pub mod generator {
 	    // Create LET code
 	    output = [output, let_statement(children.get(1).expect("DNE!").to_string())].concat();
 	} else if children.get(0).expect("DNE!").to_string() == "IF".to_string() {
+	    // Create IF code
 	    output = [output, if_statement(children.get(1).expect("DNE!").to_string(),
 					   children.get(3).expect("DNE!").to_string(),
 	                                   next_line_num.clone())].concat();
 	    next_line_num = "".to_string();
-	}
+	} else if children.get(0).expect("DNE!").to_string() == "END".to_string() {
+	    // Create END code
+	    next_line_num = "".to_string();
+	}    
 
 	// Create code to call next method and add to end
 	if next_line_num != "".to_string() {

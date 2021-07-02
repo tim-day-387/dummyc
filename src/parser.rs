@@ -82,6 +82,10 @@ pub mod parser {
 		     tokens.get(3).expect("DNE!").0.to_string()))
 	        /tr((tokens.get(4).expect("DNE!").1.to_string(),
 		     tokens.get(4).expect("DNE!").0.to_string())));
+	} else if keyword == "END".to_string() {
+	    // Create END leaf
+	    output = -(tr(line_num_pair)
+		/tr(keyword_pair));
 	} 
 	
 	return output;
