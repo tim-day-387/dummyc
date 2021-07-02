@@ -37,6 +37,7 @@ pub mod generator {
 	    
 	    // Iterate and concatenate with the function in the next leaf
 	    i = i + 1;
+	    println!("{:?}", next_leaf);
 	    output = [output, create_function(next_leaf.clone(), next_line)].concat();
 	}
 	
@@ -115,7 +116,12 @@ pub mod generator {
 	} else if children.get(0).expect("DNE!").to_string() == "LET".to_string() {
 	    // Create LET code
 	    output = [output, let_statement(children.get(1).expect("DNE!").to_string())].concat();
-	}    
+	} else if children.get(0).expect("DNE!").to_string() == "IF".to_string() {
+	    output = [output, if_statement(children.get(1).expect("DNE!").to_string(),
+					   children.get(3).expect("DNE!").to_string(),
+	                                   next_line_num.clone())].concat();
+	    next_line_num = "".to_string();
+	}
 
 	// Create code to call next method and add to end
 	if next_line_num != "".to_string() {
@@ -164,6 +170,42 @@ pub mod generator {
 	          eval.2, "));\n".to_string()].concat();
 
 	return output;
+    }
+
+    // Create IF statement
+    fn if_statement(expression:String, goto:String, next_line:String) -> String {
+	let output:String;
+	
+	// Perform evaluation on token
+	let eval:(String, String, String, String) = evaluate(expression);
+
+	// Create ouput based on evaluation
+	output = ["if ".to_string(), "vars.get(\"".to_string(),
+		  eval.0, "\").expect(\"DNE!\").1 ".to_string(),
+	          eval.1, "= ".to_string(), eval.2,
+		  " {\n".to_string(), "  line".to_string(), goto,
+		  "(vars.clone());\n".to_string(), "} else {\n".to_string(),
+		  "  line".to_string(), next_line,
+		  "(vars.clone());\n".to_string(), "}\n".to_string()].concat();
+
+	return output;
+    }
+
+    // Testing if_statement()
+    #[test]
+    fn if_1() {
+	let given_exp = "F=\"Baba\"".to_string();
+	let given_goto = "001".to_string();
+	let given_next_line = "002".to_string();
+
+	let answer = "if vars.get(\"F\").expect(\"DNE!\").1 == \"Baba\".to_string() {
+  line001(vars.clone());
+} else {
+  line002(vars.clone());
+}
+".to_string();
+
+	assert_eq!(answer, if_statement(given_exp, given_goto, given_next_line));
     }
     
     // Testing generate()

@@ -58,20 +58,30 @@ pub mod parser {
 	    // Create GOTO leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
-		/tr((tokens.get(1+1).expect("DNE!").1.to_string(),
-	             tokens.get(1+1).expect("DNE!").0.to_string())));
+		/tr((tokens.get(2).expect("DNE!").1.to_string(),
+	             tokens.get(2).expect("DNE!").0.to_string())));
 	} else if keyword == "LET".to_string() {
 	    // Create LET leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
-		/tr((tokens.get(1+1).expect("DNE!").1.to_string(),
-		     tokens.get(1+1).expect("DNE!").0.to_string())));
+		/tr((tokens.get(2).expect("DNE!").1.to_string(),
+		     tokens.get(2).expect("DNE!").0.to_string())));
 	} else if keyword == "PRINT".to_string() {
 	    // Create PRINT leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
-		/tr((tokens.get(1+1).expect("DNE!").1.to_string(),
-		     tokens.get(1+1).expect("DNE!").0.to_string())));
+		/tr((tokens.get(2).expect("DNE!").1.to_string(),
+		     tokens.get(2).expect("DNE!").0.to_string())));
+	} else if keyword == "IF".to_string() {
+	    // Create IF leaf
+	    output = -(tr(line_num_pair)
+		/tr(keyword_pair)
+		/tr((tokens.get(2).expect("DNE!").1.to_string(),
+		     tokens.get(2).expect("DNE!").0.to_string()))
+	        /tr((tokens.get(3).expect("DNE!").1.to_string(),
+		     tokens.get(3).expect("DNE!").0.to_string()))
+	        /tr((tokens.get(4).expect("DNE!").1.to_string(),
+		     tokens.get(4).expect("DNE!").0.to_string())));
 	} 
 	
 	return output;
