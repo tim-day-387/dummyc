@@ -105,24 +105,30 @@ pub mod generator {
 	}
 
 	// Figure out correct function, so Rust code can be made
+	let keyword = children.get(0).expect("AST node does not exist!").to_string();
+	
 	if children.len() == 0 {
 	    // If there is no function, do nothing
-	} else if children.get(0).expect("DNE!").to_string() == "PRINT".to_string() {
+	} else if keyword == "PRINT".to_string() {
 	    // Create PRINT code
-	    output = [output, print_statement(children.get(1).expect("DNE!").to_string())].concat();
-	} else if children.get(0).expect("DNE!").to_string() == "GOTO".to_string() {
+		output = [output, print_statement(children.get(1).expect("AST node does not exist!")
+						  .to_string())].concat();
+	} else if keyword == "GOTO".to_string() {
 	    // Create GOTO code
-	    next_line_num = children.get(1).expect("DNE!").to_string();
-	} else if children.get(0).expect("DNE!").to_string() == "LET".to_string() {
+	    next_line_num = children.get(1).expect("AST node does not exist!").to_string();
+	} else if keyword == "LET".to_string() {
 	    // Create LET code
-	    output = [output, let_statement(children.get(1).expect("DNE!").to_string())].concat();
-	} else if children.get(0).expect("DNE!").to_string() == "IF".to_string() {
+	    output = [output, let_statement(children.get(1).expect("AST node does not exist!")
+						.to_string())].concat();
+	} else if keyword == "IF".to_string() {
 	    // Create IF code
-	    output = [output, if_statement(children.get(1).expect("DNE!").to_string(),
-					   children.get(3).expect("DNE!").to_string(),
+	    output = [output, if_statement(children.get(1).expect("AST node does not exist!")
+					   .to_string(),
+					   children.get(3).expect("AST node does not exist!")
+					   .to_string(),
 	                                   next_line_num.clone())].concat();
 	    next_line_num = "".to_string();
-	} else if children.get(0).expect("DNE!").to_string() == "END".to_string() {
+	} else if keyword == "END".to_string() {
 	    // Create END code
 	    next_line_num = "".to_string();
 	}    

@@ -40,17 +40,17 @@ pub mod parser {
 
 	// Trivial case (only line number)
 	if tokens.len() == 1 {
-	    output = -(tr((tokens.get(0).expect("DNE!").1.to_string(),
-			   tokens.get(0).expect("DNE!").0.to_string())));
+	    output = -(tr((tokens.get(0).expect("Token doesn't exist!").1.to_string(),
+			   tokens.get(0).expect("Token doesn't exist!").0.to_string())));
 	    return output;
 	}
 
 	// Save first tokens, create pairs
-	let line_num:String = tokens.get(0).expect("DNE!").0.to_string();
-	let keyword:String = tokens.get(1).expect("DNE!").0.to_string();
-	let line_num_pair:(String, String) = (tokens.get(0).expect("DNE!").1.to_string(),
+	let line_num:String = tokens.get(0).expect("Token doesn't exist!").0.to_string();
+	let keyword:String = tokens.get(1).expect("Token doesn't exist!").0.to_string();
+	let line_num_pair:(String, String) = (tokens.get(0).expect("Token doesn't exist!").1.to_string(),
 					      line_num.clone());
-	let keyword_pair:(String, String) = (tokens.get(1).expect("DNE!").1.to_string(),
+	let keyword_pair:(String, String) = (tokens.get(1).expect("Token doesn't exist!").1.to_string(),
 					     keyword.clone());
 	
 	// Parse remaining tokens
@@ -58,30 +58,30 @@ pub mod parser {
 	    // Create GOTO leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
-		/tr((tokens.get(2).expect("DNE!").1.to_string(),
-	             tokens.get(2).expect("DNE!").0.to_string())));
+		/tr((tokens.get(2).expect("Token doesn't exist!").1.to_string(),
+	             tokens.get(2).expect("Token doesn't exist!").0.to_string())));
 	} else if keyword == "LET".to_string() {
 	    // Create LET leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
-		/tr((tokens.get(2).expect("DNE!").1.to_string(),
-		     tokens.get(2).expect("DNE!").0.to_string())));
+		/tr((tokens.get(2).expect("Token doesn't exist!").1.to_string(),
+		     tokens.get(2).expect("Token doesn't exist!").0.to_string())));
 	} else if keyword == "PRINT".to_string() {
 	    // Create PRINT leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
-		/tr((tokens.get(2).expect("DNE!").1.to_string(),
-		     tokens.get(2).expect("DNE!").0.to_string())));
+		/tr((tokens.get(2).expect("Token doesn't exist!").1.to_string(),
+		     tokens.get(2).expect("Token doesn't exist!").0.to_string())));
 	} else if keyword == "IF".to_string() {
 	    // Create IF leaf
 	    output = -(tr(line_num_pair)
 		/tr(keyword_pair)
-		/tr((tokens.get(2).expect("DNE!").1.to_string(),
-		     tokens.get(2).expect("DNE!").0.to_string()))
-	        /tr((tokens.get(3).expect("DNE!").1.to_string(),
-		     tokens.get(3).expect("DNE!").0.to_string()))
-	        /tr((tokens.get(4).expect("DNE!").1.to_string(),
-		     tokens.get(4).expect("DNE!").0.to_string())));
+		/tr((tokens.get(2).expect("Token doesn't exist!").1.to_string(),
+		     tokens.get(2).expect("Token doesn't exist!").0.to_string()))
+	        /tr((tokens.get(3).expect("Token doesn't exist!").1.to_string(),
+		     tokens.get(3).expect("Token doesn't exist!").0.to_string()))
+	        /tr((tokens.get(4).expect("Token doesn't exist!").1.to_string(),
+		     tokens.get(4).expect("Token doesn't exist!").0.to_string())));
 	} else if keyword == "END".to_string() {
 	    // Create END leaf
 	    output = -(tr(line_num_pair)

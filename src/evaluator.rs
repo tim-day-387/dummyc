@@ -90,7 +90,8 @@ pub mod evaluator {
 	let mut output = false;
 
 	// If the first and last chars are ", we have a string
-	if char_vec.get(0).expect("DNE!") == &'"' && char_vec.get(last).expect("DNE!") == &'"' {
+	if char_vec.get(0).expect("First char missing!") == &'"' &&
+	    char_vec.get(last).expect("First char missing!") == &'"' {
 	    output = true;
 	}
 
