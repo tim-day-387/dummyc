@@ -22,32 +22,39 @@ fn main() {
 	panic!("Wrong number of arguements!");
     }
 
+    // Get file name
+    let basic_path = Path::new(&args[1]);
+    let filename = basic_path.file_stem().expect("DNE!");
+    
     // Read file
-    let contents = fs::read_to_string(&args[1])
+    let contents = fs::read_to_string(basic_path)
 	.expect("Something went wrong reading the file!");
-    println!("Compiling {}", args[1]);
 
-    // Perform lexing
+    // Perform lexing, parsing, generation
+    println!("Lexing {:?} ...", basic_path);
     let tokens = perform_lexing(contents.clone());
+    println!("Done!");
 
-    // Perform parsing
+    println!("Parsing {:?} ...", basic_path);
     let ast = construct_tree(tokens);
+    println!("Done!");
 
-    // Perform generation
+    println!("Generating code for {:?} ...", basic_path);
     let code = generate(ast);
-
-    // Create file
-    let path = Path::new("/tmp/dummy_program.rs");
+    println!("Done!");
+    
+    // Create file path
+    let rust_path = Path::new("/tmp").join(filename).with_extension("rs");
 
     // Open a file in write-only mode
-    let mut file = match File::create(&path) {
+    let mut file = match File::create(&rust_path) {
         Err(_) => panic!("Couldn't create file!"),
         Ok(file) => file,
     };
 
     // Write the code string
     match file.write_all(code.as_bytes()) {
-        Err(_) => panic!("Couldn't read file!"),
-        Ok(_) => println!("Successfully wrote to file!"),
+        Err(_) => panic!("Couldn't create file!"),
+        Ok(_) => println!("Successfully compiled and wrote to {:?} ", rust_path),
     }
 }
