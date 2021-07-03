@@ -105,7 +105,11 @@ pub mod generator {
 	}
 
 	// Figure out correct function, so Rust code can be made
-	let keyword = children.get(0).expect("AST node does not exist!").to_string();
+	let keyword_attempt = children.get(0);
+	let keyword:String = match keyword_attempt {
+	    Some(keyword_attempt) => keyword_attempt.to_string(),
+	    None => "".to_string()
+	};
 	
 	if children.len() == 0 {
 	    // If there is no function, do nothing
