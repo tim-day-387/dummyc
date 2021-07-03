@@ -26,8 +26,6 @@ jobs:
       run: mkdir -p dummy/usr/bin
     - name: Copy Binary
       run: cp /home/runner/work/dummy_compiler/dummy_compiler/target/debug/dummy_compiler dummy/usr/bin/dummy_compiler
-    - name: Copy Script
-      run: cp /home/runner/work/dummy_compiler/dummy_compiler/dummyc dummy/usr/bin/dummyc
     - name: Build Package
       run: dpkg-deb --build dummy
     - name: Archive Package

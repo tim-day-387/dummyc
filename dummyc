@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# Run file through compiler
-FILE=$1
-/usr/bin/dummy_compiler $FILE
-
-# Compile the Rust file
-rustc /tmp/dummy_program.rs
-
