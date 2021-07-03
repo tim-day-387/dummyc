@@ -19,21 +19,21 @@ jobs:
     - name: Build
       run: cargo build
     - name: Make Debian Directory
-      run: mkdir -p dummy/DEBIAN
+      run: mkdir -p dummyc/DEBIAN
     - name: Make Control File
-      run: 'printf "Package: dummy\nVersion: 0.1\nSection: custom\nPriority: optional\nArchitecture: all\nEssential: no\nInstalled-Size: 1024\nMaintainer: tday141@gmail.com\nDescription: Compiler for Minimal Basic (EMCA-55)\n" > ./dummy/DEBIAN/control'
+      run: 'printf "Package: dummyc\nVersion: 0.1\nSection: custom\nPriority: optional\nArchitecture: all\nEssential: no\nInstalled-Size: 1024\nMaintainer: tday141@gmail.com\nDescription: Compiler for Minimal Basic (EMCA-55)\n" > ./dummyc/DEBIAN/control'
     - name: Make Binary Directory
-      run: mkdir -p dummy/usr/bin
+      run: mkdir -p dummyc/usr/bin
     - name: Copy Binary
-      run: cp /home/runner/work/dummy_compiler/dummy_compiler/target/debug/dummy_compiler dummy/usr/bin/dummy_compiler
+      run: cp /home/runner/work/dummyc/dummyc/target/debug/dummyc dummyc/usr/bin/dummyc
     - name: Make a Man Directory
-      run: mkdir -p dummy/usr/share/man/man1
+      run: mkdir -p dummyc/usr/share/man/man1
     - name: Copy Man Page
-      run: cp /home/runner/work/dummy_compiler/dummy_compiler/docs/dummyc.1.gz dummy/usr/share/man/man1/dummyc.1.gz
+      run: cp /home/runner/work/dummyc/dummyc/docs/dummyc.1.gz dummyc/usr/share/man/man1/dummyc.1.gz
     - name: Build Package
-      run: dpkg-deb --build dummy
+      run: dpkg-deb --build dummyc
     - name: Archive Package
       uses: actions/upload-artifact@v2
       with:
         name: debian-package
-        path: ./dummy.deb
+        path: ./dummyc.deb
