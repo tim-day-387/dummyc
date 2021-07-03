@@ -26,6 +26,10 @@ jobs:
       run: mkdir -p dummy/usr/bin
     - name: Copy Binary
       run: cp /home/runner/work/dummy_compiler/dummy_compiler/target/debug/dummy_compiler dummy/usr/bin/dummy_compiler
+    - name: Make a Man Directory
+      run: mkdir -p dummy/usr/share/man/man1
+    - name: Copy Man Page
+      run: cp /home/runner/work/dummy_compiler/dummy_compiler/docs/dummyc.1.gz dummy/usr/share/man/man1/dummyc.1.gz
     - name: Build Package
       run: dpkg-deb --build dummy
     - name: Archive Package
