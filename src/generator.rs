@@ -37,7 +37,6 @@ pub mod generator {
 	    
 	    // Iterate and concatenate with the function in the next leaf
 	    i = i + 1;
-	    println!("{:?}", next_leaf);
 	    output = [output, create_function(next_leaf.clone(), next_line)].concat();
 	}
 	
