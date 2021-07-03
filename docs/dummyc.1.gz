@@ -1,5 +1,5 @@
 .\" Manpage for dummyc.
-.TH man 1 "02 Jul 2021" "0.1" "dummyc man page"
+.TH dummyc 1 "03 Jul 2021" "0.1" "dummyc man page"
 .SH NAME
 dummyc \- compile ECMA-55 BASIC into Rust 
 .SH SYNOPSIS
