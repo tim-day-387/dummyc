@@ -57,12 +57,14 @@ pub fn find_token(token:String) -> String {
     let output:String;
 
     // Find what find of token we're looking at
-    if is_number(token.clone()) {
+    if is_int(token.clone()) {
 	output = "int".to_string();
     } else if is_string(token.clone()) {
 	output = "string".to_string();
     } else if is_res(token.clone()) {
 	output = "res".to_string();
+    } else if is_float(token.clone()) {
+	output = "float".to_string();	
     } else {
 	output = "eval".to_string();
     }
@@ -70,8 +72,38 @@ pub fn find_token(token:String) -> String {
     return output;
 }
 
-// Check if number
-fn is_number(token:String) -> bool {
+// Check if float
+fn is_float(token:String) -> bool {
+    let char_vec:Vec<char> = token.chars().collect();
+    let mut output = true;
+    let mut seen_point = false;
+
+    // If every char is a digit, or a decimal point
+    for c in char_vec {
+	// Check if char is digit
+	if !c.is_digit(10) {
+	    // Check if char is a point
+	    if c != '.' {
+		// Not a point, not a float
+		output = false;
+	    } else if seen_point {
+		// Already had a point, not a float
+		output = false;
+	    } else {
+		// First point, might be a float
+		seen_point = true;
+	    }
+	}    
+    }
+
+    // Must have seen a point 
+    output = output & seen_point;
+    
+    return output;
+}
+
+// Check if integer
+fn is_int(token:String) -> bool {
     let char_vec:Vec<char> = token.chars().collect();
     let mut output = true;
 
@@ -149,6 +181,15 @@ mod test {
 
 	assert_eq!(answer, find_token(given));
     }
+
+    // Testing find_token()
+    #[test]
+    fn find_4() {
+	let given:String = ".1326546".to_string();
+	let answer:String = "float".to_string();
+
+	assert_eq!(answer, find_token(given));
+    }
     
     // Testing is_string()
     #[test]
@@ -177,31 +218,58 @@ mod test {
 	assert_eq!(answer, is_string(given));
     }
     
-    // Testing is_number()
+    // Testing is_float()
     #[test]
-    fn is_n_1() {
+    fn is_f_1() {
 	let given:String = "0F1".to_string();
 	let answer:bool = false;
 
-	assert_eq!(answer, is_number(given));
+	assert_eq!(answer, is_float(given));
+    }
+
+    // Testing is_float()
+    #[test]
+    fn is_f_2() {
+	let given:String = "387".to_string();
+	let answer:bool = false;
+
+	assert_eq!(answer, is_float(given));
     }
 
     // Testing is_number()
     #[test]
-    fn is_n_2() {
+    fn is_f_3() {
+	let given:String = "38.7".to_string();
+	let answer:bool = true;
+
+	assert_eq!(answer, is_float(given));
+    }
+    
+    // Testing is_int()
+    #[test]
+    fn is_i_1() {
+	let given:String = "0F1".to_string();
+	let answer:bool = false;
+
+	assert_eq!(answer, is_int(given));
+    }
+
+    // Testing is_int()
+    #[test]
+    fn is_i_2() {
 	let given:String = "LET".to_string();
 	let answer:bool = false;
 
-	assert_eq!(answer, is_number(given));
+	assert_eq!(answer, is_int(given));
     }
 
-    // Testing is_number()
+    // Testing is_int()
     #[test]
-    fn is_n_3() {
+    fn is_i_3() {
 	let given:String = "387".to_string();
 	let answer:bool = true;
 
-	assert_eq!(answer, is_number(given));
+	assert_eq!(answer, is_int(given));
     }
 
     // Testing is_res()
