@@ -1,11 +1,11 @@
 .\" Manpage for dummyc.
-.TH man 1 "02 Jul 2021" "0.1" "dummyc man page"
+.TH dummyc 1 "03 Jul 2021" "0.1" "dummyc man page"
 .SH NAME
 dummyc \- compile ECMA-55 BASIC into Rust 
 .SH SYNOPSIS
 dummyc [BASIC File]
 .SH DESCRIPTION
-The dummyc compiler compiles BASIC adhearing to ECMA-55 into valid Rust code. 
+The dummyc compiler compiles BASIC adhering to ECMA-55 into valid Rust code. 
 .SH OPTIONS
 The dummyc does not take any options. However, you can supply a file path to the BASIC code.
 .SH BUGS
