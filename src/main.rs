@@ -7,11 +7,11 @@ use std::path::Path;
 
 // File Imports
 mod lexer;
-use lexer::lexer::*;
+use lexer::*;
 mod parser;
-use parser::parser::*;
+use parser::*;
 mod generator;
-use generator::generator::*;
+use generator::*;
 mod evaluator;
 
 // Main function code
