@@ -14,9 +14,7 @@ pub fn evaluate(token:String) -> (String, String, String, String) {
     let mut relational:Vec<char> = Vec::new();
     let mut expression:Vec<char> = Vec::new();
     let mut in_exp:bool = false;
-    
-
-    
+        
     // If every char is a digit, we have a number
     for c in char_vec {
 	if c == '=' {
@@ -36,11 +34,11 @@ pub fn evaluate(token:String) -> (String, String, String, String) {
 	output2 = variable.into_iter().collect();
 	output3 = find_token(output2.clone());
     } else {
+	let calculation = calculate(expression.into_iter().collect());
 	output0 = variable.into_iter().collect();
 	output1 = relational.into_iter().collect();
-	output2 = [expression.into_iter().collect(),
-		   ".to_string()".to_string()].concat();
-	output3 = "string".to_string();
+	output2 = calculation.0;
+	output3 = calculation.1;
     }
 
     // Set output
@@ -50,6 +48,18 @@ pub fn evaluate(token:String) -> (String, String, String, String) {
     output.3 = output3;
     
     return output;
+}
+
+// Give a Rust statement to calc the expression, give type it'll return
+fn calculate(expression:String) -> (String, String) {
+    let mut output:(String, String) = ("".to_string(), "".to_string());
+
+    // If the expression is a string, return thus
+    if is_string(expression.clone()) {
+	output = ([expression.clone(), ".to_string()".to_string()].concat(), "string".to_string());
+    }
+
+    return output
 }
 
 // Classify token
