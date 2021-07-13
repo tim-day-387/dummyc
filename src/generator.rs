@@ -249,6 +249,15 @@ mod test {
 	assert_eq!(answer, print_statement(given));
     }
 
+    // Testing print_statement()
+    #[test]
+    fn print_3() {
+	let given = vec!["PRINT".to_string(), "A".to_string(), "B".to_string()];
+	let answer = "  println!(\"{}{}\", vars.get(\"A\").expect(\"DNE!\").1, vars.get(\"B\").expect(\"DNE!\").1);\n";
+
+	assert_eq!(answer, print_statement(given));
+    }
+
     // Testing let_statement()
     #[test]
     fn let_1() {

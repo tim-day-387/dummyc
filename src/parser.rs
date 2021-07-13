@@ -68,10 +68,14 @@ fn construct_leaf(tokens:Vec<(String, String)>) -> Forest<(String, String)> {
 			tokens.get(2).expect("Token doesn't exist!").0.to_string())));
     } else if keyword == "PRINT".to_string() {
 	// Create PRINT leaf
-	output = -(tr(line_num_pair)
-		   /tr(keyword_pair)
-		   /tr((tokens.get(2).expect("Token doesn't exist!").1.to_string(),
-			tokens.get(2).expect("Token doesn't exist!").0.to_string())));
+	let mut tree:Tree<(String, String)> = tr(line_num_pair);
+	let mut forest:Forest<(String, String)> = -tr(keyword_pair);
+	for i in 2..tokens.len()  {
+	    forest.push_back(tr((tokens.get(i).expect("Token doesn't exist!").1.to_string(),
+			     tokens.get(i).expect("Token doesn't exist!").0.to_string())));
+	}
+	tree.root_mut().append(forest);
+	output = -(tree);    
     } else if keyword == "IF".to_string() {
 	// Create IF leaf
 	output = -(tr(line_num_pair)
@@ -147,6 +151,23 @@ mod test {
 	let given:Vec<(String, String)> = vec![("045".to_string(), "line_num".to_string())];
 	let answer:Forest<(String, String)> = -(tr(("line_num".to_string(), "045".to_string())));
 
+	assert_eq!(answer, construct_leaf(given));
+    }
+
+    // Testing construct_leaf()
+    #[test]
+    fn con_leaf_5() {
+	let given:Vec<(String, String)> = vec![("045".to_string(), "line_num".to_string()),
+					       ("PRINT".to_string(), "res".to_string()),
+					       ("\"Yuh Lord\"".to_string(), "string".to_string()),
+					       ("\"Yuh Lord\"".to_string(), "string".to_string()),
+					       ("\"Yuh Lord\"".to_string(), "string".to_string())];
+	let answer:Forest<(String, String)> = -(tr(("line_num".to_string(), "045".to_string()))
+						/tr(("res".to_string(), "PRINT".to_string()))
+						/tr(("string".to_string(), "\"Yuh Lord\"".to_string()))
+						/tr(("string".to_string(), "\"Yuh Lord\"".to_string()))
+						/tr(("string".to_string(), "\"Yuh Lord\"".to_string())));
+	
 	assert_eq!(answer, construct_leaf(given));
     }
     
