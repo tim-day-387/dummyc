@@ -114,8 +114,7 @@ fn create_function(subtree:Tree<(String, String)>, line_num:String) -> String {
 	// If there is no function, do nothing
     } else if keyword == "PRINT".to_string() {
 	// Create PRINT code
-	output = [output, print_statement(children.get(1).expect("AST node does not exist!")
-					  .to_string())].concat();
+	output = [output, print_statement(children)].concat();
     } else if keyword == "GOTO".to_string() {
 	// Create GOTO code
 	next_line_num = children.get(1).expect("AST node does not exist!").to_string();
@@ -149,22 +148,39 @@ fn create_function(subtree:Tree<(String, String)>, line_num:String) -> String {
 }
 
 // Create PRINT statement
-fn print_statement(token:String) -> String {
-    let mut output:String = "".to_string();
+fn print_statement(tokens:Vec<String>) -> String {
+    let mut output:String = "  println!(\"".to_string();
+    let num_tokens = tokens.len();
     
-    // Perform evaluation on token
-    let eval:(String, String, String, String) = evaluate(token);
-
-    // Choose what to output based on evaluation
-    if eval.3 == "string" {
-	// Code for printing strings
-	output = ["  println!(".to_string(),
-		  eval.2, ");\n".to_string()].concat(); 
-    } else if eval.3 == "eval" {
-	// Code for print variables
-	output = ["  println!(\"{}\", vars.get(\"".to_string(),
-		  eval.2, "\").expect(\"DNE!\").1);\n".to_string()].concat();
+    // Create formatting spaces
+    for _i in 1..num_tokens {
+	output = [output, "{}".to_string()].concat();
     }
+
+    // Append ending slash
+    output = [output, "\"".to_string()].concat();
+
+    // Evaluate each token given
+    for i in 1..num_tokens {
+	// Get next token
+	let token = tokens.get(i).expect("AST node does not exist!").to_string();
+	
+	// Perform evaluation on token
+	let eval:(String, String, String, String) = evaluate(token.clone());
+
+	// Choose what to output based on evaluation
+	if eval.3 == "string" {
+	    // Code for printing strings
+	    output = [output, ", ".to_string(), eval.2].concat(); 
+	} else if eval.3 == "eval" {
+	    // Code for printing variables
+	    output = [output, ", vars.get(\"".to_string(), eval.2,
+		      "\").expect(\"DNE!\").1".to_string()].concat();
+	}
+    }
+
+    // Append ending
+    output = [output, ");\n".to_string()].concat();
 
     return output;
 }
@@ -218,8 +234,17 @@ mod test {
     // Testing print_statement()
     #[test]
     fn print_1() {
-	let given = "\"Test\"".to_string();
-	let answer = "  println!(\"Test\");\n";
+	let given = vec!["PRINT".to_string(), "\"Test\"".to_string()];
+	let answer = "  println!(\"{}\", \"Test\");\n";
+
+	assert_eq!(answer, print_statement(given));
+    }
+
+    // Testing print_statement()
+    #[test]
+    fn print_2() {
+	let given = vec!["PRINT".to_string(), "\"Test\"".to_string(), "\"Sample\"".to_string()];
+	let answer = "  println!(\"{}{}\", \"Test\", \"Sample\");\n";
 
 	assert_eq!(answer, print_statement(given));
     }
@@ -273,7 +298,7 @@ mod test {
 	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "PRINT".to_string()))
 	    /tr(("eval".to_string(), "\"This is a sample\"".to_string()));
-	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  println!(\"This is a sample\");\n  line002(vars.clone());\n}\n".to_string();
+	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  println!(\"{}\", \"This is a sample\");\n  line002(vars.clone());\n}\n".to_string();
 	
 	assert_eq!(answer, create_function(given, "002".to_string()));
     }
@@ -297,7 +322,7 @@ mod test {
 	let given:Tree<(String, String)> = tr(("line_num".to_string(), "001".to_string()))
 	    /tr(("res".to_string(), "PRINT".to_string()))
 	    /tr(("eval".to_string(), "\"This is a sample\"".to_string()));
-	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  println!(\"This is a sample\");\n}\n".to_string();
+	let answer = "fn line001(mut vars:HashMap<String,(String,String)>) {\n  println!(\"{}\", \"This is a sample\");\n}\n".to_string();
 	
 	assert_eq!(answer, create_function(given, "".to_string()));
     }
