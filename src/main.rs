@@ -25,7 +25,7 @@ fn main() {
 
     // Parse arguements
     let mut basic_path = Path::new("/dev/null/");
-    for n in 0..args.len() {
+    for n in 1..args.len() {
 	let chars: Vec<char> = args[n].chars().collect();
 
 	// Check if flag
