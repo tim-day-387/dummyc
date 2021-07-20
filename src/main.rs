@@ -42,7 +42,7 @@ fn main() {
 		    silent_mode = false;
 		} else if c == 'c' {
 		    current_dir = true;
-		} else {
+		} else if c != '-' {
 		    panic!("Not a valid flag!");
 		}
 	    }
