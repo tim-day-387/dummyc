@@ -17,7 +17,8 @@ mod evaluator;
 // Main function code
 fn main() {
     // Define flags
-    let mut silent_mode = false;
+    let mut silent_mode = true;
+    let mut current_dir = false;
     let mut path_set = false;
     
     // Collect args of program
@@ -30,10 +31,19 @@ fn main() {
 
 	// Check if flag
 	if chars[0] == '-' {
+	    // Check length
+	    if chars.len() == 1 {
+		panic!("No flag specified!");
+            }
+	    
 	    // Check what flags to enable
 	    for c in chars {
 		if c == 's' {
-		    silent_mode = true;
+		    silent_mode = false;
+		} else if c == 'c' {
+		    current_dir = true;
+		} else {
+		    panic!("Not a valid flag!");
 		}
 	    }
 	} else {
@@ -74,6 +84,9 @@ fn main() {
     
     // Create file path
     let rust_path = Path::new("/tmp").join(filename).with_extension("rs");
+    if current_dir {
+	rust_path = Path::new(".").join(filename).with_extension("rs");
+    }
 
     // Open a file in write-only mode
     let mut file = match File::create(&rust_path) {
