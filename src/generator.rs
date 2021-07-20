@@ -225,11 +225,10 @@ fn if_statement(expression:String, goto:String, next_line:String) -> String {
 mod test {
     // General Imports
     extern crate trees;
-    use self::trees::{tr,Tree,Forest,Node};
+    use self::trees::{Tree};
 
     // File Imports
     use super::*;
-    use evaluator::evaluate;
 
     // Testing print_statement()
     #[test]
