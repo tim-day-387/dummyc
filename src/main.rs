@@ -83,7 +83,7 @@ fn main() {
     if silent_mode {println!("Done!")};
     
     // Create file path
-    let rust_path = Path::new("/tmp").join(filename).with_extension("rs");
+    let mut rust_path = Path::new("/tmp").join(filename).with_extension("rs");
     if current_dir {
 	rust_path = Path::new(".").join(filename).with_extension("rs");
     }
