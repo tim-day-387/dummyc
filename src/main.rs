@@ -16,14 +16,43 @@ mod evaluator;
 
 // Main function code
 fn main() {
-    // Collect args of program and check if right number
+    // Define flags
+    let mut silent_mode = false;
+    let mut path_set = false;
+    
+    // Collect args of program
     let args: Vec<String> = env::args().collect();
-    if args.len() != 2 {
-	panic!("Wrong number of arguements!");
+
+    // Parse arguements
+    let mut basic_path = Path::new("/dev/null/");
+    for n in 0..args.len() {
+	let chars: Vec<char> = args[n].chars().collect();
+
+	// Check if flag
+	if chars[0] == '-' {
+	    // Check what flags to enable
+	    for c in chars {
+		if c == 's' {
+		    silent_mode = true;
+		}
+	    }
+	} else {
+	    // Check if path is set
+	    if path_set == false {
+		basic_path = Path::new(&args[n]);
+		path_set = true;
+	    } else {
+		panic!("File path already specified!");
+	    }
+	}
+    }
+
+    // Check if there is a file path
+    if path_set == false {
+	panic!("File path not specified!");
     }
 
     // Get file name
-    let basic_path = Path::new(&args[1]);
     let filename = basic_path.file_stem().expect("DNE!");
     
     // Read file
@@ -31,17 +60,17 @@ fn main() {
 	.expect("Something went wrong reading the file!");
 
     // Perform lexing, parsing, generation
-    println!("Lexing {:?} ...", basic_path);
+    if silent_mode {println!("Lexing {:?} ...", basic_path)};
     let tokens = perform_lexing(contents.clone());
-    println!("Done!");
+    if silent_mode {println!("Done!")};
 
-    println!("Parsing {:?} ...", basic_path);
+    if silent_mode {println!("Parsing {:?} ...", basic_path)};
     let ast = construct_tree(tokens);
-    println!("Done!");
+    if silent_mode {println!("Done!")};
 
-    println!("Generating code for {:?} ...", basic_path);
+    if silent_mode {println!("Generating code for {:?} ...", basic_path)};
     let code = generate(ast);
-    println!("Done!");
+    if silent_mode {println!("Done!")};
     
     // Create file path
     let rust_path = Path::new("/tmp").join(filename).with_extension("rs");
@@ -55,6 +84,6 @@ fn main() {
     // Write the code string
     match file.write_all(code.as_bytes()) {
         Err(_) => panic!("Couldn't create file!"),
-        Ok(_) => println!("Successfully compiled and wrote to {:?} ", rust_path),
+        Ok(_) => if silent_mode {println!("Successfully compiled and wrote to {:?} ", rust_path)},
     }
 }
