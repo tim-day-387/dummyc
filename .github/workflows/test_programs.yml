@@ -43,10 +43,14 @@ jobs:
       run: |
         dpkg-deb --build dummyc
         sudo dpkg -i dummyc.deb
-    - name: Compile All Programs
+    - name: Compile 1st Program
       run: |
-        ls /home/runner/work/dummyc/dummyc/examples/ | grep "*.bas" | xargs -n1 "dummyc"
-        ls /tmp/ | grep "*.rs" | xargs -n1 "rustc"
+        dummyc program_1.bas
+        rustc /tmp/program_1.rs
+    - name: Compile 2nd Program
+      run: |
+        dummyc program_2.bas
+        rustc /tmp/program_2.rs
     - name: Run Programs and Stash Them
       run: |
         ./program_1 > program_1_output_prod
