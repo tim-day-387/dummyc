@@ -53,10 +53,9 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: program_1_output_prod
-        path: ./program_1_output_prod      
-    - name: Create diff File
-      run: diff program_1_output_prod /home/runner/work/dummyc/dummyc/examples/program_1_output > diff
-    - name: Check diff File
+        path: ./program_1_output_prod
+    - name: Check If Outputs Differ
       run: |
-        [ -s diff ]
+        diff program_1_output_prod /home/runner/work/dummyc/dummyc/examples/program_1_output > diff
+        [ -s diff ] && (exit -1) || (exit 0)
       
