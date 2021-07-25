@@ -45,11 +45,11 @@ jobs:
         sudo dpkg -i dummyc.deb
     - name: Compile 1st Program
       run: |
-        dummyc program_1.bas
+        dummyc /home/runner/work/dummyc/dummyc/examples/program_1.bas
         rustc /tmp/program_1.rs
     - name: Compile 2nd Program
       run: |
-        dummyc program_2.bas
+        dummyc /home/runner/work/dummyc/dummyc/examples/program_2.bas
         rustc /tmp/program_2.rs
     - name: Run Programs and Stash Them
       run: |
