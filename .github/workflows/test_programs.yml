@@ -23,14 +23,14 @@ jobs:
     - name: Make Control File
       run: |
         printf "Package: dummyc\n"  > ./dummyc/DEBIAN/control
-        printf "Version: 0.1\n"  > ./dummyc/DEBIAN/control
-        printf "Section: custom\n"  > ./dummyc/DEBIAN/control
-        printf "Priority: optional\n"  > ./dummyc/DEBIAN/control
-        printf "Architecture: all\n"  > ./dummyc/DEBIAN/control
-        printf "Essential: no\n"  > ./dummyc/DEBIAN/control
-        printf "Installed-Size: 1024\n"  > ./dummyc/DEBIAN/control
-        printf "Maintainer: tday141@gmail.com\n"  > ./dummyc/DEBIAN/control
-        printf "Description: Compiler for Minimal Basic (EMCA-55)\n" > ./dummyc/DEBIAN/control
+        printf "Version: 0.1\n"  >> ./dummyc/DEBIAN/control
+        printf "Section: custom\n"  >> ./dummyc/DEBIAN/control
+        printf "Priority: optional\n"  >> ./dummyc/DEBIAN/control
+        printf "Architecture: all\n"  >> ./dummyc/DEBIAN/control
+        printf "Essential: no\n"  >> ./dummyc/DEBIAN/control
+        printf "Installed-Size: 1024\n"  >> ./dummyc/DEBIAN/control
+        printf "Maintainer: tday141@gmail.com\n"  >> ./dummyc/DEBIAN/control
+        printf "Description: Compiler for Minimal Basic (EMCA-55)\n" >> ./dummyc/DEBIAN/control
     - name: Copy Binary to Directory
       run: |
         mkdir -p dummyc/usr/bin
