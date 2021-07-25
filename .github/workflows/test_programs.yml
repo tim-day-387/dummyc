@@ -1,0 +1,45 @@
+name: Test Programs
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: cargo build
+    - name: Make Debian Directory
+      run: mkdir -p dummyc/DEBIAN
+    - name: Make Control File
+      run: 'printf "Package: dummyc\nVersion: 0.1\nSection: custom\nPriority: optional\nArchitecture: all\nEssential: no\nInstalled-Size: 1024\nMaintainer: tday141@gmail.com\nDescription: Compiler for Minimal Basic (EMCA-55)\n" > ./dummyc/DEBIAN/control'
+    - name: Make Binary Directory
+      run: mkdir -p dummyc/usr/bin
+    - name: Copy Binary
+      run: cp /home/runner/work/dummyc/dummyc/target/debug/dummyc dummyc/usr/bin/dummyc
+    - name: Make a Man Directory
+      run: mkdir -p dummyc/usr/share/man/man1
+    - name: Copy Man Page
+      run: cp /home/runner/work/dummyc/dummyc/docs/dummyc.1.gz dummyc/usr/share/man/man1/dummyc.1.gz
+    - name: Build Package
+      run: dpkg-deb --build dummyc
+    - name: Install Package
+      run: sudo dpkg -i dummyc.deb
+    - name: Compile program_1.bas
+      run: dummyc /home/runner/work/dummyc/dummyc/examples/program_1.bas
+      | rustc /tmp/program_1.rs
+    - name: Run Program
+      run: ./program_1 > program_1_output_prod
+    - name: Ensure Outputs Match
+      run: diff program_1_output_prod /home/runner/work/dummyc/dummyc/examples/program_1_output > diff
+      | [ -s diff] || throw
+      
