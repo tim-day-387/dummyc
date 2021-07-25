@@ -49,6 +49,11 @@ jobs:
         rustc /tmp/program_1.rs
     - name: Run Program
       run: ./program_1 > program_1_output_prod
+    - name: Archive program_1_output_prod
+      uses: actions/upload-artifact@v2
+      with:
+        name: program_1_output_prod
+        path: ./program_1_output_prod      
     - name: Ensure Outputs Match
       run: |
         diff program_1_output_prod /home/runner/work/dummyc/dummyc/examples/program_1_output > diff
