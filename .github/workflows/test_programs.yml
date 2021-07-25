@@ -52,5 +52,5 @@ jobs:
     - name: Ensure Outputs Match
       run: |
         diff program_1_output_prod /home/runner/work/dummyc/dummyc/examples/program_1_output > diff
-        [ -s diff] || throw
+        [ -s diff ]
       
