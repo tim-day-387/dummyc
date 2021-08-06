@@ -51,10 +51,15 @@ jobs:
       run: |
         dummyc /home/runner/work/dummyc/dummyc/examples/program_2.bas
         rustc /tmp/program_2.rs
+    - name: Compile 3rd Program
+      run: |
+        dummyc /home/runner/work/dummyc/dummyc/examples/program_3.bas
+        rustc /tmp/program_3.rs
     - name: Run Programs and Stash Them
       run: |
         ./program_1 > program_1_output_prod
         ./program_2 > program_2_output_prod
+	./program_3 > program_3_output_prod
         mkdir outputs
         cp *_prod outputs
     - name: Archive Program Outputs
@@ -67,5 +72,7 @@ jobs:
         diff program_1_output_prod /home/runner/work/dummyc/dummyc/examples/program_1_output > diff
         [ -s diff ] && (exit -1) || (exit 0)
         diff program_2_output_prod /home/runner/work/dummyc/dummyc/examples/program_2_output > diff
+        [ -s diff ] && (exit -1) || (exit 0)
+	diff program_3_output_prod /home/runner/work/dummyc/dummyc/examples/program_3_output > diff
         [ -s diff ] && (exit -1) || (exit 0)
       
