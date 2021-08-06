@@ -27,12 +27,12 @@ pub fn evaluate(token:String) -> (String, String, String, String) {
         }
     }
 
-    // If relational == 0, we're not in a relation 
+    // If relational.len() == 0, we're not in a relation 
     if relational.len() == 0 {
 	output0 = "".to_string();
 	output1 = "".to_string();
 	output2 = variable.into_iter().collect();
-	output3 = find_token(output2.clone());
+	output3 = return_type(output2.clone());
     } else {
 	let calculation = calculate(expression.into_iter().collect());
 	output0 = variable.into_iter().collect();
@@ -52,111 +52,28 @@ pub fn evaluate(token:String) -> (String, String, String, String) {
 
 // Give a Rust statement to calc the expression, give type it'll return
 fn calculate(expression:String) -> (String, String) {
-    let mut output:(String, String) = ("".to_string(), "".to_string());
+    let output:(String, String);
 
     // If the expression is a string, return thus
-    if is_string(expression.clone()) {
-	output = ([expression.clone(), ".to_string()".to_string()].concat(), "string".to_string());
-    }
+    output = ([expression.clone(), ".to_string()".to_string()].concat(), "string".to_string());
 
     return output
 }
 
-// Classify token
-pub fn find_token(token:String) -> String {
-    let output:String;
+// Determine the return type of an expression
+fn return_type(expression:String) -> String {
+    let expression_bytes = expression.as_bytes();
+    let mut output:String = "variable".to_string();
 
-    // Find what find of token we're looking at
-    if is_int(token.clone()) {
-	output = "int".to_string();
-    } else if is_string(token.clone()) {
-	output = "string".to_string();
-    } else if is_res(token.clone()) {
-	output = "res".to_string();
-    } else if is_float(token.clone()) {
-	output = "float".to_string();	
-    } else {
-	output = "eval".to_string();
+    // Step through each char
+    for i in 0..expression.len() {
+	// Check if expression has strings 
+	if expression_bytes[i] == b'"' {
+	    output = "string".to_string();
+	} 
     }
 
     return output;
-}
-
-// Check if float
-fn is_float(token:String) -> bool {
-    let char_vec:Vec<char> = token.chars().collect();
-    let mut output = true;
-    let mut seen_point = false;
-
-    // If every char is a digit, or a decimal point
-    for c in char_vec {
-	// Check if char is digit
-	if !c.is_digit(10) {
-	    // Check if char is a point
-	    if c != '.' {
-		// Not a point, not a float
-		output = false;
-	    } else if seen_point {
-		// Already had a point, not a float
-		output = false;
-	    } else {
-		// First point, might be a float
-		seen_point = true;
-	    }
-	}    
-    }
-
-    // Must have seen a point 
-    output = output & seen_point;
-    
-    return output;
-}
-
-// Check if integer
-fn is_int(token:String) -> bool {
-    let char_vec:Vec<char> = token.chars().collect();
-    let mut output = true;
-
-    // If every char is a digit, we have a number
-    for c in char_vec {
-	output = output && c.is_digit(10);
-    }
-
-    return output;
-}
-
-// Check if string
-fn is_string(token:String) -> bool {
-    let char_vec:Vec<char> = token.chars().collect();
-    let last = char_vec.len()-1;
-    let mut output = false;
-
-    // If the first and last chars are ", we have a string
-    if char_vec.get(0).expect("First char missing!") == &'"' &&
-	char_vec.get(last).expect("First char missing!") == &'"' {
-	    output = true;
-	}
-
-    return output;
-}
-
-// Check if a reserved token
-fn is_res(token:String) -> bool {
-    let reserved_tokens:Vec<String> = vec!["IF".to_string(), "THEN".to_string(),
-					   "GOTO".to_string(), "FOR".to_string(),
-					   "TO".to_string(), "NEXT".to_string(),
-					   "RETURN".to_string(), "GOSUB".to_string(),
-					   "PRINT".to_string(), "LET".to_string(),
-					   "DIM".to_string(), "INPUT".to_string(),
-					   "READ".to_string(), "DATA".to_string(),
-					   "END".to_string()];
-
-    // Check if token is one of the reserved_tokens
-    if reserved_tokens.contains(&token) {
-	return true;
-    } else {
-	return false;
-    }
 }
 
 // Testing methods
@@ -165,150 +82,6 @@ mod test {
     // File Imports
     use evaluator::*;
     
-    // Testing find_token()
-    #[test]
-    fn find_1() {
-	let given:String = "031".to_string();
-	let answer:String = "int".to_string();
-
-	assert_eq!(answer, find_token(given));
-    }
-
-    // Testing find_token()
-    #[test]
-    fn find_2() {
-	let given:String = "\"This is a sample\"".to_string();
-	let answer:String = "string".to_string();
-
-	assert_eq!(answer, find_token(given));
-    }
-
-    // Testing find_token()
-    #[test]
-    fn find_3() {
-	let given:String = "G3gedg444".to_string();
-	let answer:String = "eval".to_string();
-
-	assert_eq!(answer, find_token(given));
-    }
-
-    // Testing find_token()
-    #[test]
-    fn find_4() {
-	let given:String = ".1326546".to_string();
-	let answer:String = "float".to_string();
-
-	assert_eq!(answer, find_token(given));
-    }
-    
-    // Testing is_string()
-    #[test]
-    fn is_s_1() {
-	let given:String = "0F1".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_string(given));
-    }
-
-    // Testing is_string()
-    #[test]
-    fn is_s_2() {
-	let given:String = "\"0F1\"".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_string(given));
-    }
-
-    // Testing is_string()
-    #[test]
-    fn is_s_3() {
-	let given:String = "\"This is a sample string\"".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_string(given));
-    }
-    
-    // Testing is_float()
-    #[test]
-    fn is_f_1() {
-	let given:String = "0F1".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_float(given));
-    }
-
-    // Testing is_float()
-    #[test]
-    fn is_f_2() {
-	let given:String = "387".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_float(given));
-    }
-
-    // Testing is_number()
-    #[test]
-    fn is_f_3() {
-	let given:String = "38.7".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_float(given));
-    }
-    
-    // Testing is_int()
-    #[test]
-    fn is_i_1() {
-	let given:String = "0F1".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_int(given));
-    }
-
-    // Testing is_int()
-    #[test]
-    fn is_i_2() {
-	let given:String = "LET".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_int(given));
-    }
-
-    // Testing is_int()
-    #[test]
-    fn is_i_3() {
-	let given:String = "387".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_int(given));
-    }
-
-    // Testing is_res()
-    #[test]
-    fn is_r_1() {
-	let given:String = "3".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_res(given));
-    }
-
-    // Testing is_res()
-    #[test]
-    fn is_r_2() {
-	let given:String = "LET".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_res(given));
-    }
-
-    // Testing is_res()
-    #[test]
-    fn is_r_3() {
-	let given:String = "IFAND".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_res(given));
-    }    
-
     // Testing evaluate()
     #[test]
     fn eval_1() {
