@@ -59,8 +59,8 @@ jobs:
       run: |
         ./program_1 > program_1_output_prod
         ./program_2 > program_2_output_prod
-	./program_3 > program_3_output_prod
-	mkdir outputs
+        ./program_3 > program_3_output_prod
+        mkdir outputs
         cp *_prod outputs
     - name: Archive Program Outputs
       uses: actions/upload-artifact@v2
@@ -74,5 +74,5 @@ jobs:
         diff program_2_output_prod /home/runner/work/dummyc/dummyc/examples/program_2_output > diff
         [ -s diff ] && (exit -1) || (exit 0)
 	diff program_3_output_prod /home/runner/work/dummyc/dummyc/examples/program_3_output > diff
-        [ -s diff ] && (exit -1) || (exit 0)
+	[ -s diff ] && (exit -1) || (exit 0)
       
