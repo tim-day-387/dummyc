@@ -172,7 +172,7 @@ fn print_statement(tokens:Vec<String>) -> String {
 	if eval.3 == "string" {
 	    // Code for printing strings
 	    output = [output, ", ".to_string(), eval.2].concat(); 
-	} else if eval.3 == "eval" {
+	} else if eval.3 == "variable" {
 	    // Code for printing variables
 	    output = [output, ", vars.get(\"".to_string(), eval.2,
 		      "\").expect(\"DNE!\").1".to_string()].concat();
