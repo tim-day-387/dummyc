@@ -4,6 +4,7 @@ use std::env;
 //use std::fs;
 //use std::fs::File;
 use std::path::Path;
+use std::collections::HashMap;
 
 // File Imports
 mod lexer;
@@ -56,7 +57,11 @@ fn main() {
 // Interactive prompt for the BASIC interpreter
 fn interactive() {
     // Useful variables
-    let mut line = String::new();
+    let mut line:String = String::new();
+    let mut var_types:HashMap<String, String> = HashMap::new();
+    let mut string_vals:HashMap<String, String> = HashMap::new();
+    let mut state;
+    let mut silence = true;
 
     // Starting Message
     std::io::stdout().write("Start Prompt!\n".as_bytes()).unwrap();
@@ -76,8 +81,15 @@ fn interactive() {
 	    break;
 	}
 
-	// Execute given command
-	exec_command(line);
+	// Check silence conditions
+	if line == "DEVTALK\n".to_string() {
+	    silence = !silence;
+	}
+
+	// Execute given command, update state
+	state = exec_command(line, silence, var_types.clone(), string_vals.clone());
+	var_types = state.0;
+	string_vals = state.1;
 	
 	// Reset line variable
 	line = String::new();
@@ -85,16 +97,46 @@ fn interactive() {
 }
 
 // Execute the given command
-fn exec_command(line:String) {
-	// Lex command
-	let tokens = perform_lexing(line.clone());
-	
-	// Write out command
+fn exec_command(line:String, silence:bool, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>) {
+    // Lex command
+    let tokens = perform_lexing(line.clone());
+    let mut text:Vec<String> = Vec::new();
+    let mut class:Vec<String> = Vec::new();
+
+    // Write out command
+    if !silence {
 	std::io::stdout().write("COMMAND TEXT: ".as_bytes()).unwrap();
 	std::io::stdout().write(line.as_bytes()).unwrap();
-
-	// Write out tokens
-	for t in tokens {
+    }
+	
+    // Write out tokens
+    for t in tokens {
+	if !silence {
 	    println!("TOKEN: {} {} {}", t.0, t.1, t.2);
 	}
+	text.push(t.1);
+	class.push(t.2);
+    }
+
+    // Check if command is present
+    if text.len() <= 1 {
+	// Return updated state
+	return (types, strings)
+    }
+
+    // Set keyword
+    let keyword = text[1].clone();
+
+    // Execute given command
+    if keyword == "PRINT".to_string() {
+	println!("{}", text[2]);
+    } else if keyword == "GOTO".to_string() {
+    } else if keyword == "LET".to_string() {
+    } else if keyword == "IF".to_string() {
+    } else if keyword == "END".to_string() {
+    }    
+
+
+    // Return updated state
+    return (types, strings)
 }
