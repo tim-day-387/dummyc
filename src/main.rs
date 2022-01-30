@@ -6,8 +6,8 @@ use std::env;
 use std::path::Path;
 
 // File Imports
-//mod lexer;
-//use lexer::*;
+mod lexer;
+use lexer::*;
 //mod parser;
 //use parser::*;
 //mod generator;
@@ -55,23 +55,46 @@ fn main() {
 
 // Interactive prompt for the BASIC interpreter
 fn interactive() {
+    // Useful variables
     let mut line = String::new();
-    
+
+    // Starting Message
     std::io::stdout().write("Start Prompt!\n".as_bytes()).unwrap();
     let _ = std::io::stdout().flush();
-    
+
+    // Interactive prompt main loop
     loop {
+	// Pointer
 	std::io::stdout().write("~~> ".as_bytes()).unwrap();
 	let _ = std::io::stdout().flush();
 
+	// Collect input
 	std::io::stdin().read_line(&mut line).unwrap();
 
-	if line == "EXIT\n".to_string() {
+	// Check exit conditions
+	if line == "DEVSTOP\n".to_string() {
 	    break;
 	}
 
-	std::io::stdout().write(line.as_bytes()).unwrap();
-
+	// Execute given command
+	exec_command(line);
+	
+	// Reset line variable
 	line = String::new();
     }
+}
+
+// Execute the given command
+fn exec_command(line:String) {
+	// Lex command
+	let tokens = perform_lexing(line.clone());
+	
+	// Write out command
+	std::io::stdout().write("COMMAND TEXT: ".as_bytes()).unwrap();
+	std::io::stdout().write(line.as_bytes()).unwrap();
+
+	// Write out tokens
+	for t in tokens {
+	    println!("TOKEN: {} {} {}", t.0, t.1, t.2);
+	}
 }
