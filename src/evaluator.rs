@@ -55,7 +55,7 @@ fn calculate(expression:String) -> (String, String) {
     let output:(String, String);
 
     // If the expression is a string, return thus
-    output = ([expression.clone(), ".to_string()".to_string()].concat(), "string".to_string());
+    output = (expression.clone(), "string".to_string());
 
     return output
 }
@@ -86,7 +86,7 @@ mod test {
     #[test]
     fn eval_1() {
 	let given:String = "T=\"Test\"".to_string();
-	let answer = ("T".to_string(), "=".to_string(), "\"Test\".to_string()".to_string(),
+	let answer = ("T".to_string(), "=".to_string(), "\"Test\"".to_string(),
 		      "string".to_string());
 
 	assert_eq!(answer, evaluate(given));

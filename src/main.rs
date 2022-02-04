@@ -13,7 +13,8 @@ use lexer::*;
 //use parser::*;
 //mod generator;
 //use generator::*;
-//mod evaluator;
+mod evaluator;
+use evaluator::*;
 
 // Main function code
 fn main() {
@@ -97,7 +98,7 @@ fn interactive() {
 }
 
 // Execute the given command
-fn exec_command(line:String, silence:bool, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>) {
+fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>) {
     // Lex command
     let tokens = perform_lexing(line.clone());
     let mut text:Vec<String> = Vec::new();
@@ -108,7 +109,7 @@ fn exec_command(line:String, silence:bool, types:HashMap<String, String>, string
 	std::io::stdout().write("COMMAND TEXT: ".as_bytes()).unwrap();
 	std::io::stdout().write(line.as_bytes()).unwrap();
     }
-	
+    
     // Write out tokens
     for t in tokens {
 	if !silence {
@@ -129,13 +130,51 @@ fn exec_command(line:String, silence:bool, types:HashMap<String, String>, string
 
     // Execute given command
     if keyword == "PRINT".to_string() {
-	println!("{}", text[2]);
+	// Determine how to print
+	if class[2] == "string".to_string() {
+	    // Output the string
+	    println!("{}", text[2]);
+	} else if class[2] == "eval".to_string() {
+	    // Get the type of the variable
+	    match types.get(&text[2]) {
+		Some(kind)=> {
+		    // Get and print value
+		    if kind == &"string".to_string() {
+			println!("{}", &text[2]);
+			match strings.get(&text[2]) {
+			    Some(value)=> println!("{}", value),
+			    _=> println!("ERROR VAL"),
+			}
+		    }		    
+		},
+		_=> {
+		    // Error
+		    println!("ERROR TYPE");
+		},
+	    }
+	}
     } else if keyword == "GOTO".to_string() {
     } else if keyword == "LET".to_string() {
+	// Use evaluator
+	let eval_output = evaluate(text[2].clone());
+	let var_name = eval_output.0;
+	let _rel = eval_output.1;
+	let mut val = eval_output.2;
+	let kind = eval_output.3;
+
+	// Insert name and type
+	types.insert(var_name.clone(), kind.clone());
+
+	// Where to store variable
+	if kind.clone() == "string".to_string() {
+	    println!("{}", var_name.clone());
+	    val.pop();   
+	    val.remove(0);
+	    strings.insert(var_name.clone(), val);
+	}	
     } else if keyword == "IF".to_string() {
     } else if keyword == "END".to_string() {
     }    
-
 
     // Return updated state
     return (types, strings)
