@@ -9,10 +9,6 @@ use std::collections::HashMap;
 // File Imports
 mod lexer;
 use lexer::*;
-//mod parser;
-//use parser::*;
-//mod generator;
-//use generator::*;
 mod evaluator;
 use evaluator::*;
 
