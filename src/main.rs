@@ -128,6 +128,10 @@ fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>, mu
     if keyword == "PRINT".to_string() {
 	// Determine how to print
 	if class[2] == "string".to_string() {
+	    // Remove parathesis
+	    text[2].pop();
+	    text[2].remove(0);
+
 	    // Output the string
 	    println!("{}", text[2]);
 	} else if class[2] == "eval".to_string() {
@@ -136,7 +140,6 @@ fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>, mu
 		Some(kind)=> {
 		    // Get and print value
 		    if kind == &"string".to_string() {
-			println!("{}", &text[2]);
 			match strings.get(&text[2]) {
 			    Some(value)=> println!("{}", value),
 			    _=> println!("ERROR VAL"),
@@ -163,7 +166,6 @@ fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>, mu
 
 	// Where to store variable
 	if kind.clone() == "string".to_string() {
-	    println!("{}", var_name.clone());
 	    val.pop();   
 	    val.remove(0);
 	    strings.insert(var_name.clone(), val);
