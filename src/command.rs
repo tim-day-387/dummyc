@@ -10,11 +10,12 @@ use lexer::perform_lexing;
 use evaluator::evaluate;
 
 // Execute the given command
-pub fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>) {
+pub fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
     // Lex command
     let tokens = perform_lexing(line.clone());
     let mut text:Vec<String> = Vec::new();
     let mut class:Vec<String> = Vec::new();
+    let mut goto:i64 = -1;
 
     // Write out command
     if !silence {
@@ -32,9 +33,12 @@ pub fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>
     }
 
     // Check if command is present
-    if text.len() <= 1 {
+    if text.len() == 1 {
 	// Return updated state
-	return (types, strings)
+	return (types, strings, goto, text[0].clone().parse::<i64>().unwrap())
+    } else if text.len() == 0 {
+	// Return updated state
+	return (types, strings, goto, -1)
     }
 
     // Set keyword
@@ -69,6 +73,7 @@ pub fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>
 	    }
 	}
     } else if keyword == "GOTO".to_string() {
+	goto = text[2].clone().parse::<i64>().unwrap();
     } else if keyword == "LET".to_string() {
 	// Use evaluator
 	let eval_output = evaluate(text[2].clone());
@@ -91,5 +96,5 @@ pub fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>
     }    
 
     // Return updated state
-    return (types, strings)
+    return (types, strings, goto, text[0].clone().parse::<i64>().unwrap())
 }
