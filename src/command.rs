@@ -25,10 +25,10 @@ pub fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>
     // Write out tokens
     for t in tokens {
 	if !silence {
-	    println!("TOKEN: {} {} {}", t.0, t.1, t.2);
+	    println!("TOKEN: {} {}", t.0, t.1);
 	}
-	text.push(t.1);
-	class.push(t.2);
+	text.push(t.0);
+	class.push(t.1);
     }
 
     // Check if command is present
