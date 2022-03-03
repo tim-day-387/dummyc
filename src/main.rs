@@ -59,13 +59,48 @@ fn interactive() {
     let mut string_vals:HashMap<String, String> = HashMap::new();
     let mut state;
     let mut silence = true;
+    let mut next_line = -1;
+    let mut prev_line = -1;
+    let mut prev_code:Vec<(i64, String)> = Vec::new();
 
     // Starting Message
     std::io::stdout().write("Start Prompt!\n".as_bytes()).unwrap();
     let _ = std::io::stdout().flush();
 
     // Interactive prompt main loop
-    loop {
+    loop {		
+	// Reset line variable
+	line = String::new();
+	
+	// Execute any previous commands
+	loop {
+	    let mut command:String = "".to_string();
+	    
+	    // Find next command to execute
+	    for items in &prev_code {
+		if next_line == -1 && prev_line < items.0 {
+		    command = items.1.clone();
+		    break;
+		} else if next_line != -1 && next_line <= items.0 {
+		    command = items.1.clone();
+		    break;
+		}
+	    }
+
+	    // Check if there is a line
+	    if command == "".to_string() {
+		// There are no more commands
+		break;
+	    } else {
+		// Execute given command, update state
+		state = exec_command(command.clone(), silence, var_types.clone(), string_vals.clone());
+		var_types = state.0;
+		string_vals = state.1;
+		next_line = state.2;
+		prev_line = state.3;
+            }
+	}
+
 	// Pointer
 	std::io::stdout().write("~~> ".as_bytes()).unwrap();
 	let _ = std::io::stdout().flush();
@@ -81,14 +116,17 @@ fn interactive() {
 	// Check silence conditions
 	if line == "DEVTALK\n".to_string() {
 	    silence = !silence;
+	    continue;
 	}
 
 	// Execute given command, update state
-	state = exec_command(line, silence, var_types.clone(), string_vals.clone());
+	state = exec_command(line.clone(), silence, var_types.clone(), string_vals.clone());
 	var_types = state.0;
 	string_vals = state.1;
-	
-	// Reset line variable
-	line = String::new();
+	next_line = state.2;
+	prev_line = state.3;
+
+	// Add line to previous code
+	prev_code.push((prev_line, line.clone()));
     }
 }
