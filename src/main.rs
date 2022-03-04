@@ -1,10 +1,9 @@
 // General Imports
-use std::io::Write;
 use std::env;
-//use std::fs;
-//use std::fs::File;
 use std::path::Path;
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::{self, BufRead, Write};
 
 // File Imports
 mod lexer;
@@ -14,18 +13,16 @@ use command::*;
 
 // Main function code
 fn main() {
-    // Define flags
+    // Useful variables
     let mut path_set = false;
-    
-    // Collect args of program
-    let args: Vec<String> = env::args().collect();
+    let args: Vec<String> = env::args().collect(); 
+    let mut basic_path = Path::new(".");
 
-    // Parse arguements
-    let mut _basic_path;
+    // Parse arguments
     for n in 1..args.len() {
 	// Check if path is set
 	if path_set == false {
-	    _basic_path = Path::new(&args[n]);
+	    basic_path = Path::new(&args[n]);
 	    path_set = true;
 	} else {
 	    panic!("File path already specified!");
@@ -34,27 +31,73 @@ fn main() {
 
     // Interpret file or run interactive?
     if path_set == true {
-	println!("Run file!");
+	script(basic_path);
     } else {
 	interactive();
     }	
+}
 
-    // Check if there is a file path
-    //if path_set == false {
-    //	panic!("File path not specified!");
-    //}
+// Returns an Iterator to the Reader of the lines of the file.
+fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> where P: AsRef<Path>, {
+    let file = File::open(filename)?;
+    Ok(io::BufReader::new(file).lines())
+}
 
-    // Get file name
-    //let filename = basic_path.file_stem().expect("DNE!");
-    
-    // Read file
-    //let contents = fs::read_to_string(basic_path).expect("Something went wrong reading the file!");
+// File interpreter
+fn script(file_path:&Path) {
+    // Useful variables
+    let mut var_types:HashMap<String, String> = HashMap::new();
+    let mut string_vals:HashMap<String, String> = HashMap::new();
+    let mut state;
+    let mut next_line = -1;
+    let mut prev_line = -1;
+    let mut line_num;
+    let mut prev_code:Vec<(i64, String)> = Vec::new();
+
+    // Add all lines in the code to prev_code
+    if let Ok(lines) = read_lines(file_path) {
+        for line in lines {
+            if let Ok(ip) = line {
+                line_num = get_line_num(ip.clone());
+		prev_code.push((line_num, ip.clone()));
+            }
+        }
+    }
+
+    // Execute any previous commands
+    loop {
+	let mut command:String = "".to_string();
+	
+	// Find next command to execute
+	for items in &prev_code {
+	    if next_line == -1 && prev_line < items.0 {
+		command = items.1.clone();
+		break;
+	    } else if next_line != -1 && next_line <= items.0 {
+		command = items.1.clone();
+		break;
+	    }
+	}
+
+	// Check if there is a line
+	if command == "".to_string() {
+	    // There are no more commands
+	    break;
+	} else {
+	    // Execute given command, update state
+	    state = exec_command(command.clone(), true, var_types.clone(), string_vals.clone());
+	    var_types = state.0;
+	    string_vals = state.1;
+	    next_line = state.2;
+	    prev_line = state.3;
+        }
+    }
 }
 
 // Interactive prompt for the BASIC interpreter
 fn interactive() {
     // Useful variables
-    let mut line:String = String::new();
+    let mut line:String;
     let mut var_types:HashMap<String, String> = HashMap::new();
     let mut string_vals:HashMap<String, String> = HashMap::new();
     let mut state;
