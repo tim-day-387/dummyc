@@ -58,30 +58,41 @@ pub fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>
 
     // Execute given command
     if keyword == "PRINT".to_string() {
-	// Determine how to print
-	if class[2] == "string".to_string() {
-	    // Remove parathesis
-	    text[2].pop();
-	    text[2].remove(0);
+	let mut counter = 2;
 
-	    // Output the string
-	    println!("{}", text[2]);
-	} else if class[2] == "eval".to_string() {
-	    // Get the type of the variable
-	    match types.get(&text[2]) {
-		Some(kind)=> {
-		    // Get and print value
-		    if kind == &"string".to_string() {
-			match strings.get(&text[2]) {
-			    Some(value)=> println!("{}", value),
-			    _=> println!("ERROR VAL"),
-			}
-		    }		    
-		},
-		_=> {
-		    // Error
-		    println!("ERROR TYPE");
-		},
+	loop {
+	    // Determine how to print
+	    if class[counter] == "string".to_string() {
+		// Remove parathesis
+		text[counter].pop();
+		text[counter].remove(0);
+
+		// Output the string
+		print!("{}", text[counter]);
+	    } else if class[counter] == "eval".to_string() {
+		// Get the type of the variable
+		match types.get(&text[counter]) {
+		    Some(kind)=> {
+			// Get and print value
+			if kind == &"string".to_string() {
+			    match strings.get(&text[counter]) {
+				Some(value)=> print!("{}", value),
+				_=> println!("ERROR VAL"),
+			    }
+			}		    
+		    },
+		    _=> {
+			// Error
+			println!("ERROR TYPE");
+		    },
+		}
+	    }
+
+	    counter = counter + 1;
+
+	    if counter == text.len() {
+		println!("");
+		break;
 	    }
 	}
     } else if keyword == "GOTO".to_string() {
