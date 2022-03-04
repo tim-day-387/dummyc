@@ -61,12 +61,16 @@ jobs:
       with:
         name: outputs
         path: outputs
-    - name: Check If Outputs Differ
+    - name: Check If Outputs Differ 1
       run: |
         diff program_1_output_prod /home/runner/work/dummyc/dummyc/examples/program_1_output > diff
         [ -s diff ] && (exit -1) || (exit 0)
+    - name: Check If Outputs Differ 2
+      run: |
         diff program_2_output_prod /home/runner/work/dummyc/dummyc/examples/program_2_output > diff
         [ -s diff ] && (exit -1) || (exit 0)
+    - name: Check If Outputs Differ 3
+      run: |
         diff program_3_output_prod /home/runner/work/dummyc/dummyc/examples/program_3_output > diff
         [ -s diff ] && (exit -1) || (exit 0)
 
