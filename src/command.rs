@@ -9,6 +9,18 @@ use std::collections::HashMap;
 use lexer::perform_lexing;
 use evaluator::evaluate;
 
+// Get line number
+pub fn get_line_num(line:String) -> i64 {
+    let tokens = perform_lexing(line.clone());
+    let mut text:Vec<String> = Vec::new();
+
+    for t in tokens {
+	text.push(t.0);
+    }
+
+    return text[0].clone().parse::<i64>().unwrap()
+}
+
 // Execute the given command
 pub fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
     // Lex command
@@ -93,6 +105,7 @@ pub fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>
 	}	
     } else if keyword == "IF".to_string() {
     } else if keyword == "END".to_string() {
+	goto = i64::MAX;
     }    
 
     // Return updated state
