@@ -36,15 +36,13 @@ pub fn exec_command(line:String, silence:bool, types:HashMap<String, String>, st
 
 // Find subcommand to execute
 fn find_subcommand(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
-    let mut goto:i64 = -1;
-    
     // Check if command is present
     if text.len() == 1 {
 	// Return updated state
-	return (types, strings, goto, text[0].clone().parse::<i64>().unwrap())
+	return (types, strings, -1, text[0].clone().parse::<i64>().unwrap())
     } else if text.len() == 0 {
 	// Return updated state
-	return (types, strings, goto, -1)
+	return (types, strings, -1, -1)
     }
 
     // Set keyword
@@ -52,102 +50,142 @@ fn find_subcommand(text:Vec<String>, class:Vec<String>, mut types:HashMap<String
 
     // Execute given command
     if keyword == "PRINT".to_string() {
-	let mut counter = 2;
-
-	loop {
-	    // Determine how to print
-	    if class[counter] == "string".to_string() {
-		// Remove parathesis
-		let mut string = text[counter].clone();
-		string.pop();
-		string.remove(0);
-
-		// Output the string
-		print!("{}", string);
-	    } else if class[counter] == "eval".to_string() {
-		// Get the type of the variable
-		match types.get(&text[counter]) {
-		    Some(kind)=> {
-			// Get and print value
-			if kind == &"string".to_string() {
-			    match strings.get(&text[counter]) {
-				Some(value)=> print!("{}", value),
-				_=> println!("ERROR VAL"),
-			    }
-			}		    
-		    },
-		    _=> {
-			// Error
-			println!("ERROR TYPE");
-		    },
-		}
-	    }
-
-	    counter = counter + 1;
-
-	    if counter == text.len() {
-		println!("");
-		break;
-	    }
-	}
+	return print_cmd(text, class, types, strings);
     } else if keyword == "GOTO".to_string() {
-	goto = text[2].clone().parse::<i64>().unwrap();
+	return goto_cmd(text, class, types, strings);
     } else if keyword == "LET".to_string() {
-	// Use evaluator
-	let eval_output = evaluate(text[2].clone());
-	let var_name = eval_output.0;
-	let _rel = eval_output.1;
-	let val = eval_output.2;
-	let kind = eval_output.3;
-
-	// Insert name and type
-	types.insert(var_name.clone(), kind.clone());
-
-	// Where to store variable
-	if kind.clone() == "string".to_string() {
-	    let mut string = val.clone();
-	    string.pop();   
-	    string.remove(0);
-	    strings.insert(var_name.clone(), string);
-	}	
+	return let_cmd(text, class, types, strings);
     } else if keyword == "IF".to_string() {
-	// Use evaluator
-	let eval_output = evaluate(text[2].clone());
-	let var_name = eval_output.0;
-	let _rel = eval_output.1;
-	let val = eval_output.2;
-	let mut var_val = &"".to_string();
-
-	// Remove parathesis
-	let mut string = val.clone();
-	string.pop();
-	string.remove(0);
-
-	// Get variable value
-	match types.get(&var_name) {
-	    Some(kind)=> {
-		// Get and print value
-		if kind == &"string".to_string() {
-		    match strings.get(&var_name) {
-			Some(value)=> var_val = value,
-			_=> println!("ERROR VAL"),
-		    }
-		}		    
-	    },
-	    _=> {
-		// Error
-		println!("ERROR TYPE");
-	    },
-	}
-
-	// Check if equivalent
-	if var_val == &string {
-	    goto = text[4].clone().parse::<i64>().unwrap();
-	}
+	return if_cmd(text, class, types, strings);
     } else if keyword == "END".to_string() {
-	goto = i64::MAX;
-    }    
+	return end_cmd(text, class, types, strings);
+    } else {
+	return (types, strings, i64::MAX, text[0].clone().parse::<i64>().unwrap())
+    }
+}
+
+// Implmentation of the PRINT command
+fn print_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+    let mut goto = -1;
+    let mut counter = 2;
+
+    loop {
+	// Determine how to print
+	if class[counter] == "string".to_string() {
+	    // Remove parathesis
+	    let mut string = text[counter].clone();
+	    string.pop();
+	    string.remove(0);
+
+	    // Output the string
+	    print!("{}", string);
+	} else if class[counter] == "eval".to_string() {
+	    // Get the type of the variable
+	    match types.get(&text[counter]) {
+		Some(kind)=> {
+		    // Get and print value
+		    if kind == &"string".to_string() {
+			match strings.get(&text[counter]) {
+			    Some(value)=> print!("{}", value),
+			    _=> println!("ERROR VAL"),
+			}
+		    }		    
+		},
+		_=> {
+		    // Error
+		    println!("ERROR TYPE");
+		},
+	    }
+	}
+
+	counter = counter + 1;
+
+	if counter == text.len() {
+	    println!("");
+	    break;
+	}
+    }
 
     // Return updated state
     return (types, strings, goto, text[0].clone().parse::<i64>().unwrap())
+}
+
+// Implmentation of the GOTO command
+fn goto_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+    // Return updated state
+    return (types, strings, text[2].clone().parse::<i64>().unwrap(), text[0].clone().parse::<i64>().unwrap())
+}
+
+// Implmentation of the LET command
+fn let_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+    let mut goto = -1;
+    
+    // Use evaluator
+    let eval_output = evaluate(text[2].clone());
+    let var_name = eval_output.0;
+    let _rel = eval_output.1;
+    let val = eval_output.2;
+    let kind = eval_output.3;
+
+    // Insert name and type
+    types.insert(var_name.clone(), kind.clone());
+
+    // Where to store variable
+    if kind.clone() == "string".to_string() {
+	let mut string = val.clone();
+	string.pop();   
+	string.remove(0);
+	strings.insert(var_name.clone(), string);
+    }	
+
+    // Return updated state
+    return (types, strings, goto, text[0].clone().parse::<i64>().unwrap())
+}
+
+// Implmentation of the IF command
+fn if_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+    let mut goto = -1;
+
+    // Use evaluator
+    let eval_output = evaluate(text[2].clone());
+    let var_name = eval_output.0;
+    let _rel = eval_output.1;
+    let val = eval_output.2;
+    let mut var_val = &"".to_string();
+
+    // Remove parathesis
+    let mut string = val.clone();
+    string.pop();
+    string.remove(0);
+
+    // Get variable value
+    match types.get(&var_name) {
+	Some(kind)=> {
+	    // Get and print value
+	    if kind == &"string".to_string() {
+		match strings.get(&var_name) {
+		    Some(value)=> var_val = value,
+		    _=> println!("ERROR VAL"),
+		}
+	    }		    
+	},
+	_=> {
+	    // Error
+	    println!("ERROR TYPE");
+	},
+    }
+
+    // Check if equivalent
+    if var_val == &string {
+	goto = text[4].clone().parse::<i64>().unwrap();
+    }
+
+    // Return updated state
+    return (types, strings, goto, text[0].clone().parse::<i64>().unwrap())
+}
+
+// Implmentation of the END command
+fn end_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+    // Return updated state
+    return (types, strings, i64::MAX, text[0].clone().parse::<i64>().unwrap())
 }
