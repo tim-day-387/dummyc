@@ -35,7 +35,7 @@ pub fn exec_command(line:String, silence:bool, types:HashMap<String, String>, st
 }
 
 // Find subcommand to execute
-fn find_subcommand(mut text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+fn find_subcommand(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
     let mut goto:i64 = -1;
     
     // Check if command is present
@@ -58,11 +58,12 @@ fn find_subcommand(mut text:Vec<String>, class:Vec<String>, mut types:HashMap<St
 	    // Determine how to print
 	    if class[counter] == "string".to_string() {
 		// Remove parathesis
-		text[counter].pop();
-		text[counter].remove(0);
+		let mut string = text[counter].clone();
+		string.pop();
+		string.remove(0);
 
 		// Output the string
-		print!("{}", text[counter]);
+		print!("{}", string);
 	    } else if class[counter] == "eval".to_string() {
 		// Get the type of the variable
 		match types.get(&text[counter]) {
@@ -96,7 +97,7 @@ fn find_subcommand(mut text:Vec<String>, class:Vec<String>, mut types:HashMap<St
 	let eval_output = evaluate(text[2].clone());
 	let var_name = eval_output.0;
 	let _rel = eval_output.1;
-	let mut val = eval_output.2;
+	let val = eval_output.2;
 	let kind = eval_output.3;
 
 	// Insert name and type
@@ -104,21 +105,23 @@ fn find_subcommand(mut text:Vec<String>, class:Vec<String>, mut types:HashMap<St
 
 	// Where to store variable
 	if kind.clone() == "string".to_string() {
-	    val.pop();   
-	    val.remove(0);
-	    strings.insert(var_name.clone(), val);
+	    let mut string = val.clone();
+	    string.pop();   
+	    string.remove(0);
+	    strings.insert(var_name.clone(), string);
 	}	
     } else if keyword == "IF".to_string() {
 	// Use evaluator
 	let eval_output = evaluate(text[2].clone());
 	let var_name = eval_output.0;
 	let _rel = eval_output.1;
-	let mut val = eval_output.2;
+	let val = eval_output.2;
 	let mut var_val = &"".to_string();
 
 	// Remove parathesis
-	val.pop();
-	val.remove(0);
+	let mut string = val.clone();
+	string.pop();
+	string.remove(0);
 
 	// Get variable value
 	match types.get(&var_name) {
@@ -138,7 +141,7 @@ fn find_subcommand(mut text:Vec<String>, class:Vec<String>, mut types:HashMap<St
 	}
 
 	// Check if equivalent
-	if var_val == &val {
+	if var_val == &string {
 	    goto = text[4].clone().parse::<i64>().unwrap();
 	}
     } else if keyword == "END".to_string() {
