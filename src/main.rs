@@ -44,27 +44,12 @@ fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> wher
     Ok(io::BufReader::new(file).lines())
 }
 
-// File interpreter
-fn script(file_path:&Path) {
-    // Useful variables
-    let mut var_types:HashMap<String, String> = HashMap::new();
-    let mut string_vals:HashMap<String, String> = HashMap::new();
+// Execute all previous commands, given state
+fn exec_prev(types:HashMap<String, String>, strings:HashMap<String, String>, prev_code:Vec<(i64, String)>, mut next_line:i64, mut prev_line:i64) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+    let mut var_types:HashMap<String, String> = types.clone();
+    let mut string_vals:HashMap<String, String> = strings.clone();
     let mut state;
-    let mut next_line = -1;
-    let mut prev_line = -1;
-    let mut line_num;
-    let mut prev_code:Vec<(i64, String)> = Vec::new();
-
-    // Add all lines in the code to prev_code
-    if let Ok(lines) = read_lines(file_path) {
-        for line in lines {
-            if let Ok(ip) = line {
-                line_num = get_line_num(ip.clone());
-		prev_code.push((line_num, ip.clone()));
-            }
-        }
-    }
-
+    
     // Execute any previous commands
     loop {
 	let mut command:String = "".to_string();
@@ -93,6 +78,33 @@ fn script(file_path:&Path) {
 	    prev_line = state.3;
         }
     }
+
+    // Return state
+    return (var_types, string_vals, next_line, prev_line); 
+}
+
+// File interpreter
+fn script(file_path:&Path) {
+    // Useful variables
+    let mut var_types:HashMap<String, String> = HashMap::new();
+    let mut string_vals:HashMap<String, String> = HashMap::new();
+    let mut next_line = -1;
+    let mut prev_line = -1;
+    let mut line_num;
+    let mut prev_code:Vec<(i64, String)> = Vec::new();
+
+    // Add all lines in the code to prev_code
+    if let Ok(lines) = read_lines(file_path) {
+        for line in lines {
+            if let Ok(ip) = line {
+                line_num = get_line_num(ip.clone());
+		prev_code.push((line_num, ip.clone()));
+            }
+        }
+    }
+
+    // Execute commands given state
+    exec_prev(var_types, string_vals, prev_code, next_line, prev_line);
 }
 
 // Interactive prompt for the BASIC interpreter
@@ -115,35 +127,13 @@ fn interactive() {
     loop {		
 	// Reset line variable
 	line = String::new();
-	
-	// Execute any previous commands
-	loop {
-	    let mut command:String = "".to_string();
-	    
-	    // Find next command to execute
-	    for items in &prev_code {
-		if next_line == -1 && prev_line < items.0 {
-		    command = items.1.clone();
-		    break;
-		} else if next_line != -1 && next_line <= items.0 {
-		    command = items.1.clone();
-		    break;
-		}
-	    }
 
-	    // Check if there is a line
-	    if command == "".to_string() {
-		// There are no more commands
-		break;
-	    } else {
-		// Execute given command, update state
-		state = exec_command(command.clone(), silence, var_types.clone(), string_vals.clone());
-		var_types = state.0;
-		string_vals = state.1;
-		next_line = state.2;
-		prev_line = state.3;
-            }
-	}
+	// Execute commands given state
+	state = exec_prev(var_types.clone(), string_vals.clone(), prev_code.clone(), next_line.clone(), prev_line.clone());
+	var_types = state.0;
+	string_vals = state.1;
+	next_line = state.2;
+	prev_line = state.3;
 
 	// Pointer
 	std::io::stdout().write("~~> ".as_bytes()).unwrap();
