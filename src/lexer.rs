@@ -1,9 +1,16 @@
-// Lexer module
+// Lexer modulen
 #![forbid(unsafe_code)]
 
 // Perform all lexer commands
 pub fn perform_lexing(file_string:String) -> Vec<(String, String)> {
     return classify(tokenize(file_string));
+}
+
+// Get line number
+pub fn get_line_num(line:String) -> i64 {
+    let tokens = perform_lexing(line.clone());
+
+    return tokens[0].0.clone().parse::<i64>().unwrap()
 }
 
 // Create a vector of tokens

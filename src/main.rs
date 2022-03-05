@@ -6,8 +6,9 @@ use std::fs::File;
 use std::io::{self, BufRead, Write};
 
 // File Imports
-mod lexer;
 mod evaluator;
+mod lexer;
+use lexer::*;
 mod command;
 use command::*;
 
