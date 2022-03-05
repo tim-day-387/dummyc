@@ -35,7 +35,7 @@ pub fn exec_command(line:String, silence:bool, types:HashMap<String, String>, st
 }
 
 // Find subcommand to execute
-fn find_subcommand(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+fn find_subcommand(text:Vec<String>, class:Vec<String>, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
     // Check if command is present
     if text.len() == 1 {
 	// Return updated state
@@ -65,8 +65,7 @@ fn find_subcommand(text:Vec<String>, class:Vec<String>, mut types:HashMap<String
 }
 
 // Implmentation of the PRINT command
-fn print_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
-    let mut goto = -1;
+fn print_cmd(text:Vec<String>, class:Vec<String>, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
     let mut counter = 2;
 
     loop {
@@ -107,19 +106,17 @@ fn print_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, Stri
     }
 
     // Return updated state
-    return (types, strings, goto, text[0].clone().parse::<i64>().unwrap())
+    return (types, strings, -1, text[0].clone().parse::<i64>().unwrap())
 }
 
 // Implmentation of the GOTO command
-fn goto_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+fn goto_cmd(text:Vec<String>, _class:Vec<String>, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
     // Return updated state
     return (types, strings, text[2].clone().parse::<i64>().unwrap(), text[0].clone().parse::<i64>().unwrap())
 }
 
 // Implmentation of the LET command
-fn let_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
-    let mut goto = -1;
-    
+fn let_cmd(text:Vec<String>, _class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {    
     // Use evaluator
     let eval_output = evaluate(text[2].clone());
     let var_name = eval_output.0;
@@ -139,11 +136,11 @@ fn let_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String
     }	
 
     // Return updated state
-    return (types, strings, goto, text[0].clone().parse::<i64>().unwrap())
+    return (types, strings, -1, text[0].clone().parse::<i64>().unwrap())
 }
 
 // Implmentation of the IF command
-fn if_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+fn if_cmd(text:Vec<String>, _class:Vec<String>, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
     let mut goto = -1;
 
     // Use evaluator
@@ -185,7 +182,7 @@ fn if_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>
 }
 
 // Implmentation of the END command
-fn end_cmd(text:Vec<String>, class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+fn end_cmd(text:Vec<String>, _class:Vec<String>, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
     // Return updated state
     return (types, strings, i64::MAX, text[0].clone().parse::<i64>().unwrap())
 }
