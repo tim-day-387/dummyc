@@ -9,6 +9,45 @@ use std::collections::HashMap;
 use lexer::perform_lexing;
 use evaluator::evaluate;
 
+// Execute all previous commands, given state
+pub fn exec_prev(types:HashMap<String, String>, strings:HashMap<String, String>, prev_code:Vec<(i64, String)>, mut next_line:i64, mut prev_line:i64) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+    let mut var_types:HashMap<String, String> = types.clone();
+    let mut string_vals:HashMap<String, String> = strings.clone();
+    let mut state;
+    
+    // Execute any previous commands
+    loop {
+	let mut command:String = "".to_string();
+	
+	// Find next command to execute
+	for items in &prev_code {
+	    if next_line == -1 && prev_line < items.0 {
+		command = items.1.clone();
+		break;
+	    } else if next_line != -1 && next_line <= items.0 {
+		command = items.1.clone();
+		break;
+	    }
+	}
+
+	// Check if there is a line
+	if command == "".to_string() {
+	    // There are no more commands
+	    break;
+	} else {
+	    // Execute given command, update state
+	    state = exec_command(command.clone(), true, var_types.clone(), string_vals.clone());
+	    var_types = state.0;
+	    string_vals = state.1;
+	    next_line = state.2;
+	    prev_line = state.3;
+        }
+    }
+
+    // Return state
+    return (var_types, string_vals, next_line, prev_line); 
+}
+
 // Execute the given command
 pub fn exec_command(line:String, silence:bool, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
     // Lex command
