@@ -115,6 +115,38 @@ pub fn exec_command(line:String, silence:bool, mut types:HashMap<String, String>
 	    strings.insert(var_name.clone(), val);
 	}	
     } else if keyword == "IF".to_string() {
+	// Use evaluator
+	let eval_output = evaluate(text[2].clone());
+	let var_name = eval_output.0;
+	let _rel = eval_output.1;
+	let mut val = eval_output.2;
+	let mut var_val = &"".to_string();
+
+	// Remove parathesis
+	val.pop();
+	val.remove(0);
+
+	// Get variable value
+	match types.get(&var_name) {
+	    Some(kind)=> {
+		// Get and print value
+		if kind == &"string".to_string() {
+		    match strings.get(&var_name) {
+			Some(value)=> var_val = value,
+			_=> println!("ERROR VAL"),
+		    }
+		}		    
+	    },
+	    _=> {
+		// Error
+		println!("ERROR TYPE");
+	    },
+	}
+
+	// Check if equivalent
+	if var_val == &val {
+	    goto = text[4].clone().parse::<i64>().unwrap();
+	}
     } else if keyword == "END".to_string() {
 	goto = i64::MAX;
     }    
