@@ -47,10 +47,10 @@ fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> wher
 // File interpreter
 fn script(file_path:&Path) {
     // Useful variables
-    let mut var_types:HashMap<String, String> = HashMap::new();
-    let mut string_vals:HashMap<String, String> = HashMap::new();
-    let mut next_line = -1;
-    let mut prev_line = -1;
+    let var_types:HashMap<String, String> = HashMap::new();
+    let string_vals:HashMap<String, String> = HashMap::new();
+    let next_line = -1;
+    let prev_line = -1;
     let mut line_num;
     let mut prev_code:Vec<(i64, String)> = Vec::new();
 
