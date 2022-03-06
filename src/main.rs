@@ -7,6 +7,7 @@ use std::io::{self, BufRead, Write};
 
 // File Imports
 mod evaluator;
+mod expression;
 mod lexer;
 use lexer::*;
 mod command;
