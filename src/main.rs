@@ -1,13 +1,14 @@
 // General Imports
 use std::env;
 use std::path::Path;
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead, Write};
 
 // File Imports
 mod evaluator;
 mod expression;
+mod state;
+use state::*;
 mod lexer;
 use lexer::*;
 mod command;
@@ -48,10 +49,7 @@ fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> wher
 // File interpreter
 fn script(file_path:&Path) {
     // Useful variables
-    let var_types:HashMap<String, String> = HashMap::new();
-    let string_vals:HashMap<String, String> = HashMap::new();
-    let next_line = -1;
-    let prev_line = -1;
+    let state = State::new();
     let mut line_num;
     let mut prev_code:Vec<(i64, String)> = Vec::new();
 
@@ -66,19 +64,15 @@ fn script(file_path:&Path) {
     }
 
     // Execute commands given state
-    exec_prev(var_types, string_vals, prev_code, next_line, prev_line);
+    exec_prev(prev_code, state);
 }
 
 // Interactive prompt for the BASIC interpreter
 fn interactive() {
     // Useful variables
     let mut line:String;
-    let mut var_types:HashMap<String, String> = HashMap::new();
-    let mut string_vals:HashMap<String, String> = HashMap::new();
-    let mut state;
+    let mut state = State::new();
     let mut silence = true;
-    let mut next_line = -1;
-    let mut prev_line = -1;
     let mut prev_code:Vec<(i64, String)> = Vec::new();
 
     // Starting Message
@@ -91,11 +85,7 @@ fn interactive() {
 	line = String::new();
 
 	// Execute commands given state
-	state = exec_prev(var_types.clone(), string_vals.clone(), prev_code.clone(), next_line.clone(), prev_line.clone());
-	var_types = state.0;
-	string_vals = state.1;
-	next_line = state.2;
-	prev_line = state.3;
+	state = exec_prev(prev_code.clone(), state);
 
 	// Pointer
 	std::io::stdout().write("~~> ".as_bytes()).unwrap();
@@ -116,13 +106,9 @@ fn interactive() {
 	}
 
 	// Execute given command, update state
-	state = exec_command(line.clone(), silence, var_types.clone(), string_vals.clone());
-	var_types = state.0;
-	string_vals = state.1;
-	next_line = state.2;
-	prev_line = state.3;
+	state = exec_command(line.clone(), silence, state);
 
 	// Add line to previous code
-	prev_code.push((prev_line, line.clone()));
+	prev_code.push((state.prev_line, line.clone()));
     }
 }

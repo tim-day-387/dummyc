@@ -3,28 +3,24 @@
 
 // General Imports
 use std::io::Write;
-use std::collections::HashMap;
 
 // File Imports
 use lexer::perform_lexing;
 use evaluator::evaluate;
+use state::*;
 
 // Execute all previous commands, given state
-pub fn exec_prev(types:HashMap<String, String>, strings:HashMap<String, String>, prev_code:Vec<(i64, String)>, mut next_line:i64, mut prev_line:i64) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
-    let mut var_types:HashMap<String, String> = types.clone();
-    let mut string_vals:HashMap<String, String> = strings.clone();
-    let mut state;
-    
+pub fn exec_prev(prev_code:Vec<(i64, String)>, mut state:State) -> State {    
     // Execute any previous commands
     loop {
 	let mut command:String = "".to_string();
 	
 	// Find next command to execute
 	for items in &prev_code {
-	    if next_line == -1 && prev_line < items.0 {
+	    if state.next_line == -1 && state.prev_line < items.0 {
 		command = items.1.clone();
 		break;
-	    } else if next_line != -1 && next_line <= items.0 {
+	    } else if state.next_line != -1 && state.next_line <= items.0 {
 		command = items.1.clone();
 		break;
 	    }
@@ -36,20 +32,16 @@ pub fn exec_prev(types:HashMap<String, String>, strings:HashMap<String, String>,
 	    break;
 	} else {
 	    // Execute given command, update state
-	    state = exec_command(command.clone(), true, var_types.clone(), string_vals.clone());
-	    var_types = state.0;
-	    string_vals = state.1;
-	    next_line = state.2;
-	    prev_line = state.3;
+	    state = exec_command(command.clone(), true, state);
         }
     }
 
     // Return state
-    return (var_types, string_vals, next_line, prev_line); 
+    return state; 
 }
 
 // Execute the given command
-pub fn exec_command(line:String, silence:bool, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+pub fn exec_command(line:String, silence:bool, state:State) -> State {
     // Lex command
     let tokens = perform_lexing(line.clone());
     let mut text:Vec<String> = Vec::new();
@@ -70,18 +62,26 @@ pub fn exec_command(line:String, silence:bool, types:HashMap<String, String>, st
 	class.push(t.1);
     }
 
-    return find_subcommand(text, class, types, strings);
+    return find_subcommand(text, class, state);
 }
 
 // Find subcommand to execute
-fn find_subcommand(text:Vec<String>, class:Vec<String>, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+fn find_subcommand(text:Vec<String>, class:Vec<String>, mut state:State) -> State {
     // Check if command is present
     if text.len() == 1 {
+	// Update state
+	state.next_line = -1;
+	state.prev_line = text[0].clone().parse::<i64>().unwrap();
+	
 	// Return updated state
-	return (types, strings, -1, text[0].clone().parse::<i64>().unwrap())
+	return state;
     } else if text.len() == 0 {
+	// Update state
+	state.next_line = -1;
+	state.prev_line = -1;
+
 	// Return updated state
-	return (types, strings, -1, -1)
+	return state;
     }
 
     // Set keyword
@@ -89,22 +89,27 @@ fn find_subcommand(text:Vec<String>, class:Vec<String>, types:HashMap<String, St
 
     // Execute given command
     if keyword == "PRINT".to_string() {
-	return print_cmd(text, class, types, strings);
+	return print_cmd(text, class, state);
     } else if keyword == "GOTO".to_string() {
-	return goto_cmd(text, class, types, strings);
+	return goto_cmd(text, class, state);
     } else if keyword == "LET".to_string() {
-	return let_cmd(text, class, types, strings);
+	return let_cmd(text, class, state);
     } else if keyword == "IF".to_string() {
-	return if_cmd(text, class, types, strings);
+	return if_cmd(text, class, state);
     } else if keyword == "END".to_string() {
-	return end_cmd(text, class, types, strings);
+	return end_cmd(text, class, state);
     } else {
-	return (types, strings, i64::MAX, text[0].clone().parse::<i64>().unwrap())
+	// Update state
+	state.next_line = i64::MAX;
+	state.prev_line = text[0].clone().parse::<i64>().unwrap();
+
+	// Return updated state
+	return state;
     }
 }
 
 // Implmentation of the PRINT command
-fn print_cmd(text:Vec<String>, class:Vec<String>, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+fn print_cmd(text:Vec<String>, class:Vec<String>, mut state:State) -> State {
     let mut counter = 2;
 
     loop {
@@ -119,11 +124,11 @@ fn print_cmd(text:Vec<String>, class:Vec<String>, types:HashMap<String, String>,
 	    print!("{}", string);
 	} else if class[counter] == "eval".to_string() {
 	    // Get the type of the variable
-	    match types.get(&text[counter]) {
+	    match state.types.get(&text[counter]) {
 		Some(kind)=> {
 		    // Get and print value
 		    if kind == &"string".to_string() {
-			match strings.get(&text[counter]) {
+			match state.strings.get(&text[counter]) {
 			    Some(value)=> print!("{}", value),
 			    _=> println!("ERROR VAL"),
 			}
@@ -144,18 +149,26 @@ fn print_cmd(text:Vec<String>, class:Vec<String>, types:HashMap<String, String>,
 	}
     }
 
+    // Update state
+    state.next_line = -1;
+    state.prev_line = text[0].clone().parse::<i64>().unwrap();
+
     // Return updated state
-    return (types, strings, -1, text[0].clone().parse::<i64>().unwrap())
+    return state;
 }
 
 // Implmentation of the GOTO command
-fn goto_cmd(text:Vec<String>, _class:Vec<String>, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+fn goto_cmd(text:Vec<String>, _class:Vec<String>, mut state:State) -> State {
+    // Update state
+    state.next_line = text[2].clone().parse::<i64>().unwrap();
+    state.prev_line = text[0].clone().parse::<i64>().unwrap();
+
     // Return updated state
-    return (types, strings, text[2].clone().parse::<i64>().unwrap(), text[0].clone().parse::<i64>().unwrap())
+    return state;
 }
 
 // Implmentation of the LET command
-fn let_cmd(text:Vec<String>, _class:Vec<String>, mut types:HashMap<String, String>, mut strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {    
+fn let_cmd(text:Vec<String>, _class:Vec<String>, mut state:State) -> State {
     // Use evaluator
     let eval_output = evaluate(text[2].clone());
     let var_name = eval_output.0;
@@ -164,22 +177,26 @@ fn let_cmd(text:Vec<String>, _class:Vec<String>, mut types:HashMap<String, Strin
     let kind = eval_output.3;
 
     // Insert name and type
-    types.insert(var_name.clone(), kind.clone());
+    state.types.insert(var_name.clone(), kind.clone());
 
     // Where to store variable
     if kind.clone() == "string".to_string() {
 	let mut string = val.clone();
 	string.pop();   
 	string.remove(0);
-	strings.insert(var_name.clone(), string);
+	state.strings.insert(var_name.clone(), string);
     }	
 
+    // Update state
+    state.next_line = -1;
+    state.prev_line = text[0].clone().parse::<i64>().unwrap();
+
     // Return updated state
-    return (types, strings, -1, text[0].clone().parse::<i64>().unwrap())
+    return state;
 }
 
 // Implmentation of the IF command
-fn if_cmd(text:Vec<String>, _class:Vec<String>, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+fn if_cmd(text:Vec<String>, _class:Vec<String>, mut state:State) -> State {
     let mut goto = -1;
 
     // Use evaluator
@@ -195,11 +212,11 @@ fn if_cmd(text:Vec<String>, _class:Vec<String>, types:HashMap<String, String>, s
     string.remove(0);
 
     // Get variable value
-    match types.get(&var_name) {
+    match state.types.get(&var_name) {
 	Some(kind)=> {
 	    // Get and print value
 	    if kind == &"string".to_string() {
-		match strings.get(&var_name) {
+		match state.strings.get(&var_name) {
 		    Some(value)=> var_val = value,
 		    _=> println!("ERROR VAL"),
 		}
@@ -216,12 +233,20 @@ fn if_cmd(text:Vec<String>, _class:Vec<String>, types:HashMap<String, String>, s
 	goto = text[4].clone().parse::<i64>().unwrap();
     }
 
+    // Update state
+    state.next_line = goto;
+    state.prev_line = text[0].clone().parse::<i64>().unwrap();
+
     // Return updated state
-    return (types, strings, goto, text[0].clone().parse::<i64>().unwrap())
+    return state;
 }
 
 // Implmentation of the END command
-fn end_cmd(text:Vec<String>, _class:Vec<String>, types:HashMap<String, String>, strings:HashMap<String, String>) -> (HashMap<String, String>, HashMap<String, String>, i64, i64) {
+fn end_cmd(text:Vec<String>, _class:Vec<String>, mut state:State) -> State {
+    // Update state
+    state.next_line = i64::MAX;
+    state.prev_line = text[0].clone().parse::<i64>().unwrap();
+    
     // Return updated state
-    return (types, strings, i64::MAX, text[0].clone().parse::<i64>().unwrap())
+    return state;
 }
