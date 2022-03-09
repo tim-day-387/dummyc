@@ -11,8 +11,6 @@ mod state;
 use state::*;
 mod lexer;
 use lexer::*;
-mod command;
-use command::*;
 
 // Main function code
 fn main() {
@@ -49,7 +47,7 @@ fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> wher
 // File interpreter
 fn script(file_path:&Path) {
     // Useful variables
-    let state = State::new();
+    let mut state = State::new();
     let mut line_num;
     let mut prev_code:Vec<(i64, String)> = Vec::new();
 
@@ -64,7 +62,7 @@ fn script(file_path:&Path) {
     }
 
     // Execute commands given state
-    exec_prev(prev_code, state);
+    state.exec_prev(prev_code);
 }
 
 // Interactive prompt for the BASIC interpreter
@@ -85,7 +83,7 @@ fn interactive() {
 	line = String::new();
 
 	// Execute commands given state
-	state = exec_prev(prev_code.clone(), state);
+	state.exec_prev(prev_code.clone());
 
 	// Pointer
 	std::io::stdout().write("~~> ".as_bytes()).unwrap();
@@ -106,7 +104,7 @@ fn interactive() {
 	}
 
 	// Execute given command, update state
-	state = exec_command(line.clone(), silence, state);
+	state.exec_command(line.clone(), silence);
 
 	// Add line to previous code
 	prev_code.push((state.prev_line, line.clone()));
