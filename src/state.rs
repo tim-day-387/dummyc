@@ -60,23 +60,13 @@ impl State {
     // Execute the given command
     pub fn exec_command(&mut self, line:String, silence:bool) {
 	// Lex command
-	let tokens = perform_lexing(line.clone());
-	let mut text:Vec<String> = Vec::new();
-	let mut class:Vec<String> = Vec::new();
+	let text:Vec<String> = perform_lexing(line.clone()).0;
+	let class:Vec<String> = perform_lexing(line.clone()).1;
 
 	// Write out command
 	if !silence {
 	    std::io::stdout().write("COMMAND TEXT: ".as_bytes()).unwrap();
 	    std::io::stdout().write(line.as_bytes()).unwrap();
-	}
-	
-	// Write out tokens
-	for t in tokens {
-	    if !silence {
-		println!("TOKEN: {} {}", t.0, t.1);
-	    }
-	    text.push(t.0);
-	    class.push(t.1);
 	}
 
 	self.find_subcommand(text, class);

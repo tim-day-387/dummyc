@@ -55,7 +55,7 @@ fn script(file_path:&Path) {
     if let Ok(lines) = read_lines(file_path) {
         for line in lines {
             if let Ok(ip) = line {
-                line_num = get_line_num(ip.clone());
+                line_num = perform_lexing(ip.clone()).0[0].parse::<i64>().unwrap();
 		prev_code.push((line_num, ip.clone()));
             }
         }

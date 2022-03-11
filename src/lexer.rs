@@ -2,15 +2,8 @@
 #![forbid(unsafe_code)]
 
 // Perform all lexer commands
-pub fn perform_lexing(file_string:String) -> Vec<(String, String)> {
+pub fn perform_lexing(file_string:String) -> (Vec<String>, Vec<String>) {
     return classify(tokenize(file_string));
-}
-
-// Get line number
-pub fn get_line_num(line:String) -> i64 {
-    let tokens = perform_lexing(line.clone());
-
-    return tokens[0].0.clone().parse::<i64>().unwrap()
 }
 
 // Create a vector of tokens
@@ -51,8 +44,9 @@ fn tokenize(file_string:String) -> Vec<String> {
 }
 
 // Create a vector of tokens
-fn classify(tokens:Vec<String>) -> Vec<(String, String)> {
-    let mut output: Vec<(String, String)> = Vec::new();
+fn classify(tokens:Vec<String>) -> (Vec<String>, Vec<String>) {
+    let mut text:Vec<String> = Vec::new();
+    let mut class:Vec<String> = Vec::new();
     let mut line_set = false;
 
     // Find each token
@@ -60,19 +54,21 @@ fn classify(tokens:Vec<String>) -> Vec<(String, String)> {
 	// Check if the line number has been seen
 	if !line_set {
 	    // Classify line_num
-	    output.push((t.clone(), "line_num".to_string()));
+	    text.push(t.clone());
+	    class.push("line_num".to_string());
 	    line_set = true;
 	} else {
-	    // Identify non-line number tokens
-	    output.push((t.clone(), find_token(t.clone())));
+	    // Identify non-line number
+	    text.push(t.clone());
+	    class.push(find_token(t.clone()));
 	}
     }
 
-    return output;
+    return (text, class);
 }
 
 // Classify token
-pub fn find_token(token:String) -> String {
+fn find_token(token:String) -> String {
     let output:String;
 
     // Find what find of token we're looking at
@@ -166,239 +162,4 @@ fn is_res(token:String) -> bool {
     } else {
 	return false;
     }
-}
-
-// Testing methods
-#[cfg(test)]
-mod test {
-    // File Imports
-    use super::*;
-
-    // Testing tokenize()
-    #[test]
-    fn token_1() {
-	let given:String = "001 GOTO 001".to_string();
-	let answer:Vec<String> = vec!["001".to_string(),"GOTO".to_string(),
-					     "001".to_string()];
-
-	assert_eq!(answer, tokenize(given));
-    }
-
-    // Testing tokenize()
-    #[test]
-    fn token_2() {
-	let given:String = "000 PRINT \"This ismy program\"".to_string();
-	let answer:Vec<String> = vec!["000".to_string(),"PRINT".to_string(),
-					     "\"This ismy program\"".to_string()];
-
-	assert_eq!(answer, tokenize(given));
-    }
-
-    // Testing tokenize()
-    #[test]
-    fn token_3() {
-	let given:String = "1010 PRINT \"A HAS\";N;\"ELEMENTS\"".to_string();
-	let answer:Vec<String> = vec!["1010".to_string(),"PRINT".to_string(),
-				             "\"A HAS\"".to_string(),
-					     "N".to_string(),"\"ELEMENTS\"".to_string()];
-
-	assert_eq!(answer, tokenize(given));
-    }
-
-    // Testing tokenize()
-    #[test]
-    fn token_4() {
-	let given:String = "9000 DATA 9,1,5,5".to_string();
-	let answer:Vec<String> = vec!["9000".to_string(),"DATA".to_string(),
-				             "9".to_string(),"1".to_string(),
-					     "5".to_string(),"5".to_string()];
-
-	assert_eq!(answer, tokenize(given));
-    }
-
-    // Testing classify()
-    #[test]
-    fn class_1() {
-	let given:Vec<String> = vec!["80".to_string(),"IF".to_string(),
-				            "F=1".to_string(),"THEN".to_string(),
-					    "110".to_string()];
-	let answer:Vec<(String, String)> = vec![("80".to_string(), "line_num".to_string()),
-						     ("IF".to_string(), "res".to_string()),
-						     ("F=1".to_string(), "eval".to_string()),
-						     ("THEN".to_string(), "res".to_string()),
-						     ("110".to_string(), "int".to_string())];
-
-	assert_eq!(answer, classify(given));
-    }
-
-    // Testing classify()
-    #[test]
-    fn class_2() {
-	let given:Vec<String> = vec!["9000".to_string(),"DATA".to_string(),
-				            "9".to_string(),"1".to_string(),
-					    "5".to_string(),"5".to_string()]; 
-	let answer:Vec<(String, String)> = vec![("9000".to_string(), "line_num".to_string()),
-						     ("DATA".to_string(), "res".to_string()),
-						     ("9".to_string(), "int".to_string()),
-						     ("1".to_string(), "int".to_string()),
-						     ("5".to_string(), "int".to_string()),
-						     ("5".to_string(), "int".to_string())];
-
-	assert_eq!(answer, classify(given));
-    }
-    
-    // Testing perform_lexing()
-    #[test]
-    fn lex_1() {
-	let given:String = "001 GOTO 001".to_string();
-	let answer:Vec<(String, String)> = vec![("001".to_string(), "line_num".to_string()),
-						     ("GOTO".to_string(), "res".to_string()),
-					             ("001".to_string(), "int".to_string())];
-	
-	assert_eq!(answer, perform_lexing(given));
-    }
-
-    // Testing find_token()
-    #[test]
-    fn find_1() {
-	let given:String = "031".to_string();
-	let answer:String = "int".to_string();
-
-	assert_eq!(answer, find_token(given));
-    }
-
-    // Testing find_token()
-    #[test]
-    fn find_2() {
-	let given:String = "\"This is a sample\"".to_string();
-	let answer:String = "string".to_string();
-
-	assert_eq!(answer, find_token(given));
-    }
-
-    // Testing find_token()
-    #[test]
-    fn find_3() {
-	let given:String = "G3gedg444".to_string();
-	let answer:String = "eval".to_string();
-
-	assert_eq!(answer, find_token(given));
-    }
-
-    // Testing find_token()
-    #[test]
-    fn find_4() {
-	let given:String = ".1326546".to_string();
-	let answer:String = "float".to_string();
-
-	assert_eq!(answer, find_token(given));
-    }
-    
-    // Testing is_string()
-    #[test]
-    fn is_s_1() {
-	let given:String = "0F1".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_string(given));
-    }
-
-    // Testing is_string()
-    #[test]
-    fn is_s_2() {
-	let given:String = "\"0F1\"".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_string(given));
-    }
-
-    // Testing is_string()
-    #[test]
-    fn is_s_3() {
-	let given:String = "\"This is a sample string\"".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_string(given));
-    }
-    
-    // Testing is_float()
-    #[test]
-    fn is_f_1() {
-	let given:String = "0F1".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_float(given));
-    }
-
-    // Testing is_float()
-    #[test]
-    fn is_f_2() {
-	let given:String = "387".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_float(given));
-    }
-
-    // Testing is_number()
-    #[test]
-    fn is_f_3() {
-	let given:String = "38.7".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_float(given));
-    }
-    
-    // Testing is_int()
-    #[test]
-    fn is_i_1() {
-	let given:String = "0F1".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_int(given));
-    }
-
-    // Testing is_int()
-    #[test]
-    fn is_i_2() {
-	let given:String = "LET".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_int(given));
-    }
-
-    // Testing is_int()
-    #[test]
-    fn is_i_3() {
-	let given:String = "387".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_int(given));
-    }
-
-    // Testing is_res()
-    #[test]
-    fn is_r_1() {
-	let given:String = "3".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_res(given));
-    }
-
-    // Testing is_res()
-    #[test]
-    fn is_r_2() {
-	let given:String = "LET".to_string();
-	let answer:bool = true;
-
-	assert_eq!(answer, is_res(given));
-    }
-
-    // Testing is_res()
-    #[test]
-    fn is_r_3() {
-	let given:String = "IFAND".to_string();
-	let answer:bool = false;
-
-	assert_eq!(answer, is_res(given));
-    }    
 }
