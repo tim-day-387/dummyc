@@ -2,8 +2,11 @@
 #![forbid(unsafe_code)]
 
 // General Imports
-use std::io::Write;
 use std::collections::HashMap;
+use std::path::Path;
+use std::fs::File;
+use std::io::{self, BufRead, Write};
+
 
 // File Imports
 use lexer::perform_lexing;
@@ -13,6 +16,7 @@ use evaluator::evaluate;
 pub struct State {
     pub types:HashMap<String, String>,
     pub strings:HashMap<String, String>,
+    pub prev_code:Vec<(i64, String)>,
     pub next_line:i64,
     pub prev_line:i64,
 }
@@ -24,19 +28,36 @@ impl State {
 	State {
 	    types:HashMap::new(),
 	    strings:HashMap::new(),
+	    prev_code:Vec::new(),
 	    next_line:-1,
 	    prev_line:-1,
 	}
     }
 
+    // Load previous commmands from a file
+    pub fn load_prev(&mut self, file_path:&Path) {
+	// Useful variables 
+	let mut line_num;
+
+	// Add all lines in the code to prev_code
+	if let Ok(lines) = read_lines(file_path) {
+            for line in lines {
+		if let Ok(ip) = line {
+                    line_num = perform_lexing(ip.clone()).0[0].parse::<i64>().unwrap();
+		    self.prev_code.push((line_num, ip.clone()));
+		}
+            }
+	}
+    }
+
     // Execute all previous commands, given state
-    pub fn exec_prev(&mut self, prev_code:Vec<(i64, String)>) {    
+    pub fn exec_prev(&mut self) {    
 	// Execute any previous commands
 	loop {
 	    let mut command:String = "".to_string();
 	    
 	    // Find next command to execute
-	    for items in &prev_code {
+	    for items in &self.prev_code {
 		if self.next_line == -1 && self.prev_line < items.0 {
 		    command = items.1.clone();
 		    break;
@@ -69,6 +90,11 @@ impl State {
 	    std::io::stdout().write(line.as_bytes()).unwrap();
 	}
 
+	// Add line to previous code
+	self.prev_line = text[0].clone().parse::<i64>().unwrap();
+	self.prev_code.push((self.prev_line, line.clone()));
+
+	// Execute command specific method
 	self.find_subcommand(text, class);
     }
 
@@ -78,7 +104,6 @@ impl State {
 	if text.len() == 1 {
 	    // Update state
 	    self.next_line = -1;
-	    self.prev_line = text[0].clone().parse::<i64>().unwrap();
 	    return;
 	} else if text.len() == 0 {
 	    // Update state
@@ -104,7 +129,6 @@ impl State {
 	} else {
 	    // Update state
 	    self.next_line = i64::MAX;
-	    self.prev_line = text[0].clone().parse::<i64>().unwrap();
 	}
     }
 
@@ -151,14 +175,12 @@ impl State {
 
 	// Update state
 	self.next_line = -1;
-	self.prev_line = text[0].clone().parse::<i64>().unwrap();
     }
 
     // Implmentation of the GOTO command
     fn goto_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
 	// Update state
 	self.next_line = text[2].clone().parse::<i64>().unwrap();
-	self.prev_line = text[0].clone().parse::<i64>().unwrap();
     }
 
     // Implmentation of the LET command
@@ -183,7 +205,6 @@ impl State {
 
 	// Update state
 	self.next_line = -1;
-	self.prev_line = text[0].clone().parse::<i64>().unwrap();
     }
 
     // Implmentation of the IF command
@@ -226,15 +247,19 @@ impl State {
 
 	// Update state
 	self.next_line = goto;
-	self.prev_line = text[0].clone().parse::<i64>().unwrap();
     }
 
     // Implmentation of the END command
-    fn end_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
+    fn end_cmd(&mut self, _text:Vec<String>, _class:Vec<String>) {
 	// Update state
 	self.next_line = i64::MAX;
-	self.prev_line = text[0].clone().parse::<i64>().unwrap();
     }
-
 }
+
+// Returns an Iterator to the Reader of the lines of the file.
+fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> where P: AsRef<Path>, {
+    let file = File::open(filename)?;
+    Ok(io::BufReader::new(file).lines())
+}
+
 

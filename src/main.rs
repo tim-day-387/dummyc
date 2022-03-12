@@ -1,15 +1,13 @@
 // General Imports
 use std::env;
 use std::path::Path;
-use std::fs::File;
-use std::io::{self, BufRead, Write};
+use std::io::Write;
 
 // File Imports
+mod lexer;
 mod evaluator;
 mod state;
 use state::*;
-mod lexer;
-use lexer::*;
 
 // Main function code
 fn main() {
@@ -37,31 +35,16 @@ fn main() {
     }	
 }
 
-// Returns an Iterator to the Reader of the lines of the file.
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> where P: AsRef<Path>, {
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
-}
-
 // File interpreter
 fn script(file_path:&Path) {
     // Useful variables
     let mut state = State::new();
-    let mut line_num;
-    let mut prev_code:Vec<(i64, String)> = Vec::new();
 
     // Add all lines in the code to prev_code
-    if let Ok(lines) = read_lines(file_path) {
-        for line in lines {
-            if let Ok(ip) = line {
-                line_num = perform_lexing(ip.clone()).0[0].parse::<i64>().unwrap();
-		prev_code.push((line_num, ip.clone()));
-            }
-        }
-    }
-
+    state.load_prev(file_path);
+    
     // Execute commands given state
-    state.exec_prev(prev_code);
+    state.exec_prev();
 }
 
 // Interactive prompt for the BASIC interpreter
@@ -70,7 +53,6 @@ fn interactive() {
     let mut line:String;
     let mut state = State::new();
     let mut silence = true;
-    let mut prev_code:Vec<(i64, String)> = Vec::new();
 
     // Starting Message
     std::io::stdout().write("Start Prompt!\n".as_bytes()).unwrap();
@@ -82,7 +64,7 @@ fn interactive() {
 	line = String::new();
 
 	// Execute commands given state
-	state.exec_prev(prev_code.clone());
+	state.exec_prev();
 
 	// Pointer
 	std::io::stdout().write("~~> ".as_bytes()).unwrap();
@@ -104,8 +86,5 @@ fn interactive() {
 
 	// Execute given command, update state
 	state.exec_command(line.clone(), silence);
-
-	// Add line to previous code
-	prev_code.push((state.prev_line, line.clone()));
     }
 }
