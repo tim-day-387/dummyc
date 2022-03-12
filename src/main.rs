@@ -7,6 +7,7 @@ use std::io::Write;
 mod lexer;
 mod evaluator;
 mod state;
+mod data;
 use state::*;
 
 // Main function code
