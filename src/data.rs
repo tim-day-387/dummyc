@@ -24,8 +24,13 @@ impl Data {
     }
 
     // Simplify data output to one which can be stored and printed out
-    pub fn simplify(&mut self) {
+    pub fn simplify(&mut self, mut vars:HashMap<String, Data>) {
 	self.find_output_type();
+
+	if self.output_type == "unresolved".to_string() {
+	    self.get_var_value(vars);
+	}
+	
 	self.get_print_out();
     }
     
