@@ -6,6 +6,29 @@ pub fn perform_lexing(file_string:String) -> (Vec<String>, Vec<String>) {
     return classify(tokenize(file_string));
 }
 
+// Split an expression across the relational
+pub fn split(token:String) -> (String, String, String) {
+    let char_vec:Vec<char> = token.chars().collect();
+    let mut first_part_string:String = "".to_string();
+    let mut relational_string:String = "".to_string();
+    let mut second_part_string:String = "".to_string();
+    let mut in_exp:bool = false;
+        
+    // Splits expression based on relational
+    for c in char_vec {
+	if c == '=' || c == '<' || c == '>' || c == '!' {
+	    relational_string.push(c);
+	    in_exp = true;
+	} else if !in_exp {
+	    first_part_string.push(c);
+	} else {
+	    second_part_string.push(c);
+        }
+    }
+
+    return (first_part_string, relational_string, second_part_string);
+}
+
 // Create a vector of tokens
 fn tokenize(file_string:String) -> Vec<String> {
     let file_bytes = file_string.as_bytes();
@@ -161,5 +184,30 @@ fn is_res(token:String) -> bool {
 	return true;
     } else {
 	return false;
+    }
+}
+
+// Testing methods
+#[cfg(test)]
+mod test {
+    // File Imports
+    use lexer::*;
+    
+    // Testing split()
+    #[test]
+    fn split_1() {
+	let given:String = "A=\"Fuh\"".to_string();
+	let answer = ("A".to_string(), "=".to_string(), "\"Fuh\"".to_string());
+
+	assert_eq!(answer, split(given));
+    }
+
+    // Testing split()
+    #[test]
+    fn split_2() {
+	let given:String = "B<=23423984723fffffjjjdjdj{}||[".to_string();
+	let answer = ("B".to_string(), "<=".to_string(), "23423984723fffffjjjdjdj{}||[".to_string());
+
+	assert_eq!(answer, split(given));
     }
 }
