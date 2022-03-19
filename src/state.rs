@@ -121,7 +121,7 @@ impl State {
 	} else if keyword == "LET".to_string() {
 	    self.let_cmd(text, class);
 	} else if keyword == "IF".to_string() {
-//	    self.if_cmd(text, class);
+	    self.if_cmd(text, class);
 	} else if keyword == "END".to_string() {
 	    self.end_cmd(text, class);
 	} else {
@@ -167,10 +167,10 @@ impl State {
     // Implmentation of the LET command
     fn let_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
 	// Split statement
-	let text = split(text[2].clone());
-	let var_name = text.0;
-	let _relational = text.1;
-	let data = text.2;
+	let text_split = split(text[2].clone());
+	let var_name = text_split.0;
+	let _relational = text_split.1;
+	let data = text_split.2;
 
 	// Generate data object
 	let mut object = Data::new(data);
@@ -185,49 +185,34 @@ impl State {
 	// Update state
 	self.next_line = -1;
     }
-/*
+
     // Implmentation of the IF command
     fn if_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
 	let mut goto = -1;
 
-	// Use evaluator
-	let eval_output = evaluate(text[2].clone());
-	let var_name = eval_output.0;
-	let _rel = eval_output.1;
-	let val = eval_output.2;
-	let mut var_val = &"".to_string();
+	// Split statement
+	let text_split = split(text[2].clone());
+	let dataa = text_split.0;
+	let _relational = text_split.1;
+	let datab = text_split.2;
 
-	// Remove parathesis
-	let mut string = val.clone();
-	string.pop();
-	string.remove(0);
+	// Generate data objects
+	let mut objecta = Data::new(dataa);
+	let mut objectb = Data::new(datab);
 
-	// Get variable value
-	match self.types.get(&var_name) {
-	    Some(kind)=> {
-		// Get and print value
-		if kind == &"string".to_string() {
-		    match self.strings.get(&var_name) {
-			Some(value)=> var_val = value,
-			_=> println!("ERROR VAL"),
-		    }
-		}		    
-	    },
-	    _=> {
-		// Error
-		println!("ERROR TYPE");
-	    },
-	}
+	// Simplify object
+	objecta.simplify(self.variables.clone());
+	objectb.simplify(self.variables.clone());
 
 	// Check if equivalent
-	if var_val == &string {
+	if objecta.equals(objectb) {
 	    goto = text[4].clone().parse::<i64>().unwrap();
 	}
 
 	// Update state
 	self.next_line = goto;
     }
-*/
+
     // Implmentation of the END command
     fn end_cmd(&mut self, _text:Vec<String>, _class:Vec<String>) {
 	// Update state
