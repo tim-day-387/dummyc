@@ -23,8 +23,17 @@ impl Data {
 	}
     }
 
+    // Check if two data objects are equal
+    pub fn equals(self, other:Data) -> bool {
+	let first:bool = (self.plain_text == other.plain_text);
+	let second:bool = (self.output_type == other.output_type);
+	let third:bool = (self.print_out_text == other.print_out_text);
+
+	return first && second && third;
+    }
+
     // Simplify data output to one which can be stored and printed out
-    pub fn simplify(&mut self, mut vars:HashMap<String, Data>) {
+    pub fn simplify(&mut self, vars:HashMap<String, Data>) {
 	self.find_output_type();
 
 	if self.output_type == "unresolved".to_string() {
@@ -54,7 +63,7 @@ impl Data {
     }
 
     // Get variable value
-    fn get_var_value(&mut self, mut vars:HashMap<String, Data>) {
+    fn get_var_value(&mut self, vars:HashMap<String, Data>) {
 	let mut var_value:&Data = &Data::new("".to_string());
 	
 	match vars.get(&self.plain_text) {
