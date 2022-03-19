@@ -5,6 +5,7 @@
 use std::collections::HashMap;
 
 // Data struct
+#[derive(Clone)]
 pub struct Data {
     pub plain_text:String,
     pub output_type:String,
@@ -25,9 +26,9 @@ impl Data {
 
     // Check if two data objects are equal
     pub fn equals(self, other:Data) -> bool {
-	let first:bool = (self.plain_text == other.plain_text);
-	let second:bool = (self.output_type == other.output_type);
-	let third:bool = (self.print_out_text == other.print_out_text);
+	let first:bool = self.plain_text == other.plain_text;
+	let second:bool = self.output_type == other.output_type;
+	let third:bool = self.print_out_text == other.print_out_text;
 
 	return first && second && third;
     }
