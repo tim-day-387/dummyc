@@ -5,7 +5,6 @@ use std::io::Write;
 
 // File Imports
 mod lexer;
-mod evaluator;
 mod state;
 mod data;
 use state::*;
