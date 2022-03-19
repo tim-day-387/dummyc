@@ -9,13 +9,12 @@ use std::io::{self, BufRead, Write};
 
 
 // File Imports
-use lexer::perform_lexing;
-use evaluator::evaluate;
+use lexer::*;
+use data::*;
 
 // State struct
 pub struct State {
-    pub types:HashMap<String, String>,
-    pub strings:HashMap<String, String>,
+    pub variables:HashMap<String, Data>,
     pub prev_code:Vec<(i64, String)>,
     pub next_line:i64,
     pub prev_line:i64,
@@ -26,8 +25,7 @@ impl State {
     // Constructor
     pub fn new() -> State {
 	State {
-	    types:HashMap::new(),
-	    strings:HashMap::new(),
+	    variables:HashMap::new(),
 	    prev_code:Vec::new(),
 	    next_line:-1,
 	    prev_line:-1,
@@ -123,7 +121,7 @@ impl State {
 	} else if keyword == "LET".to_string() {
 	    self.let_cmd(text, class);
 	} else if keyword == "IF".to_string() {
-	    self.if_cmd(text, class);
+//	    self.if_cmd(text, class);
 	} else if keyword == "END".to_string() {
 	    self.end_cmd(text, class);
 	} else {
@@ -133,40 +131,23 @@ impl State {
     }
 
     // Implmentation of the PRINT command
-    fn print_cmd(&mut self, text:Vec<String>, class:Vec<String>) {
+    fn print_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
 	let mut counter = 2;
 
 	loop {
-	    // Determine how to print
-	    if class[counter] == "string".to_string() {
-		// Remove parathesis
-		let mut string = text[counter].clone();
-		string.pop();
-		string.remove(0);
+	    // Generate data object
+	    let mut object = Data::new(text[counter].clone());
 
-		// Output the string
-		print!("{}", string);
-	    } else if class[counter] == "eval".to_string() {
-		// Get the type of the variable
-		match self.types.get(&text[counter]) {
-		    Some(kind)=> {
-			// Get and print value
-			if kind == &"string".to_string() {
-			    match self.strings.get(&text[counter]) {
-				Some(value)=> print!("{}", value),
-				_=> println!("ERROR VAL"),
-			    }
-			}		    
-		    },
-		    _=> {
-			// Error
-			println!("ERROR TYPE");
-		    },
-		}
-	    }
+	    // Simplify object
+	    object.simplify(self.variables.clone());
 
+	    // Print out text
+	    print!("{}", object.print_out_text);			       
+
+	    // Iterate token
 	    counter = counter + 1;
 
+	    // End if we run out of tokens
 	    if counter == text.len() {
 		println!("");
 		break;
@@ -185,28 +166,26 @@ impl State {
 
     // Implmentation of the LET command
     fn let_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
-	// Use evaluator
-	let eval_output = evaluate(text[2].clone());
-	let var_name = eval_output.0;
-	let _rel = eval_output.1;
-	let val = eval_output.2;
-	let kind = eval_output.3;
+	// Split statement
+	let text = split(text[2].clone());
+	let var_name = text.0;
+	let _relational = text.1;
+	let data = text.2;
 
+	// Generate data object
+	let mut object = Data::new(data);
+
+	// Simplify object
+	object.simplify(self.variables.clone());
+
+	
 	// Insert name and type
-	self.types.insert(var_name.clone(), kind.clone());
-
-	// Where to store variable
-	if kind.clone() == "string".to_string() {
-	    let mut string = val.clone();
-	    string.pop();   
-	    string.remove(0);
-	    self.strings.insert(var_name.clone(), string);
-	}	
+	self.variables.insert(var_name.clone(), object.clone());
 
 	// Update state
 	self.next_line = -1;
     }
-
+/*
     // Implmentation of the IF command
     fn if_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
 	let mut goto = -1;
@@ -248,7 +227,7 @@ impl State {
 	// Update state
 	self.next_line = goto;
     }
-
+*/
     // Implmentation of the END command
     fn end_cmd(&mut self, _text:Vec<String>, _class:Vec<String>) {
 	// Update state
