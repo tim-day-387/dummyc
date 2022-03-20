@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-echo "***************** PROGRAM 1 *****************"
-./target/debug/dummyc ./examples/custom/programs/program_1.bas
-echo "***************** PROGRAM 2 *****************" 
-./target/debug/dummyc ./examples/custom/programs/program_2.bas
-echo "***************** PROGRAM 3 *****************"
-./target/debug/dummyc ./examples/custom/programs/program_3.bas
+for file in $(ls -1 ./examples/custom/programs); do
+    echo "==================== $file ===================="
+    ./target/debug/dummyc "./examples/custom/programs/$file"
+done
