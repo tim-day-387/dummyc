@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-for file in $(ls -1 ./examples/custom/programs); do
+for file in $(ls -1 ./examples/custom/programs | grep -v "~"); do
     echo "==================== $file ===================="
     ./target/debug/dummyc "./examples/custom/programs/$file"
 done
