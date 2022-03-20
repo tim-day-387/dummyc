@@ -122,6 +122,10 @@ impl State {
 	    self.let_cmd(text, class);
 	} else if keyword == "IF".to_string() {
 	    self.if_cmd(text, class);
+	} else if keyword == "REM".to_string() {
+	    self.rem_cmd(text, class);
+	} else if keyword == "STOP".to_string() {
+	    self.stop_cmd(text, class);
 	} else if keyword == "END".to_string() {
 	    self.end_cmd(text, class);
 	} else {
@@ -213,6 +217,17 @@ impl State {
 	self.next_line = goto;
     }
 
+    // Implmentation of the REM command
+    fn rem_cmd(&mut self, _text:Vec<String>, _class:Vec<String>) {
+	// Do nothing, this is just a placeholder
+    }
+
+    // Implmentation of the STOP command
+    fn stop_cmd(&mut self, _text:Vec<String>, _class:Vec<String>) {
+	// Update state
+	self.next_line = i64::MAX;
+    }
+    
     // Implmentation of the END command
     fn end_cmd(&mut self, _text:Vec<String>, _class:Vec<String>) {
 	// Update state
