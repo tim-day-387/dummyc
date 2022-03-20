@@ -1,6 +1,21 @@
 #!/usr/bin/env bash
 
 for file in $(ls -1 ./examples/custom/programs | grep -v "~"); do
-    echo "==================== $file ===================="
-    ./target/debug/dummyc "./examples/custom/programs/$file"
+    ./target/debug/dummyc "./examples/custom/programs/$file" > "/tmp/${file%.*}_output"
 done
+
+if [ $1 -eq 0 ]
+then
+    for file in $(ls -1 ./examples/custom/outputs | grep -v "~"); do
+	diff "./examples/custom/outputs/$file" "/tmp/$file" > "/tmp/diff"
+	echo -n "$file: " && [ -s /tmp/diff ] && (echo "Fail") || (echo "Pass")
+    done
+fi
+
+if [ $1 -eq 1 ]
+then
+    for file in $(ls -1 ./examples/custom/outputs | grep -v "~"); do
+	echo "~~~~~~~~~~> $file: "
+	cat "/tmp/$file"
+    done
+fi
