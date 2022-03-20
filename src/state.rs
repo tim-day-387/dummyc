@@ -139,6 +139,12 @@ impl State {
 	let mut counter = 2;
 
 	loop {
+	    // End if we run out of tokens
+	    if counter == text.len() {
+		println!("");
+		break;
+	    }
+	    
 	    // Generate data object
 	    let mut object = Data::new(text[counter].clone());
 
@@ -150,12 +156,6 @@ impl State {
 
 	    // Iterate token
 	    counter = counter + 1;
-
-	    // End if we run out of tokens
-	    if counter == text.len() {
-		println!("");
-		break;
-	    }
 	}
 
 	// Update state
