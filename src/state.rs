@@ -140,10 +140,18 @@ impl State {
 
 	loop {
 	    // End if we run out of tokens
-	    if counter == text.len() {
+	    if counter == text.len() && text[counter - 1].clone() == ";".to_string() {
+		break;
+	    } else if counter == text.len() {
 		println!("");
 		break;
-	    }
+            }
+
+	    // Check if we have a punc token
+	    if text[counter].clone() == ";".to_string() || text[counter].clone() == ",".to_string() {
+		counter = counter + 1;
+		continue;
+            }
 	    
 	    // Generate data object
 	    let mut object = Data::new(text[counter].clone());

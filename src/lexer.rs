@@ -45,12 +45,17 @@ fn tokenize(file_string:String) -> Vec<String> {
 
 	// Add to token or finish token
 	if ((file_bytes[i] == b';') | (file_bytes[i] == b',')) && !in_string {
-	    // If we hit ; make a token and move on
+	    // If we hit ; or , make two tokens and move on
 	    output.push(String::from_utf8_lossy(&token).to_string());
 	    token = Vec::new();
+
+	    // Punc token
+	    token.push(file_bytes[i]);
+	    output.push(String::from_utf8_lossy(&token).to_string());
+	    token = Vec::new();	    
 	} else if (file_bytes[i] != b' ' && file_bytes[i] != b'\n') | in_string {
 	    // Push char to token
-	    token.push(file_bytes[i])
+	    token.push(file_bytes[i]);
 	} else if (token.len() > 0) && !in_string {
 	    // Push token to vector and make new token
 	    output.push(String::from_utf8_lossy(&token).to_string());
