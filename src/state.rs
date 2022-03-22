@@ -7,7 +7,6 @@ use std::path::Path;
 use std::fs::File;
 use std::io::{self, BufRead, Write};
 
-
 // File Imports
 use lexer::*;
 use data::*;
