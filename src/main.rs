@@ -85,6 +85,6 @@ fn interactive() {
 	}
 
 	// Execute given command, update state
-	state.exec_command(line.clone(), silence);
+	state.exec_command(line.clone(), silence, false);
     }
 }

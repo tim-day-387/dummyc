@@ -73,13 +73,13 @@ impl State {
 		break;
 	    } else {
 		// Execute given command, update state
-		self.exec_command(command.clone(), true);
+		self.exec_command(command.clone(), true, false);
             }
 	}
     }
 
     // Execute the given command
-    pub fn exec_command(&mut self, line:String, silence:bool) {
+    pub fn exec_command(&mut self, line:String, silence:bool, save:bool) {
 	// Lex command
 	let text:Vec<String> = perform_lexing(line.clone()).0;
 	let class:Vec<String> = perform_lexing(line.clone()).1;
@@ -92,7 +92,10 @@ impl State {
 
 	// Add line to previous code
 	self.prev_line = text[0].clone().parse::<i64>().unwrap();
-	self.prev_code.push((self.prev_line, line.clone()));
+
+	if save {
+	    self.prev_code.push((self.prev_line, line.clone()));
+	}
 
 	// Execute command specific method
 	self.find_subcommand(text, class);
