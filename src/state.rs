@@ -18,7 +18,7 @@ pub struct State {
     pub prev_code:Vec<(i64, String)>,
     pub next_line:i64,
     pub prev_line:i64,
-    pub return_to_line:i64,
+    pub return_to_line:Vec<i64>,
 }
 
 // State implementation
@@ -30,7 +30,7 @@ impl State {
 	    prev_code:Vec::new(),
 	    next_line:-1,
 	    prev_line:-1,
-	    return_to_line:-1,
+	    return_to_line:Vec::new(),
 	}
     }
 
@@ -234,15 +234,18 @@ impl State {
     // Implmentation of the GOSUB command
     fn gosub_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
 	// Update state
-	self.return_to_line = text[0].clone().parse::<i64>().unwrap();
+	self.return_to_line.push(text[0].clone().parse::<i64>().unwrap());
 	self.next_line = text[2].clone().parse::<i64>().unwrap();
     }
 
     // Implmentation of the RETURN command
     fn return_cmd(&mut self, _text:Vec<String>, _class:Vec<String>) {
 	// Update state
-	self.prev_line = self.return_to_line;
-	self.return_to_line = -1;
+	match self.return_to_line.pop() {
+	    None => println!("Nowhere to return to!"),
+	    Some(line_to_return_to) => self.prev_line = line_to_return_to,
+	}
+	
 	self.next_line = -1;
     }
     
