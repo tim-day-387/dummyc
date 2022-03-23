@@ -225,7 +225,7 @@ impl State {
 	objectb.simplify(self.variables.clone());
 
 	// Check if equivalent
-	if objecta.equals(objectb) {
+	if objecta.eq(&objectb) {
 	    goto = text[4].clone().parse::<i64>().unwrap();
 	}
 
