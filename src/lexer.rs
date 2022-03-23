@@ -52,6 +52,20 @@ pub fn split_over_op(token:String) -> (String, String, String) {
     return (first_part_string, operation_string, second_part_string);
 }
 
+// Function to remove spaces
+fn remove_spaces(file_string:String) -> String {
+    let char_vec:Vec<char> = file_string.chars().collect();
+    let mut output_string:String = "".to_string();
+        
+    for c in char_vec {
+	if c != ' ' {
+	    output_string.push(c);
+        }
+    }
+
+    return output_string;
+}
+
 // Create a vector of tokens
 fn tokenize(file_string:String) -> Vec<String> {
     let file_bytes = file_string.as_bytes();
@@ -243,5 +257,23 @@ mod test {
 	let answer = ("B".to_string(), "<=".to_string(), "23423984723fffffjjjdjdj{}||[".to_string());
 
 	assert_eq!(answer, split(given));
+    }
+
+    // Testing remove_spaces()
+    #[test]
+    fn remove_spaces_1() {
+	let given:String = "A =\"F u h\"".to_string();
+	let answer:String = "A=\"Fuh\"".to_string();
+
+	assert_eq!(answer, remove_spaces(given));
+    }
+
+    // Testing remove_spaces()
+    #[test]
+    fn remove_spaces_2() {
+	let given:String = "                  ".to_string();
+	let answer:String = "".to_string();
+
+	assert_eq!(answer, remove_spaces(given));
     }
 }
