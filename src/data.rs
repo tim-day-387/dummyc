@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use lexer::*;
 
 // Data struct
-#[derive(Clone)]
+#[derive(PartialEq, Clone)]
 pub struct Data {
     pub plain_text:String,
     pub output_type:String,
@@ -26,15 +26,6 @@ impl Data {
 	}
     }
 
-    // Check if two data objects are equal
-    pub fn equals(self, other:Data) -> bool {
-	let first:bool = self.plain_text == other.plain_text;
-	let second:bool = self.output_type == other.output_type;
-	let third:bool = self.print_out_text == other.print_out_text;
-
-	return first && second && third;
-    }
-
     // Simplify data output to one which can be stored and printed out
     pub fn simplify(&mut self, vars:HashMap<String, Data>) {
 	self.find_output_type();
@@ -48,11 +39,13 @@ impl Data {
     
     // Resolve any unresolved operations in the expression
     fn resolve(&mut self, vars:HashMap<String, Data>) {
+	// Split the expression over the operation
 	let split = split_over_op(self.plain_text.clone());
 	let first_part_string:String = split.0;
 	let operation_string:String = split.1;
 	let second_part_string:String = split.2;
 
+	// If there is no operation, check if there is a variable
 	if operation_string == "".to_string() {
 	    self.get_var_value(vars);
 	    return;
@@ -64,16 +57,13 @@ impl Data {
 	first_obj.simplify(vars.clone());
 	second_obj.simplify(vars.clone());
 
-	first_obj.operation(second_obj);
+	first_obj.operation(second_obj, operation_string);
 
-	// Simplify later
-	self.plain_text = first_obj.plain_text.clone();
-	self.output_type = first_obj.output_type.clone();
-	self.print_out_text = first_obj.print_out_text.clone();	
+	*self = first_obj.clone();
     }
 
     // Perform the operation
-    fn operation(&mut self, other:Data) {
+    fn operation(&mut self, other:Data, operation_string:String) {
 	self.plain_text = format!("{}{}{}{}", "\"".to_string(), self.print_out_text.clone(), other.print_out_text.clone(), "\"".to_string());
     }
 
@@ -98,10 +88,7 @@ impl Data {
 	    _=> println!("ERROR VAL"),
 	}
 
-	// Simplify later
-	self.plain_text = var_value.plain_text.clone();
-	self.output_type = var_value.output_type.clone();
-	self.print_out_text = var_value.print_out_text.clone();
+	*self = var_value.clone();
     }
 
     // Find text to be printed out
