@@ -4,6 +4,9 @@
 // General Imports
 use std::collections::HashMap;
 
+// File Imports
+use lexer::*;
+
 // Data struct
 #[derive(Clone)]
 pub struct Data {
@@ -16,7 +19,6 @@ pub struct Data {
 impl Data {
     // Constructor
     pub fn new(given_text:String) -> Data {
-
 	Data {
 	    plain_text:given_text,
 	    output_type:"".to_string(),
@@ -36,28 +38,52 @@ impl Data {
     // Simplify data output to one which can be stored and printed out
     pub fn simplify(&mut self, vars:HashMap<String, Data>) {
 	self.find_output_type();
-
+	
 	if self.output_type == "unresolved".to_string() {
-	    self.get_var_value(vars);
+	    self.resolve(vars);
 	}
 	
 	self.get_print_out();
     }
     
     // Resolve any unresolved operations in the expression
-    fn resolve(&mut self) {
+    fn resolve(&mut self, vars:HashMap<String, Data>) {
+	let split = split_over_op(self.plain_text.clone());
+	let first_part_string:String = split.0;
+	let operation_string:String = split.1;
+	let second_part_string:String = split.2;
+
+	if operation_string == "".to_string() {
+	    self.get_var_value(vars);
+	    return;
+	}
+
+	let mut first_obj:Data = Data::new(first_part_string);
+	let mut second_obj:Data = Data::new(second_part_string);
 	
+	first_obj.simplify(vars.clone());
+	second_obj.simplify(vars.clone());
+
+	first_obj.operation(second_obj);
+
+	// Simplify later
+	self.plain_text = first_obj.plain_text.clone();
+	self.output_type = first_obj.output_type.clone();
+	self.print_out_text = first_obj.print_out_text.clone();	
+    }
+
+    // Perform the operation
+    fn operation(&mut self, other:Data) {
+	self.plain_text = format!("{}{}{}{}", "\"".to_string(), self.print_out_text.clone(), other.print_out_text.clone(), "\"".to_string());
     }
 
     // Determine output type
     fn find_output_type(&mut self) {
-	let char_vec:Vec<char> = self.plain_text.chars().collect();
-	let first = 0;
-	let last = char_vec.len()-1;
-
 	// Series of cases to find type
-	if char_vec.get(first).expect("First char missing!") == &'"' && char_vec.get(last).expect("First char missing!") == &'"' {
+	if is_string(self.plain_text.clone()) {
 	    self.output_type = "string".to_string();
+	} else if is_float(self.plain_text.clone()) {
+	    self.output_type = "float".to_string();
 	} else {
 	    self.output_type = "unresolved".to_string();
 	}
@@ -86,6 +112,9 @@ impl Data {
 	    self.print_out_text = self.plain_text.clone();
 	    self.print_out_text.pop();
 	    self.print_out_text.remove(0);
+	} else {
+	    // Just use the plain text if nothing else
+	    self.print_out_text = self.plain_text.clone();
 	}
     }
 }
