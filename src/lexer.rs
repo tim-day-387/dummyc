@@ -29,6 +29,29 @@ pub fn split(token:String) -> (String, String, String) {
     return (first_part_string, relational_string, second_part_string);
 }
 
+// Split an expression across the relational
+pub fn split_over_op(token:String) -> (String, String, String) {
+    let char_vec:Vec<char> = token.chars().collect();
+    let mut first_part_string:String = "".to_string();
+    let mut operation_string:String = "".to_string();
+    let mut second_part_string:String = "".to_string();
+    let mut in_exp:bool = false;
+        
+    // Splits expression based on operation
+    for c in char_vec {
+	if (c == '+' || c == '/' || c == '*' || c == '-') && !in_exp {
+	    operation_string.push(c);
+	    in_exp = true;
+	} else if !in_exp {
+	    first_part_string.push(c);
+	} else {
+	    second_part_string.push(c);
+        }
+    }
+
+    return (first_part_string, operation_string, second_part_string);
+}
+
 // Create a vector of tokens
 fn tokenize(file_string:String) -> Vec<String> {
     let file_bytes = file_string.as_bytes();
@@ -116,7 +139,7 @@ fn find_token(token:String) -> String {
 }
 
 // Check if float
-fn is_float(token:String) -> bool {
+pub fn is_float(token:String) -> bool {
     let char_vec:Vec<char> = token.chars().collect();
     let mut output = true;
     let mut seen_point = false;
@@ -159,17 +182,23 @@ fn is_int(token:String) -> bool {
 }
 
 // Check if string
-fn is_string(token:String) -> bool {
+pub fn is_string(token:String) -> bool {
     let char_vec:Vec<char> = token.chars().collect();
-    let last = char_vec.len()-1;
-    let mut output = false;
+    let mut in_string = false;
+    let mut output = true;
 
-    // If the first and last chars are ", we have a string
-    if char_vec.get(0).expect("First char missing!") == &'"' &&
-	char_vec.get(last).expect("First char missing!") == &'"' {
-	    output = true;
+    // Step through each char
+    for i in 0..(token.len() - 1) {
+	// Check if in string 
+	if char_vec[i] == '"' {
+	    in_string = !in_string;
 	}
 
+	output = output && in_string;
+    }
+
+    output = output && (char_vec[token.len() - 1] == '"');
+    
     return output;
 }
 
