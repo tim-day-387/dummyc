@@ -87,6 +87,10 @@ impl State {
 	if !silence {
 	    std::io::stdout().write("COMMAND TEXT: ".as_bytes()).unwrap();
 	    std::io::stdout().write(line.as_bytes()).unwrap();
+
+	    for token in text.clone() {
+		println!("TOKEN: {}", token);
+	    }
 	}
 
 	// Add line to previous code
