@@ -321,6 +321,15 @@ mod test {
 
 	assert_eq!(answer, tokenize(given));
     }
+
+    // Testing tokenize()
+    #[test]
+    fn tokenize_6() {
+	let given:String = remove_spaces("100".to_string());
+	let answer:Vec<String> = vec!["100".to_string()];
+
+	assert_eq!(answer, tokenize(given));
+    }
         
     // Testing split()
     #[test]
