@@ -89,7 +89,7 @@ impl State {
 	    std::io::stdout().write(line.as_bytes()).unwrap();
 
 	    for token in text.clone() {
-		println!("TOKEN: {}", token);
+		println!("TOKEN: ~~>{}<~~", token);
 	    }
 	}
 
