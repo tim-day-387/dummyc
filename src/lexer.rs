@@ -1,6 +1,10 @@
 // Lexer modulen
 #![forbid(unsafe_code)]
 
+// Constants
+const RESERVED:[&'static str; 19] = ["RETURN", "GOSUB", "PRINT", "INPUT", "READ", "DATA", "STOP", "GOTO",
+				     "THEN", "NEXT", "FOR", "REM", "LET", "DIM", "END", "IF", "TO", ";", ","];
+
 // Perform all lexer commands
 pub fn perform_lexing(file_string:String) -> (Vec<String>, Vec<String>) {
     return classify(tokenize(remove_spaces(file_string)));
@@ -124,19 +128,10 @@ fn classify(tokens:Vec<String>) -> (Vec<String>, Vec<String>) {
 
 // Find the beginnings and ends of all matching reserved tokens
 fn find_res_tokens(file_string:String) -> Vec<usize> {
-    let reserved_tokens:Vec<String> = vec!["IF".to_string(), "THEN".to_string(),
-					   "GOTO".to_string(), "FOR".to_string(),
-					   ";".to_string(), ",".to_string(),
-					   "NEXT".to_string(), "REM".to_string(),
-					   "RETURN".to_string(), "GOSUB".to_string(),
-					   "PRINT".to_string(), "LET".to_string(),
-					   "DIM".to_string(), "INPUT".to_string(),
-					   "READ".to_string(), "DATA".to_string(),
-					   "END".to_string(), "STOP".to_string()];
     let mut locations:Vec<usize> = Vec::new();
-    let mut i_in_string = Vec::new();
+    let mut i_in_string_or_res = Vec::new();
     let mut in_string = false;
-    let mut i = 0;
+    let mut iter = 0;
     let char_vec:Vec<char> = file_string.chars().collect();
     
     for c in char_vec {
@@ -145,19 +140,23 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
 	}
 
 	if in_string {
-	    i_in_string.push(i);
+	    i_in_string_or_res.push(iter);
         }
 
-	i = i + 1;
+	iter = iter + 1;
     }
     
-    for i in reserved_tokens {
-	let value:Vec<_> = file_string.match_indices(&i).map(|(j, _)|j).collect();
+    for i in &RESERVED {
+	let value:Vec<_> = file_string.match_indices(i).map(|(j, _)|j).collect();
 	
 	for loc in value {
-	    if !i_in_string.contains(&loc) {
+	    if !i_in_string_or_res.contains(&loc) {
 		locations.push(loc);
 		locations.push(loc + i.len());
+
+		for k in loc..(loc + i.len()) {
+		    i_in_string_or_res.push(k);
+		}
 	    }
 	}
     }
