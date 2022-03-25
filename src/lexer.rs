@@ -252,18 +252,8 @@ pub fn is_string(token:String) -> bool {
 
 // Check if a reserved token
 fn is_res(token:String) -> bool {
-    let reserved_tokens:Vec<String> = vec!["IF".to_string(), "THEN".to_string(),
-					   "GOTO".to_string(), "FOR".to_string(),
-					   ";".to_string(), ",".to_string(),
-					   "NEXT".to_string(), "REM".to_string(),
-					   "RETURN".to_string(), "GOSUB".to_string(),
-					   "PRINT".to_string(), "LET".to_string(),
-					   "DIM".to_string(), "INPUT".to_string(),
-					   "READ".to_string(), "DATA".to_string(),
-					   "END".to_string(), "STOP".to_string()];
-    
     // Check if token is one of the reserved_tokens
-    if reserved_tokens.contains(&token) {
+    if RESERVED.contains(&token.as_str()) {
 	return true;
     } else {
 	return false;
