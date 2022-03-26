@@ -42,7 +42,7 @@ impl State {
 	if let Ok(lines) = read_lines(file_path) {
             for line in lines {
 		if let Ok(ip) = line {
-                    line_num = perform_lexing(ip.clone()).0[0].parse::<i64>().unwrap();
+                    line_num = perform_lexing(ip.clone())[0].parse::<i64>().unwrap();
 		    self.prev_code.push((line_num, ip.clone()));
 		}
             }
@@ -80,8 +80,7 @@ impl State {
     // Execute the given command
     pub fn exec_command(&mut self, line:String, silence:bool, save:bool) {
 	// Lex command
-	let text:Vec<String> = perform_lexing(line.clone()).0;
-	let class:Vec<String> = perform_lexing(line.clone()).1;
+	let text:Vec<String> = perform_lexing(line.clone());
 
 	// Write out command
 	if !silence {
@@ -101,11 +100,11 @@ impl State {
 	}
 
 	// Execute command specific method
-	self.find_subcommand(text, class);
+	self.find_subcommand(text);
     }
 
     // Find subcommand to execute
-    fn find_subcommand(&mut self, text:Vec<String>, class:Vec<String>) {
+    fn find_subcommand(&mut self, text:Vec<String>) {
 	// Check if command is present
 	if text.len() == 1 {
 	    // Update state
@@ -123,23 +122,23 @@ impl State {
 
 	// Execute given command
 	if keyword == "PRINT".to_string() {
-	    self.print_cmd(text, class);
+	    self.print_cmd(text);
 	} else if keyword == "GOTO".to_string() {
-	    self.goto_cmd(text, class);
+	    self.goto_cmd(text);
 	} else if keyword == "LET".to_string() {
-	    self.let_cmd(text, class);
+	    self.let_cmd(text);
 	} else if keyword == "IF".to_string() {
-	    self.if_cmd(text, class);
+	    self.if_cmd(text);
 	} else if keyword == "GOSUB".to_string() {
-	    self.gosub_cmd(text, class);
+	    self.gosub_cmd(text);
 	} else if keyword == "RETURN".to_string() {
-	    self.return_cmd(text, class);
+	    self.return_cmd(text);
 	} else if keyword == "REM".to_string() {
-	    self.rem_cmd(text, class);
+	    self.rem_cmd(text);
 	} else if keyword == "STOP".to_string() {
-	    self.stop_cmd(text, class);
+	    self.stop_cmd(text);
 	} else if keyword == "END".to_string() {
-	    self.end_cmd(text, class);
+	    self.end_cmd(text);
 	} else {
 	    // Update state
 	    self.next_line = i64::MAX;
@@ -147,7 +146,7 @@ impl State {
     }
 
     // Implmentation of the PRINT command
-    fn print_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
+    fn print_cmd(&mut self, text:Vec<String>) {
 	let mut counter = 2;
 
 	loop {
@@ -183,13 +182,13 @@ impl State {
     }
 
     // Implmentation of the GOTO command
-    fn goto_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
+    fn goto_cmd(&mut self, text:Vec<String>) {
 	// Update state
 	self.next_line = text[2].clone().parse::<i64>().unwrap();
     }
 
     // Implmentation of the LET command
-    fn let_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
+    fn let_cmd(&mut self, text:Vec<String>) {
 	// Split statement
 	let text_split = split(text[2].clone());
 	let var_name = text_split.0;
@@ -211,7 +210,7 @@ impl State {
     }
 
     // Implmentation of the IF command
-    fn if_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
+    fn if_cmd(&mut self, text:Vec<String>) {
 	let mut goto = -1;
 
 	// Split statement
@@ -238,14 +237,14 @@ impl State {
     }
 
     // Implmentation of the GOSUB command
-    fn gosub_cmd(&mut self, text:Vec<String>, _class:Vec<String>) {
+    fn gosub_cmd(&mut self, text:Vec<String>) {
 	// Update state
 	self.return_to_line.push(text[0].clone().parse::<i64>().unwrap());
 	self.next_line = text[2].clone().parse::<i64>().unwrap();
     }
 
     // Implmentation of the RETURN command
-    fn return_cmd(&mut self, _text:Vec<String>, _class:Vec<String>) {
+    fn return_cmd(&mut self, _text:Vec<String>) {
 	// Update state
 	match self.return_to_line.pop() {
 	    None => println!("Nowhere to return to!"),
@@ -256,19 +255,19 @@ impl State {
     }
     
     // Implmentation of the REM command
-    fn rem_cmd(&mut self, _text:Vec<String>, _class:Vec<String>) {
+    fn rem_cmd(&mut self, _text:Vec<String>) {
 	// Do nothing, this is just a placeholder
 	self.next_line = -1;
     }
 
     // Implmentation of the STOP command
-    fn stop_cmd(&mut self, _text:Vec<String>, _class:Vec<String>) {
+    fn stop_cmd(&mut self, _text:Vec<String>) {
 	// Update state
 	self.next_line = i64::MAX;
     }
     
     // Implmentation of the END command
-    fn end_cmd(&mut self, _text:Vec<String>, _class:Vec<String>) {
+    fn end_cmd(&mut self, _text:Vec<String>) {
 	// Update state
 	self.next_line = i64::MAX;
     }

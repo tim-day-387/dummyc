@@ -7,8 +7,8 @@ const RESERVED:[&'static str; 23] = ["RESTORE", "RETURN", "GOSUB", "PRINT", "INP
 				     "IF", "TO", "ON", ";", ","];
 
 // Perform all lexer commands
-pub fn perform_lexing(file_string:String) -> (Vec<String>, Vec<String>) {
-    return classify(tokenize(remove_spaces(file_string)));
+pub fn perform_lexing(file_string:String) -> Vec<String> {
+    return tokenize(remove_spaces(file_string));
 }
 
 // Split an expression across the relational
