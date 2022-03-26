@@ -41,12 +41,18 @@ pub fn split_over_op(token:String) -> (String, String, String) {
     let mut operation_string:String = "".to_string();
     let mut second_part_string:String = "".to_string();
     let mut in_exp:bool = false;
+    let mut left_paran = 0;
+    let mut right_paran = 0;
     
     // Splits expression based on operation
     for c in char_vec {
-	if (c == '+' || c == '/' || c == '*' || c == '-') && !in_exp {
+	if (c == '+' || c == '/' || c == '*' || c == '-') && (left_paran == right_paran) && !in_exp {
 	    operation_string.push(c);
 	    in_exp = true;
+	} else if c == '(' {
+	    left_paran = left_paran + 1;
+	} else if c == ')' {
+	    right_paran = right_paran + 1;
 	} else if !in_exp {
 	    first_part_string.push(c);
 	} else {
@@ -168,7 +174,7 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
 }
 
 // Check if float
-pub fn is_float(token:String) -> bool {
+pub fn _is_float(token:String) -> bool {
     let char_vec:Vec<char> = token.chars().collect();
     let mut output = true;
     let mut seen_point = false;
@@ -232,7 +238,7 @@ pub fn is_string(token:String) -> bool {
 }
 
 // Check if a reserved token
-fn is_res(token:String) -> bool {
+pub fn is_res(token:String) -> bool {
     // Check if token is one of the reserved_tokens
     if RESERVED.contains(&token.as_str()) {
 	return true;
