@@ -99,34 +99,6 @@ fn tokenize(file_string:String) -> Vec<String> {
     return output;
 }
 
-// Create a vector of tokens
-fn classify(tokens:Vec<String>) -> (Vec<String>, Vec<String>) {
-    let mut text:Vec<String> = Vec::new();
-    let mut class:Vec<String> = Vec::new();
-    let mut line_set = false;
-
-    // Find each token
-    for t in tokens {
-	// Check if the line number has been seen
-	if !line_set && find_token(t.clone()) == "int".to_string() {
-	    // Classify line_num
-	    text.push(t.clone());
-	    class.push("line_num".to_string());
-	    line_set = true;
-	} else {
-	    // Identify non-line number
-	    text.push(t.clone());
-	    class.push(find_token(t.clone()));
-	}
-    }
-
-    if class[0] != "line_num".to_string() {
-	panic!("LEXER: classify: Line does not have a line number");
-    }
-
-    return (text, class);
-}
-
 // Find the beginnings and ends of all matching reserved tokens
 fn find_res_tokens(file_string:String) -> Vec<usize> {
     let mut locations:Vec<usize> = Vec::new();
@@ -185,15 +157,15 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
 }
 
 // Classify token
-fn find_token(token:String) -> String {
+fn _find_token(token:String) -> String {
     let output:String;
 
     // Find what find of token we're looking at
-    if is_int(token.clone()) {
+    if _is_int(token.clone()) {
 	output = "int".to_string();
     } else if is_string(token.clone()) {
 	output = "string".to_string();
-    } else if is_res(token.clone()) {
+    } else if _is_res(token.clone()) {
 	output = "res".to_string();
     } else if is_float(token.clone()) {
 	output = "float".to_string();	
@@ -235,7 +207,7 @@ pub fn is_float(token:String) -> bool {
 }
 
 // Check if integer
-fn is_int(token:String) -> bool {
+fn _is_int(token:String) -> bool {
     let char_vec:Vec<char> = token.chars().collect();
     let mut output = true;
 
@@ -269,7 +241,7 @@ pub fn is_string(token:String) -> bool {
 }
 
 // Check if a reserved token
-fn is_res(token:String) -> bool {
+fn _is_res(token:String) -> bool {
     // Check if token is one of the reserved_tokens
     if RESERVED.contains(&token.as_str()) {
 	return true;
