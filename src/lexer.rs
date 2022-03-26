@@ -198,7 +198,7 @@ pub fn is_float(token:String) -> bool {
 }
 
 // Check if integer
-fn is_int(token:String) -> bool {
+pub fn is_int(token:String) -> bool {
     let char_vec:Vec<char> = token.chars().collect();
     let mut output = true;
 
