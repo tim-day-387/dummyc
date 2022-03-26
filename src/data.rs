@@ -64,16 +64,50 @@ impl Data {
 
     // Perform the operation
     fn operation(&mut self, other:Data, operation_string:String) {
-	self.plain_text = format!("{}{}{}{}", "\"".to_string(), self.print_out_text.clone(), other.print_out_text.clone(), "\"".to_string());
+	let output_type = self.clone().find_operation_output_type(other.clone());
+
+	if output_type == "string".to_string() {
+	    self.plain_text = format!("{}{}{}{}", "\"".to_string(), self.print_out_text.clone(), other.print_out_text.clone(), "\"".to_string());
+	} else if output_type == "int".to_string() {
+	    let a = match self.plain_text.parse::<i32>() {
+		Ok(i) => i,
+		Err(_e) => panic!("DATA: operation: Invalid integer"),
+	    };
+	    let b = match other.plain_text.parse::<i32>() {
+		Ok(i) => i,
+		Err(_e) => panic!("DATA: operation: Invalid integer"),
+	    };
+
+	    if operation_string == "+".to_string() {
+		self.plain_text = (a+b).to_string();
+	    } else if operation_string == "*".to_string() {
+		self.plain_text = (a*b).to_string();
+	    } else if operation_string == "-".to_string() {
+		self.plain_text = (a-b).to_string();
+	    } else {
+		panic!("DATA: operation: Invalid operation");
+            } 
+	}
     }
 
+    // Find output type of an binary operation
+    fn find_operation_output_type(self, other:Data) -> String {
+	if self.output_type == "string".to_string() && other.output_type == "string".to_string() {
+	    return "string".to_string();
+	} else if self.output_type == "int".to_string() && other.output_type == "int".to_string() {
+	    return "int".to_string();
+	} else {
+	    panic!("DATA: find_operation_output_type: Incompatible types");
+	}
+    }
+    
     // Determine output type
     fn find_output_type(&mut self) {
 	// Series of cases to find type
 	if is_string(self.plain_text.clone()) {
 	    self.output_type = "string".to_string();
-	} else if is_float(self.plain_text.clone()) {
-	    self.output_type = "float".to_string();
+	} else if is_int(self.plain_text.clone()) {
+	    self.output_type = "int".to_string();
 	} else {
 	    self.output_type = "unresolved".to_string();
 	}
