@@ -1,0 +1,3 @@
+001 FOR I=1 TO 10
+002 PRINT "Test"    
+003 NEXT I
