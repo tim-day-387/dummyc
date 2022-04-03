@@ -18,6 +18,7 @@ pub struct State {
     pub next_line:i64,
     pub prev_line:i64,
     pub return_to_line:Vec<i64>,
+    pub for_return_to_line:HashMap<String, i64>,
 }
 
 // State implementation
@@ -30,6 +31,7 @@ impl State {
 	    next_line:-1,
 	    prev_line:-1,
 	    return_to_line:Vec::new(),
+	    for_return_to_line:HashMap::new(),
 	}
     }
 
@@ -259,14 +261,69 @@ impl State {
     }
 
     // Implmentation of the FOR command
-    fn for_cmd(&mut self, _text:Vec<String>) {
+    fn for_cmd(&mut self, text:Vec<String>) {
+	let cur_value:Data;
+	
+	// Parse step
+	let mut step:Data = Data::new("1".to_string());
+	step.simplify(self.variables.clone());
+	
+	// Split statement
+	let text_split = split(text[2].clone());
+	let var_name = text_split.0;
+	let _relational = text_split.1;
+	let data = text_split.2;
+
+	// Check if exists, then add if not
+	match self.variables.get(&var_name) {
+	    Some(value)=> {
+		// Advance counter by one step
+		let mut var_value = value.clone();
+		var_value.operation(step, "+".to_string());
+		var_value.simplify(self.variables.clone());
+		cur_value = var_value.clone();
+		self.variables.insert(var_name.clone(), var_value);
+	    },
+	    _=> {
+		// Create counter for the first time
+		let mut object = Data::new(data);
+		object.simplify(self.variables.clone());
+		cur_value = object.clone();
+		self.variables.insert(var_name.clone(), object);
+	    },
+	}
+
+	// Final allowed value
+	let mut limit = Data::new(text[4].clone());
+	limit.simplify(self.variables.clone());
+
+	if !cur_value.eq(&limit) {
+	    self.for_return_to_line.insert(var_name.clone(), text[0].clone().parse::<i64>().unwrap());
+	}
+	
 	// Update state
 	self.next_line = -1;
     }
 
     // Implmentation of the NEXT command
-    fn next_cmd(&mut self, _text:Vec<String>) {
-	self.next_line = -1;
+    fn next_cmd(&mut self, text:Vec<String>) {
+	let var_name = text[2].clone();
+	
+	// Check if exists, and set next_line
+	match self.for_return_to_line.get(&var_name) {
+	    Some(value)=> {
+		// Return to FOR
+		self.next_line = value.clone();
+	    },
+	    _=> {
+		// Keep going, remove variable
+		self.variables.remove(&var_name);
+		self.next_line = -1;
+	    },
+	}
+
+	// Remove line to return to
+	self.for_return_to_line.remove(&var_name);
     }
     
     // Implmentation of the REM command
