@@ -133,6 +133,10 @@ impl State {
 	    self.gosub_cmd(text);
 	} else if keyword == "RETURN".to_string() {
 	    self.return_cmd(text);
+	} else if keyword == "FOR".to_string() {
+	    self.for_cmd(text);
+	} else if keyword == "NEXT".to_string() {
+	    self.next_cmd(text);
 	} else if keyword == "REM".to_string() {
 	    self.rem_cmd(text);
 	} else if keyword == "STOP".to_string() {
@@ -247,10 +251,21 @@ impl State {
     fn return_cmd(&mut self, _text:Vec<String>) {
 	// Update state
 	match self.return_to_line.pop() {
-	    None => println!("Nowhere to return to!"),
+	    None => panic!("STATE: return_cmd: Nowhere to return to"),
 	    Some(line_to_return_to) => self.prev_line = line_to_return_to,
 	}
 	
+	self.next_line = -1;
+    }
+
+    // Implmentation of the FOR command
+    fn for_cmd(&mut self, _text:Vec<String>) {
+	// Update state
+	self.next_line = -1;
+    }
+
+    // Implmentation of the NEXT command
+    fn next_cmd(&mut self, _text:Vec<String>) {
 	self.next_line = -1;
     }
     
