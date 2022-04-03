@@ -63,7 +63,7 @@ impl Data {
     }
 
     // Perform the operation
-    fn operation(&mut self, other:Data, operation_string:String) {
+    pub fn operation(&mut self, other:Data, operation_string:String) {
 	let output_type = self.clone().find_operation_output_type(other.clone());
 
 	if output_type == "string".to_string() {
@@ -115,11 +115,11 @@ impl Data {
 
     // Get variable value
     fn get_var_value(&mut self, vars:HashMap<String, Data>) {
-	let mut var_value:&Data = &Data::new("".to_string());
+	let var_value:&Data;
 	
 	match vars.get(&self.plain_text) {
 	    Some(value)=> var_value = value,
-	    _=> println!("ERROR VAL"),
+	    _=> panic!("DATA: get_var_value: Variable does not exist"),
 	}
 
 	*self = var_value.clone();
