@@ -120,7 +120,7 @@ impl State {
 	}
 
 	// Set keyword
-	let keyword = text[1].clone();
+	let keyword = text[1].clone().to_uppercase();
 
 	// Execute given command
 	if keyword == "PRINT".to_string() {
