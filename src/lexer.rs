@@ -154,7 +154,10 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
     }
     
     for i in &RESERVED {
-	let value:Vec<_> = file_string.match_indices(i).map(|(j, _)|j).collect();
+	let mut value:Vec<usize> = file_string.match_indices(i).map(|(j, _)|j).collect();
+	let mut lower_value:Vec<usize> = file_string.match_indices(&i.to_lowercase()).map(|(j, _)|j).collect();
+
+	value.append(&mut lower_value);
 	
 	for loc in value {
 	    if !i_in_string_or_res.contains(&loc) {
@@ -240,7 +243,7 @@ pub fn is_string(token:String) -> bool {
 // Check if a reserved token
 pub fn is_res(token:String) -> bool {
     // Check if token is one of the reserved_tokens
-    if RESERVED.contains(&token.as_str()) {
+    if RESERVED.contains(&token.as_str()) || RESERVED.contains(&token.to_uppercase().as_str()) {
 	return true;
     } else {
 	return false;
