@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 for file in $(ls -1 ./examples/nbs/programs | grep -v "~"); do
-    ./target/debug/dummyc "./examples/nbs/programs/$file" > "/tmp/${file%.*}_output"
+    ./target/debug/dummyc "./examples/nbs/programs/$file" 1> "/tmp/${file%.*}_output" 2> /dev/null
 done
 
 if [ $1 -eq 0 ]
