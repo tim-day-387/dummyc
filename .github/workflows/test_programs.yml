@@ -2,9 +2,9 @@ name: Test Programs
 
 on:
   push:
-    branches: [ main ]
+    branches: [ transpiler ]
   pull_request:
-    branches: [ main ]
+    branches: [ transpiler ]
 
 env:
   CARGO_TERM_COLOR: always
