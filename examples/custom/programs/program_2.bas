@@ -1,4 +1,4 @@
-000 # Begin program #
+000 
 005 PRINT "-- Add Two Single Digit Numbers --"
 010 LET first="6"
 020 LET second="9"
@@ -7,7 +7,7 @@
 050 PRINT "Second Number:"
 060 PRINT second
 070 PRINT "Sum:"
-900 # Decide where to go based on first number #
+900 
 1000 IF first="0" THEN 2000
 1001 IF first="1" THEN 2010
 1002 IF first="2" THEN 2020
@@ -18,7 +18,7 @@
 1007 IF first="7" THEN 2070
 1008 IF first="8" THEN 2080
 1009 IF first="9" THEN 2090
-2000 IF second="0" THEN 9000 # Zero #
+2000 IF second="0" THEN 9000
 2001 IF second="1" THEN 9010
 2002 IF second="2" THEN 9020
 2003 IF second="3" THEN 9030
@@ -28,7 +28,7 @@
 2007 IF second="7" THEN 9070
 2008 IF second="8" THEN 9080
 2009 IF second="9" THEN 9090
-2010 IF second="0" THEN 9010 # One #
+2010 IF second="0" THEN 9010
 2011 IF second="1" THEN 9020
 2012 IF second="2" THEN 9030
 2013 IF second="3" THEN 9040
@@ -38,7 +38,7 @@
 2017 IF second="7" THEN 9080
 2018 IF second="8" THEN 9090
 2019 IF second="9" THEN 9100
-2020 IF second="0" THEN 9020 # Two #
+2020 IF second="0" THEN 9020
 2021 IF second="1" THEN 9030
 2022 IF second="2" THEN 9040
 2023 IF second="3" THEN 9050
@@ -48,7 +48,7 @@
 2027 IF second="7" THEN 9090
 2028 IF second="8" THEN 9100
 2029 IF second="9" THEN 9110
-2030 IF second="0" THEN 9030 # Three #
+2030 IF second="0" THEN 9030
 2031 IF second="1" THEN 9040
 2032 IF second="2" THEN 9050
 2033 IF second="3" THEN 9060
@@ -58,7 +58,7 @@
 2037 IF second="7" THEN 9100
 2038 IF second="8" THEN 9110
 2039 IF second="9" THEN 9120
-2040 IF second="0" THEN 9040 # Four #
+2040 IF second="0" THEN 9040
 2041 IF second="1" THEN 9050
 2042 IF second="2" THEN 9060
 2043 IF second="3" THEN 9070
@@ -68,7 +68,7 @@
 2047 IF second="7" THEN 9110
 2048 IF second="8" THEN 9120
 2049 IF second="9" THEN 9130
-2050 IF second="0" THEN 9050 # Five #
+2050 IF second="0" THEN 9050
 2051 IF second="1" THEN 9060
 2052 IF second="2" THEN 9070
 2053 IF second="3" THEN 9080
@@ -78,7 +78,7 @@
 2057 IF second="7" THEN 9120
 2058 IF second="8" THEN 9130
 2059 IF second="9" THEN 9140
-2060 IF second="0" THEN 9060 # Six #
+2060 IF second="0" THEN 9060
 2061 IF second="1" THEN 9070
 2062 IF second="2" THEN 9080
 2063 IF second="3" THEN 9090
@@ -88,7 +88,7 @@
 2067 IF second="7" THEN 9130
 2068 IF second="8" THEN 9140
 2069 IF second="9" THEN 9150
-2070 IF second="0" THEN 9070 # Seven #
+2070 IF second="0" THEN 9070
 2071 IF second="1" THEN 9080
 2072 IF second="2" THEN 9090
 2073 IF second="3" THEN 9100
@@ -98,7 +98,7 @@
 2077 IF second="7" THEN 9140
 2078 IF second="8" THEN 9150
 2079 IF second="9" THEN 9160
-2080 IF second="0" THEN 9080 # Eight #
+2080 IF second="0" THEN 9080
 2081 IF second="1" THEN 9090
 2082 IF second="2" THEN 9100
 2083 IF second="3" THEN 9110
@@ -108,7 +108,7 @@
 2087 IF second="7" THEN 9150
 2088 IF second="8" THEN 9160
 2089 IF second="9" THEN 9170
-2090 IF second="0" THEN 9090 # Nine #
+2090 IF second="0" THEN 9090
 2091 IF second="1" THEN 9100
 2092 IF second="2" THEN 9110
 2093 IF second="3" THEN 9120
@@ -118,7 +118,7 @@
 2097 IF second="7" THEN 9160
 2098 IF second="8" THEN 9170
 2099 IF second="9" THEN 9180
-8000 # Pick a number to print #
+8000 
 9000 PRINT "0"
 9005 END
 9010 PRINT "1"

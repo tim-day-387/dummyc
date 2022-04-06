@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+for file in $(ls -1 ./examples/custom/programs | grep -v "~"); do
+    ./target/debug/dummyc "./examples/custom/programs/$file" 1> "/tmp/${file%.*}_output" 2> /dev/null
+done
+
+if [ $1 -eq 0 ]
+then
+    for file in $(ls -1 ./examples/custom/outputs | grep -v "~"); do
+	diff "./examples/custom/outputs/$file" "/tmp/$file" > "/tmp/diff"
+	echo -n "$file: " && [ -s /tmp/diff ] && (echo "Fail") || (echo "Pass")
+    done
+fi
+
+if [ $1 -eq 1 ]
+then
+    for file in $(ls -1 ./examples/custom/outputs | grep -v "~"); do
+	echo "~~~~~~~~~~> $file: "
+	cat "/tmp/$file"
+    done
+fi
