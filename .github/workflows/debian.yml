@@ -2,9 +2,9 @@ name: Debian
 
 on:
   push:
-    branches: [ interpreter ]
+    branches: [ main ]
   pull_request:
-    branches: [ interpreter ]
+    branches: [ main ]
 
 env:
   CARGO_TERM_COLOR: always
