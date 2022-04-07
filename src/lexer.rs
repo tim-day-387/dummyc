@@ -66,9 +66,7 @@ pub fn split_over_op(token:String) -> (String, String, String) {
 // Create an error if the command is not formed properly
 fn verify(tokens:Vec<String>) -> Vec<String> {
     if !is_int(tokens[0].clone()) {
-	panic!("LEXER: verify: Line does not have a line number");
-    } else if tokens.len() > 1 && !is_res(tokens[1].clone()) {
-	panic!("LEXER: verify: Line has malformed command");
+	panic!("LEXER: verify: Line either has no line number or has no reserved token");
     } else {
 	return tokens;
     }
@@ -256,7 +254,7 @@ pub fn is_string(token:String) -> bool {
 }
 
 // Check if a reserved token
-pub fn is_res(token:String) -> bool {
+pub fn _is_res(token:String) -> bool {
     let output;
 
     // Check if token is one of the reserved_tokens
