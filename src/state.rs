@@ -94,6 +94,11 @@ impl State {
 	    }
 	}
 
+	// Check for shebang, and do nothing
+	if text[0].clone() == "#!/usr/bin/dummyc" {
+	    return;
+	}
+
 	// Add line to previous code
 	self.prev_line = text[0].clone().parse::<i64>().unwrap();
 

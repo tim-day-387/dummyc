@@ -65,7 +65,7 @@ pub fn split_over_op(token:String) -> (String, String, String) {
 
 // Create an error if the command is not formed properly
 fn verify(tokens:Vec<String>) -> Vec<String> {
-    if !is_int(tokens[0].clone()) {
+    if !is_int(tokens[0].clone()) && !is_shebang(tokens[0].clone()) {
 	panic!("LEXER: verify: Line either has no line number or has no reserved token");
     } else {
 	return tokens;
@@ -262,6 +262,18 @@ pub fn _is_res(token:String) -> bool {
 	output = true;
     } else {
 	output = false;
+    }
+
+    return output;
+}
+
+// Check if a shebang token
+pub fn is_shebang(token:String) -> bool {
+    let mut output = false;
+
+    // Check if token is shebang
+    if token.clone() == "#!/usr/bin/dummyc" {
+	output = true;
     }
 
     return output;
