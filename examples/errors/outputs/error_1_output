@@ -1,0 +1,2 @@
+thread 'main' panicked at 'LEXER: verify: Line does not have a line number', src/lexer.rs:69:5
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
