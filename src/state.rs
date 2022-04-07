@@ -38,14 +38,16 @@ impl State {
     // Load previous commmands from a file
     pub fn load_prev(&mut self, file_path:&Path) {
 	// Useful variables 
-	let mut line_num;
+	let mut first_token;
 
 	// Add all lines in the code to prev_code
 	if let Ok(lines) = read_lines(file_path) {
             for line in lines {
 		if let Ok(ip) = line {
-                    line_num = perform_lexing(ip.clone())[0].parse::<i64>().unwrap();
-		    self.prev_code.push((line_num, ip.clone()));
+		    first_token = perform_lexing(ip.clone())[0].clone();
+		    if !is_shebang(first_token.clone()) {
+			self.prev_code.push((first_token.parse::<i64>().unwrap(), ip.clone()));
+		    }
 		}
             }
 	}
