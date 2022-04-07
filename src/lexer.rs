@@ -182,6 +182,11 @@ pub fn _is_float(token:String) -> bool {
     let mut output = true;
     let mut seen_point = false;
 
+    // Check if string is empty
+    if token.len() == 0 {
+	output = false;
+    }
+    
     // If every char is a digit, or a decimal point
     for c in char_vec {
 	// Check if char is digit
@@ -211,6 +216,11 @@ pub fn is_int(token:String) -> bool {
     let char_vec:Vec<char> = token.chars().collect();
     let mut output = true;
 
+    // Check if string is empty
+    if token.len() == 0 {
+	output = false;
+    }
+
     // If every char is a digit, we have a number
     for c in char_vec {
 	output = output && c.is_digit(10);
@@ -224,6 +234,11 @@ pub fn is_string(token:String) -> bool {
     let char_vec:Vec<char> = token.chars().collect();
     let mut in_string = false;
     let mut output = true;
+
+    // Check if string is empty
+    if token.len() == 0 {
+	output = false;
+    }
 
     // Step through each char
     for i in 0..(token.len() - 1) {
@@ -242,12 +257,16 @@ pub fn is_string(token:String) -> bool {
 
 // Check if a reserved token
 pub fn is_res(token:String) -> bool {
+    let output;
+
     // Check if token is one of the reserved_tokens
     if RESERVED.contains(&token.as_str()) || RESERVED.contains(&token.to_uppercase().as_str()) {
-	return true;
+	output = true;
     } else {
-	return false;
+	output = false;
     }
+
+    return output;
 }
 
 // Testing methods
