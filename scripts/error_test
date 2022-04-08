@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 
 for file in $(ls -1 ./examples/errors/programs | grep -v "~"); do
-    ./target/debug/dummyc "./examples/errors/programs/$file" 2> "/tmp/${file%.*}_output" 1> /dev/null
+    ./target/debug/dummyc "./examples/errors/programs/$file" 2> "/tmp/${file%.*}_output_pre" 1> /dev/null
 done
+
+mkdir -p /tmp/outputs
 
 if [ $1 -eq 0 ]
 then
     for file in $(ls -1 ./examples/errors/outputs | grep -v "~"); do
-	diff "./examples/errors/outputs/$file" "/tmp/$file" > "/tmp/diff"
+	cat "./examples/errors/outputs/$file" | grep "main" | awk -F , '{print $1}' > "/tmp/outputs/$file"
+	cat "/tmp/${file}_pre" | grep "main" | awk -F , '{print $1}' > "/tmp/$file"
+	diff "/tmp/outputs/$file" "/tmp/$file" > "/tmp/diff"
 	echo -n "$file: " && [ -s /tmp/diff ] && (echo "Fail") || (echo "Pass")
     done
 fi
