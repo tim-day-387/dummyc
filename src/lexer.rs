@@ -22,10 +22,15 @@ pub fn split(token:String) -> (String, String, String) {
     let mut relational_string:String = "".to_string();
     let mut second_part_string:String = "".to_string();
     let mut in_exp:bool = false;
+    let mut in_string:bool = false;
     
     // Splits expression based on relational
     for c in char_vec {
-	if c == '=' || c == '<' || c == '>' || c == '!' {
+	if c == '"' {
+	    in_string = !in_string;
+	}
+	
+	if (c == '=' || c == '<' || c == '>' || c == '!') && !in_string {
 	    relational_string.push(c);
 	    in_exp = true;
 	} else if !in_exp {
@@ -45,11 +50,16 @@ pub fn split_over_op(token:String) -> (String, String, String) {
     let mut operation_string:String = "".to_string();
     let mut second_part_string:String = "".to_string();
     let mut in_exp:bool = false;
+    let mut in_string:bool = false;
     let mut left_paran = 0;
     let mut right_paran = 0;
     
     // Splits expression based on operation
     for c in char_vec {
+	if c == '"' {
+	    in_string = !in_string;
+	}
+	
 	if (c == '+' || c == '/' || c == '*' || c == '-') && (left_paran == right_paran) && !in_exp {
 	    operation_string.push(c);
 	    in_exp = true;
