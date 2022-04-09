@@ -5,63 +5,42 @@
 #[cfg(test)]
 mod tests;
 
-// Split an expression across the relational
-pub fn split(token:String) -> (String, String, String) {
-    let char_vec:Vec<char> = token.chars().collect();
-    let mut first_part_string:String = "".to_string();
-    let mut relational_string:String = "".to_string();
-    let mut second_part_string:String = "".to_string();
-    let mut in_exp:bool = false;
-    let mut in_string:bool = false;
-    
-    // Splits expression based on relational
-    for c in char_vec {
-	if c == '"' {
-	    in_string = !in_string;
-	}
-	
-	if (c == '=' || c == '<' || c == '>' || c == '!') && !in_string {
-	    relational_string.push(c);
-	    in_exp = true;
-	} else if !in_exp {
-	    first_part_string.push(c);
-	} else {
-	    second_part_string.push(c);
-        }
-    }
-
-    return (first_part_string, relational_string, second_part_string);
-}
+// Constants
+const RELS:[char; 4] = ['=', '<', '>', '!'];
+const OPS:[char; 4] = ['+', '/', '*', '-'];
 
 // Split an expression across the relational
-pub fn split_over_op(token:String) -> (String, String, String) {
-    let char_vec:Vec<char> = token.chars().collect();
+pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {
     let mut first_part_string:String = "".to_string();
     let mut operation_string:String = "".to_string();
     let mut second_part_string:String = "".to_string();
     let mut in_exp:bool = false;
     let mut in_string:bool = false;
-    let mut left_paran = 0;
-    let mut right_paran = 0;
+    let mut paran_diff = 0;
     
     // Splits expression based on operation
-    for c in char_vec {
-	if c == '"' {
-	    in_string = !in_string;
-	}
-	
-	if (c == '+' || c == '/' || c == '*' || c == '-') && (left_paran == right_paran) && !in_exp {
-	    operation_string.push(c);
-	    in_exp = true;
-	} else if c == '(' {
-	    left_paran = left_paran + 1;
-	} else if c == ')' {
-	    right_paran = right_paran + 1;
-	} else if !in_exp {
-	    first_part_string.push(c);
+    for c in token.chars() {
+	if c == '"' {in_string = !in_string;}
+
+	if rels_or_ops {
+	    if RELS.contains(&c) && (paran_diff == 0) && !in_string {
+		operation_string.push(c);
+		in_exp = true;
+		continue;
+	    }
 	} else {
-	    second_part_string.push(c);
-        }
+	    if OPS.contains(&c) && (paran_diff == 0) && !in_exp && !in_string {
+		operation_string.push(c);
+		in_exp = true;
+		continue;
+	    }
+	}
+	    
+	if c == '(' {paran_diff += 1; continue;}
+	if c == ')' {paran_diff += -1; continue;}
+
+	if !in_exp {first_part_string.push(c); continue;}
+	if in_exp {second_part_string.push(c); continue;}
     }
 
     return (first_part_string, operation_string, second_part_string);
