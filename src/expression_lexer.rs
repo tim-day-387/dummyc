@@ -83,20 +83,10 @@ pub fn _is_float(token:String) -> bool {
 
 // Check if integer
 pub fn is_int(token:String) -> bool {
-    let char_vec:Vec<char> = token.chars().collect();
-    let mut output = true;
-
-    // Check if string is empty
-    if token.len() == 0 {
-	output = false;
-    }
-
-    // If every char is a digit, we have a number
-    for c in char_vec {
-	output = output && c.is_digit(10);
-    }
-
-    return output;
+    match token.parse::<i32>() {
+	Ok(_i) => return true,
+	Err(_e) => return false,
+    };
 }
 
 // Check if string
