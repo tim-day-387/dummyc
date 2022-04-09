@@ -22,7 +22,7 @@ pub struct Data {
 // Data implementation
 impl Data {
     // Constructor
-    pub fn new(given_text:String) -> Data {
+    fn new(given_text:String) -> Data {
 	Data {
 	    plain_text:given_text,
 	    output_type:"".to_string(),
@@ -142,4 +142,13 @@ impl Data {
 	    self.print_out_text = self.plain_text.clone();
 	}
     }
+}
+
+// Constructor with simplification
+pub fn new_simplified(given_text:String, vars:HashMap<String, Data>) -> Data {
+    let mut output = Data::new(given_text);
+
+    output.simplify(vars);
+
+    return output;
 }
