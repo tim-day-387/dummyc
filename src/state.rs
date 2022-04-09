@@ -179,10 +179,7 @@ impl State {
             }
 	    
 	    // Generate data object
-	    let mut object = Data::new(text[counter].clone());
-
-	    // Simplify object
-	    object.simplify(self.variables.clone());
+	    let object = new_simplified(text[counter].clone(), self.variables.clone());
 
 	    // Print out text
 	    print!("{}", object.print_out_text);			       
@@ -210,12 +207,8 @@ impl State {
 	let data = text_split.2;
 
 	// Generate data object
-	let mut object = Data::new(data);
+	let object = new_simplified(data, self.variables.clone());
 
-	// Simplify object
-	object.simplify(self.variables.clone());
-
-	
 	// Insert name and type
 	self.variables.insert(var_name.clone(), object.clone());
 
@@ -234,12 +227,8 @@ impl State {
 	let datab = text_split.2;
 
 	// Generate data objects
-	let mut objecta = Data::new(dataa);
-	let mut objectb = Data::new(datab);
-
-	// Simplify object
-	objecta.simplify(self.variables.clone());
-	objectb.simplify(self.variables.clone());
+	let objecta = new_simplified(dataa, self.variables.clone());
+	let objectb = new_simplified(datab, self.variables.clone());
 
 	// Check if equivalent
 	if objecta.eq(&objectb) {
@@ -273,8 +262,7 @@ impl State {
 	let cur_value:Data;
 	
 	// Parse step
-	let mut step:Data = Data::new("1".to_string());
-	step.simplify(self.variables.clone());
+	let step:Data = new_simplified("1".to_string(), self.variables.clone());
 	
 	// Split statement
 	let text_split = split(text[2].clone(), true);
@@ -294,16 +282,14 @@ impl State {
 	    },
 	    _=> {
 		// Create counter for the first time
-		let mut object = Data::new(data);
-		object.simplify(self.variables.clone());
+		let object = new_simplified(data, self.variables.clone());
 		cur_value = object.clone();
 		self.variables.insert(var_name.clone(), object);
 	    },
 	}
 
 	// Final allowed value
-	let mut limit = Data::new(text[4].clone());
-	limit.simplify(self.variables.clone());
+	let limit = new_simplified(text[4].clone(), self.variables.clone());
 
 	if !cur_value.eq(&limit) {
 	    self.for_return_to_line.insert(var_name.clone(), text[0].clone().parse::<i64>().unwrap());
