@@ -9,7 +9,7 @@ mod tests;
 use std::collections::HashMap;
 
 // File Imports
-use lexer::*;
+use expression_lexer::*;
 
 // Data struct
 #[derive(PartialEq, Clone)]

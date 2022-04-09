@@ -9,6 +9,7 @@ use std::io::{self, BufRead, Write};
 
 // File Imports
 use lexer::*;
+use expression_lexer::*;
 use data::*;
 
 // State struct
