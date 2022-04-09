@@ -48,37 +48,10 @@ pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {
 
 // Check if float
 pub fn _is_float(token:String) -> bool {
-    let char_vec:Vec<char> = token.chars().collect();
-    let mut output = true;
-    let mut seen_point = false;
-
-    // Check if string is empty
-    if token.len() == 0 {
-	output = false;
-    }
-    
-    // If every char is a digit, or a decimal point
-    for c in char_vec {
-	// Check if char is digit
-	if !c.is_digit(10) {
-	    // Check if char is a point
-	    if c != '.' {
-		// Not a point, not a float
-		output = false;
-	    } else if seen_point {
-		// Already had a point, not a float
-		output = false;
-	    } else {
-		// First point, might be a float
-		seen_point = true;
-	    }
-	}    
-    }
-
-    // Must have seen a point 
-    output = output & seen_point;
-    
-    return output;
+    match token.parse::<f32>() {
+	Ok(_i) => return true,
+	Err(_e) => return false,
+    };
 }
 
 // Check if integer
