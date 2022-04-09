@@ -44,7 +44,7 @@ impl Data {
     // Resolve any unresolved operations in the expression
     fn resolve(&mut self, vars:HashMap<String, Data>) {
 	// Split the expression over the operation
-	let split = split_over_op(self.plain_text.clone());
+	let split = split(self.plain_text.clone(), false);
 	let first_part_string:String = split.0;
 	let operation_string:String = split.1;
 	let second_part_string:String = split.2;
