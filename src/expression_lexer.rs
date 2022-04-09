@@ -92,25 +92,12 @@ pub fn is_int(token:String) -> bool {
 // Check if string
 pub fn is_string(token:String) -> bool {
     let char_vec:Vec<char> = token.chars().collect();
-    let mut in_string = false;
-    let mut output = true;
+    let num_parans = token.matches("\"").count();
 
-    // Check if string is empty
-    if token.len() == 0 {
-	output = false;
+    // Check if string
+    if num_parans == 2 && char_vec[0] == '"' && char_vec[token.len() -1] == '"' {
+	return true;
+    } else {
+	return false;
     }
-
-    // Step through each char
-    for i in 0..(token.len() - 1) {
-	// Check if in string 
-	if char_vec[i] == '"' {
-	    in_string = !in_string;
-	}
-
-	output = output && in_string;
-    }
-
-    output = output && (char_vec[token.len() - 1] == '"');
-    
-    return output;
 }
