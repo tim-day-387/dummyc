@@ -93,10 +93,8 @@ impl Data {
 
     // Find output type of an binary operation
     fn find_operation_output_type(self, other:Data) -> String {
-	if self.output_type == "string".to_string() && other.output_type == "string".to_string() {
-	    return "string".to_string();
-	} else if self.output_type == "int".to_string() && other.output_type == "int".to_string() {
-	    return "int".to_string();
+	if self.output_type == other.output_type {
+	    return self.output_type;
 	} else {
 	    panic!("DATA: find_operation_output_type: Incompatible types");
 	}
