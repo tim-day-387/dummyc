@@ -55,11 +55,8 @@ impl Data {
 	    return;
 	}
 
-	let mut first_obj:Data = Data::new(first_part_string);
-	let mut second_obj:Data = Data::new(second_part_string);
-	
-	first_obj.simplify(vars.clone());
-	second_obj.simplify(vars.clone());
+	let mut first_obj:Data = new_simplified(first_part_string, vars.clone());
+	let second_obj:Data = new_simplified(second_part_string, vars.clone());
 
 	first_obj.operation(second_obj, operation_string);
 
