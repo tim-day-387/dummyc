@@ -3,6 +3,9 @@
 # Create binary
 cargo build
 
+# Remove old package directory
+rm -rf packages
+
 # Make all need directories
 mkdir -p packages/dummyc/DEBIAN
 mkdir -p packages/dummyc/usr/bin
@@ -20,3 +23,9 @@ gzip packages/dummyc/usr/share/man/man1/dummyc.1
 cd packages
 dpkg-deb --build dummyc
 
+# Install the .deb
+if [ $1 == "--install" ]
+then
+   cd ..
+   sudo dpkg -i packages/dummyc.deb
+fi
