@@ -1,0 +1,9 @@
+Package: dummyc
+Version: 0.1
+Section: custom
+Priority: optional
+Architecture: all
+Essential: no
+Installed-Size: 1024
+Maintainer: tday141@gmail.com
+Description: Compiler for Minimal Basic (EMCA-55)
