@@ -1,0 +1,18 @@
+.\" Manpage for dummyc.
+.TH dummyc 1 "03 Jul 2021" "0.1" "dummyc man page"
+.SH NAME
+dummyc \- compile ECMA-55 BASIC into Rust 
+.SH SYNOPSIS
+dummyc [BASIC File]
+.SH DESCRIPTION
+The dummyc compiler compiles BASIC adhering to ECMA-55 into valid Rust code. 
+.SH OPTIONS
+Regardless of which options are selected, a file must be supplied.
+.IP -s
+Disable output messages; errors will still show.
+.IP -c
+Output file in the current directory instead of the /tmp/ directory.
+.SH BUGS
+No known bugs. Please report any bugs found to the author.
+.SH AUTHOR
+Timothy Day (tday141@gmail.com)
