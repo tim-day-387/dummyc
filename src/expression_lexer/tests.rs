@@ -19,6 +19,24 @@ fn split_2() {
     assert_eq!(answer, split(given, true));
 }
 
+// Testing split()
+#[test]
+fn split_3() {
+    let given:String = "a=test(Sample,Sample,Sample)".to_string();
+    let answer = ("a".to_string(), "=".to_string(), "test(Sample,Sample,Sample)".to_string());
+
+    assert_eq!(answer, split(given, true));
+}
+
+// Testing split()
+#[test]
+fn split_4() {
+    let given:String = "a=test()".to_string();
+    let answer = ("a".to_string(), "=".to_string(), "test()".to_string());
+
+    assert_eq!(answer, split(given, true));
+}
+
 // Testing is_float()
 #[test]
 fn is_float_1() {
