@@ -7,9 +7,11 @@ mod tests;
 
 // General Imports
 use std::collections::HashMap;
+use Path;
 
 // File Imports
 use expression_lexer::*;
+use state::*;
 
 // Data struct
 #[derive(PartialEq, Clone)]
@@ -35,12 +37,29 @@ impl Data {
 	self.find_output_type();
 	
 	if self.output_type == "function".to_string() {
-
+	    self.function();
 	} else if self.output_type == "unresolved".to_string() {
 	    self.resolve(vars);
 	}
 	
 	self.get_print_out();
+    }
+
+    // Execute the given function call
+    fn function(&mut self) {
+	let name = split_function(self.plain_text.clone());
+	let location = "./std/".to_string();
+	let string_path = format!("{}{}{}", location, name, ".bas".to_string());
+	let file_path = Path::new(&string_path);
+
+	// Useful variables
+	let mut state = State::new();
+
+	// Add all lines in the code to prev_code
+	state.load_prev(file_path);
+	
+	// Execute commands given state
+	state.exec_prev();
     }
     
     // Resolve any unresolved operations in the expression
