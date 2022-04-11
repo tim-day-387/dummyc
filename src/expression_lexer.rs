@@ -35,15 +35,35 @@ pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {
 		continue;
 	    }
 	}
-	    
-	if c == '(' {paran_diff += 1; continue;}
-	if c == ')' {paran_diff += -1; continue;}
+
+	if rels_or_ops {
+	    if c == '(' {paran_diff += 1;}
+	    if c == ')' {paran_diff += -1;}
+	} else {
+	    if c == '(' {paran_diff += 1; continue;}
+	    if c == ')' {paran_diff += -1; continue;}
+	}
 
 	if !in_exp {first_part_string.push(c); continue;}
 	if in_exp {second_part_string.push(c); continue;}
     }
 
     return (first_part_string, operation_string, second_part_string);
+}
+
+// Get function name
+pub fn split_function(token:String) -> String {
+    let mut name = "".to_string();
+    
+    for c in token.chars() {
+	if c == '(' {
+	    break;
+	} else {
+	    name.push(c);
+	}    
+    }
+
+    return name;
 }
 
 // Check if float
