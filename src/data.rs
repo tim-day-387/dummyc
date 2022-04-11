@@ -34,7 +34,9 @@ impl Data {
     pub fn simplify(&mut self, vars:HashMap<String, Data>) {
 	self.find_output_type();
 	
-	if self.output_type == "unresolved".to_string() {
+	if self.output_type == "function".to_string() {
+
+	} else if self.output_type == "unresolved".to_string() {
 	    self.resolve(vars);
 	}
 	
@@ -107,6 +109,8 @@ impl Data {
 	    self.output_type = "string".to_string();
 	} else if is_int(self.plain_text.clone()) {
 	    self.output_type = "int".to_string();
+	} else if is_function(self.plain_text.clone()) {
+	    self.output_type = "function".to_string();
 	} else {
 	    self.output_type = "unresolved".to_string();
 	}
