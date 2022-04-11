@@ -74,3 +74,24 @@ pub fn is_string(token:String) -> bool {
 	return false;
     }
 }
+
+// Check if function call
+pub fn is_function(token:String) -> bool {
+    let mut output = false;
+    let char_vec:Vec<char> = token.chars().collect();
+    
+    for c in char_vec.clone() {
+	if RELS.contains(&c) || OPS.contains(&c) {
+	    output = false;
+	    break;
+	}
+
+	if c == '(' && char_vec[token.len() - 1] == ')' {
+	    output = true;
+	    break;
+	}
+    }
+
+    return output;
+}
+

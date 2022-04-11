@@ -72,3 +72,39 @@ fn is_string_2() {
 
     assert_eq!(answer, is_string(given));
 }
+
+// Testing is_function()
+#[test]
+fn is_function_1() {
+    let given:String = "\"This is a test\"".to_string();
+    let answer = false;
+
+    assert_eq!(answer, is_function(given));
+}
+
+// Testing is_function()
+#[test]
+fn is_function_2() {
+    let given:String = "tab(32)".to_string();
+    let answer = true;
+
+    assert_eq!(answer, is_function(given));
+}
+
+// Testing is_function()
+#[test]
+fn is_function_3() {
+    let given:String = "ta+b(32)".to_string();
+    let answer = false;
+
+    assert_eq!(answer, is_function(given));
+}
+
+// Testing is_function()
+#[test]
+fn is_function_4() {
+    let given:String = "tab(adf;laj4;fjjef;f;f;f;f;()()()()00008877yhh)".to_string();
+    let answer = true;
+
+    assert_eq!(answer, is_function(given));
+}
