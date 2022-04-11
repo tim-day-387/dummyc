@@ -136,6 +136,15 @@ fn tokenize_15() {
     assert_eq!(answer, tokenize(given));
 }
 
+// Testing tokenize()
+#[test]
+fn tokenize_16() {
+    let given:String = remove_spaces("9 let a = test()".to_string());
+    let answer:Vec<String> = vec!["9".to_string(), "let".to_string(), "a=test()".to_string()];
+
+    assert_eq!(answer, tokenize(given));
+}
+
 // Testing remove_spaces()
 #[test]
 fn remove_spaces_1() {
