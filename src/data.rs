@@ -60,7 +60,7 @@ impl Data {
 	for args in arguments.clone() {
 	    let data = new_simplified(args, vars.clone());
 
-	    state.input_args.push(data);
+	    state.input_args.insert(0, data);
 	}
 
 	// Add all lines in the code to prev_code

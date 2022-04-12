@@ -167,8 +167,8 @@ impl State {
 
     // Implmentation of the FUNCTION command
     fn function_cmd(&mut self, text:Vec<String>) {
-	let needed = self.input_args.len();
-	let given = (((text.len() - 2) - 1) / 2) + 1;
+	let given = self.input_args.len();
+	let needed = (((text.len() - 2) - 1) / 2) + 1;
 
 	if text[2] == "RETURN".to_string() || text[2] == "return".to_string() {
 	    println!("Time to return!");
