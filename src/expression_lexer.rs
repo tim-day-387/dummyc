@@ -72,6 +72,31 @@ pub fn split_function(token:String) -> (String, String) {
     return (name, arguments);
 }
 
+// Split items over commas
+pub fn split_arguments(token:String) -> Vec<String> {
+    let mut current:String = "".to_string();
+    let mut in_string:bool = false;
+    let mut paran_diff = 0;
+    let mut output:Vec<String> = Vec::new();
+    
+    // Splits expression based on operation
+    for c in token.chars() {
+	if c == '"' {in_string = !in_string;}
+
+	if c == '(' {paran_diff += 1;}
+	if c == ')' {paran_diff += -1;}
+
+	if c == ',' && !in_string && paran_diff == 0{
+	    output.push(current);
+	    current = "".to_string();
+	} else {
+	    current.push(c);
+	}
+    }
+
+    return output;
+}
+
 // Check if float
 pub fn _is_float(token:String) -> bool {
     match token.parse::<f32>() {
