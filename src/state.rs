@@ -135,7 +135,9 @@ impl State {
 	let keyword = text[1].clone().to_uppercase();
 
 	// Execute given command
-	if keyword == "PRINT".to_string() {
+	if keyword == "FUNCTION".to_string() {
+	    self.function_cmd(text);
+	} else if keyword == "PRINT".to_string() {
 	    self.print_cmd(text);
 	} else if keyword == "GOTO".to_string() {
 	    self.goto_cmd(text);
@@ -163,6 +165,54 @@ impl State {
 	}
     }
 
+    // Implmentation of the FUNCTION command
+    fn function_cmd(&mut self, text:Vec<String>) {
+	if text.len() >= 3 && (text[2] == "RETURN".to_string() || text[2] == "return".to_string()) {
+	    let var_value:&Data;
+	    
+	    match self.variables.get(&text[3]) {
+		Some(value)=> var_value = value,
+		_=> panic!("STATE: function_cmd: Variable does not exist"),
+	    }
+
+	    self.return_val = var_value.clone();
+	} else {
+	    let mut counter = 2;
+
+	    loop {
+		// End if we run out of tokens
+		if counter == text.len() {
+		    break;
+		}
+
+		// Check if we have a punc token
+		if text[counter].clone() == ",".to_string() {
+		    counter = counter + 1;
+		    continue;
+		}
+
+		// Generate data object
+		let arg:Data;
+		
+		match self.input_args.pop() {
+		    Some(value)=> arg = value,
+		    _=> panic!("STATE: function_cmd: Not enough inputs arguments"),
+		}
+
+		// Insert name and type
+		self.variables.insert(text[counter].clone(), arg.clone());
+
+		// Iterate token
+		counter = counter + 1;
+	    }	    
+	}
+
+	// Check if we had too many args
+	if self.input_args.len() != 0 {
+	    panic!("STATE: function_cmd: Too many input arguments");
+	}
+    }
+    
     // Implmentation of the PRINT command
     fn print_cmd(&mut self, text:Vec<String>) {
 	let mut counter = 2;
