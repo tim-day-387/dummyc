@@ -9,7 +9,7 @@ mod tests;
 use expression_lexer::*;
 
 // Constants
-const RESERVED:[&'static str; 23] = ["RESTORE", "RETURN", "GOSUB", "PRINT", "INPUT", "READ", "DATA", "STOP",
+const RESERVED:[&'static str; 24] = ["FUNCTION", "RESTORE", "RETURN", "GOSUB", "PRINT", "INPUT", "READ", "DATA", "STOP",
 				     "GOTO", "THEN", "NEXT", "STEP", "FOR", "REM", "LET", "DIM", "END", "DEF",
 				     "IF", "TO", "ON", ";", ","];
 
