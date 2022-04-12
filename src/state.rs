@@ -14,6 +14,8 @@ use data::*;
 
 // State struct
 pub struct State {
+    pub input_args:Vec<Data>,
+    pub return_val:Data,
     pub variables:HashMap<String, Data>,
     pub prev_code:Vec<(i64, String)>,
     pub next_line:i64,
@@ -27,6 +29,8 @@ impl State {
     // Constructor
     pub fn new() -> State {
 	State {
+	    input_args:Vec::new(),
+	    return_val:Data::new("".to_string()),
 	    variables:HashMap::new(),
 	    prev_code:Vec::new(),
 	    next_line:-1,
