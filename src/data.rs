@@ -24,7 +24,7 @@ pub struct Data {
 // Data implementation
 impl Data {
     // Constructor
-    fn new(given_text:String) -> Data {
+    pub fn new(given_text:String) -> Data {
 	Data {
 	    plain_text:given_text,
 	    output_type:"".to_string(),
@@ -37,7 +37,7 @@ impl Data {
 	self.find_output_type();
 	
 	if self.output_type == "function".to_string() {
-	    self.function();
+	    self.function(vars);
 	} else if self.output_type == "unresolved".to_string() {
 	    self.resolve(vars);
 	}
@@ -46,8 +46,9 @@ impl Data {
     }
 
     // Execute the given function call
-    fn function(&mut self) {
+    fn function(&mut self, vars:HashMap<String, Data>) {
 	let name = split_function(self.plain_text.clone()).0;
+	let arguments = split_arguments(split_function(self.plain_text.clone()).1);
 	let location = "./std/".to_string();
 	let string_path = format!("{}{}{}", location, name, ".bas".to_string());
 	let file_path = Path::new(&string_path);
@@ -55,11 +56,21 @@ impl Data {
 	// Useful variables
 	let mut state = State::new();
 
+	// Add arguments
+	for args in arguments.clone() {
+	    let data = new_simplified(args, vars.clone());
+
+	    state.input_args.push(data);
+	}
+
 	// Add all lines in the code to prev_code
 	state.load_prev(file_path);
 	
 	// Execute commands given state
 	state.exec_prev();
+
+	// Replace self with return value
+	*self = state.return_val.clone();
     }
     
     // Resolve any unresolved operations in the expression
