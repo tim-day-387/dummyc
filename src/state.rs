@@ -171,7 +171,6 @@ impl State {
 	let needed = (((text.len() - 2) - 1) / 2) + 1;
 
 	if text[2] == "RETURN".to_string() || text[2] == "return".to_string() {
-	    println!("Time to return!");
 	    let var_value:&Data;
 	    
 	    match self.variables.get(&text[3]) {
