@@ -167,7 +167,11 @@ impl State {
 
     // Implmentation of the FUNCTION command
     fn function_cmd(&mut self, text:Vec<String>) {
-	if text.len() >= 3 && (text[2] == "RETURN".to_string() || text[2] == "return".to_string()) {
+	let needed = self.input_args.len();
+	let given = (((text.len() - 2) - 1) / 2) + 1;
+
+	if text[2] == "RETURN".to_string() || text[2] == "return".to_string() {
+	    println!("Time to return!");
 	    let var_value:&Data;
 	    
 	    match self.variables.get(&text[3]) {
@@ -196,7 +200,7 @@ impl State {
 		
 		match self.input_args.pop() {
 		    Some(value)=> arg = value,
-		    _=> panic!("STATE: function_cmd: Not enough inputs arguments"),
+		    _=> panic!("STATE: function_cmd: Not enough input arguments, have {} and need {}", given, needed),
 		}
 
 		// Insert name and type
@@ -209,7 +213,7 @@ impl State {
 
 	// Check if we had too many args
 	if self.input_args.len() != 0 {
-	    panic!("STATE: function_cmd: Too many input arguments");
+	    panic!("STATE: function_cmd: Too many input arguments, have {} and need {}", given, needed);
 	}
     }
     
