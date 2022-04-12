@@ -47,7 +47,7 @@ impl Data {
 
     // Execute the given function call
     fn function(&mut self) {
-	let name = split_function(self.plain_text.clone());
+	let name = split_function(self.plain_text.clone()).0;
 	let location = "./std/".to_string();
 	let string_path = format!("{}{}{}", location, name, ".bas".to_string());
 	let file_path = Path::new(&string_path);

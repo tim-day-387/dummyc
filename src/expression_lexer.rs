@@ -52,18 +52,24 @@ pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {
 }
 
 // Get function name
-pub fn split_function(token:String) -> String {
+pub fn split_function(token:String) -> (String, String) {
     let mut name = "".to_string();
+    let mut arguments = "".to_string();
+    let mut in_args = false;
     
     for c in token.chars() {
-	if c == '(' {
-	    break;
+	if c == '(' || in_args {
+	    in_args = true;
+	    arguments.push(c);
 	} else {
 	    name.push(c);
 	}    
     }
 
-    return name;
+    arguments.pop();
+    arguments.remove(0);
+
+    return (name, arguments);
 }
 
 // Check if float
