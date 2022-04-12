@@ -94,6 +94,8 @@ pub fn split_arguments(token:String) -> Vec<String> {
 	}
     }
 
+    output.push(current);
+
     return output;
 }
 
