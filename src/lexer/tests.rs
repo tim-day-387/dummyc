@@ -145,6 +145,15 @@ fn tokenize_16() {
     assert_eq!(answer, tokenize(given));
 }
 
+// Testing tokenize()
+#[test]
+fn tokenize_17() {
+    let given:String = remove_spaces("9 function return x".to_string());
+    let answer:Vec<String> = vec!["9".to_string(), "function".to_string(), "return".to_string(), "x".to_string()];
+
+    assert_eq!(answer, tokenize(given));
+}
+
 // Testing remove_spaces()
 #[test]
 fn remove_spaces_1() {
