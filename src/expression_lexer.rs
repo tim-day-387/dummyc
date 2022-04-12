@@ -78,6 +78,11 @@ pub fn split_arguments(token:String) -> Vec<String> {
     let mut in_string:bool = false;
     let mut paran_diff = 0;
     let mut output:Vec<String> = Vec::new();
+
+    // Check if empty string
+    if token == "".to_string() {
+	return output;
+    }
     
     // Splits expression based on operation
     for c in token.chars() {

@@ -46,6 +46,16 @@ fn split_arguments_1() {
     assert_eq!(answer, split_arguments(given));
 }
 
+// Testing split_arguments()
+#[test]
+fn split_arguments_2() {
+    let given:String = "".to_string();
+    let answer:Vec<String> = Vec::new();
+
+    assert_eq!(answer, split_arguments(given));
+}
+
+
 // Testing is_float()
 #[test]
 fn is_float_1() {
