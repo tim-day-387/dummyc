@@ -47,7 +47,7 @@ impl Data {
 
     // Execute the given function call
     fn function(&mut self, vars:HashMap<String, Data>) {
-	let name = split_function(self.plain_text.clone()).0;
+	let name = split_function(self.plain_text.clone()).0.to_lowercase();
 	let arguments = split_arguments(split_function(self.plain_text.clone()).1);
 	let location = "./std/".to_string();
 	let string_path = format!("{}{}{}", location, name, ".bas".to_string());
