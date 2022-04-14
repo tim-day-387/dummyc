@@ -5,6 +5,7 @@
 use std::collections::HashMap;
 use std::path::Path;
 use std::fs::File;
+use std::cmp;
 use std::io::{self, BufRead, Write};
 
 // File Imports
@@ -219,6 +220,8 @@ impl State {
     // Implmentation of the PRINT command
     fn print_cmd(&mut self, text:Vec<String>) {
 	let mut counter = 2;
+	let mut printed_already = 0;
+	let mut zone = 1;
 
 	loop {
 	    // End if we run out of tokens
@@ -230,8 +233,16 @@ impl State {
             }
 
 	    // Check if we have a punc token
-	    if text[counter].clone() == ";".to_string() || text[counter].clone() == ",".to_string() {
+	    if text[counter].clone() == ";".to_string() {
 		counter = counter + 1;
+		continue;
+            } else if text[counter].clone() == ",".to_string() {
+		for _i in 0..cmp::max((zone * 15) - printed_already, 0) {
+		    print!(" ");
+		    printed_already += 1;
+		}
+		zone += 1;
+		counter += 1;
 		continue;
             }
 	    
@@ -239,7 +250,8 @@ impl State {
 	    let object = new_simplified(text[counter].clone(), self.variables.clone());
 
 	    // Print out text
-	    print!("{}", object.print_out_text);			       
+	    print!("{}", object.print_out_text);
+	    printed_already = printed_already + object.print_out_text.len();
 
 	    // Iterate token
 	    counter = counter + 1;
