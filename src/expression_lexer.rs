@@ -105,7 +105,7 @@ pub fn split_arguments(token:String) -> Vec<String> {
 }
 
 // Check if float
-pub fn _is_float(token:String) -> bool {
+pub fn is_float(token:String) -> bool {
     match token.parse::<f32>() {
 	Ok(_i) => return true,
 	Err(_e) => return false,

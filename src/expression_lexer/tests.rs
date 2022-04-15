@@ -62,7 +62,7 @@ fn is_float_1() {
     let given:String = "3.14159".to_string();
     let answer = true;
 
-    assert_eq!(answer, _is_float(given));
+    assert_eq!(answer, is_float(given));
 }
 
 // Testing is_float()
@@ -71,7 +71,7 @@ fn is_float_2() {
     let given:String = "3.1sdfsdf4159".to_string();
     let answer = false;
 
-    assert_eq!(answer, _is_float(given));
+    assert_eq!(answer, is_float(given));
 }
 
 // Testing is_int()
