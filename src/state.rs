@@ -295,7 +295,7 @@ impl State {
 	// Split statement
 	let text_split = split(text[2].clone(), true);
 	let dataa = text_split.0;
-	let _relational = text_split.1;
+	let relational = text_split.1;
 	let datab = text_split.2;
 
 	// Generate data objects
@@ -304,6 +304,8 @@ impl State {
 
 	// Check if equivalent
 	if objecta.eq(&objectb) {
+	    goto = text[4].clone().parse::<i64>().unwrap();
+	} else if objecta.compare(objectb, relational) {
 	    goto = text[4].clone().parse::<i64>().unwrap();
 	}
 

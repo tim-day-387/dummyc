@@ -95,6 +95,32 @@ impl Data {
 	*self = first_obj.clone();
     }
 
+    // Perform the compare
+    pub fn compare(self, other:Data, operation_string:String) -> bool {
+	let output_type = self.clone().find_operation_output_type(other.clone());
+
+	if output_type == "int".to_string() || output_type == "float".to_string() {
+	    let a = match self.plain_text.parse::<f32>() {
+		Ok(i) => i,
+		Err(_e) => panic!("DATA: compare: Invalid float"),
+	    };
+	    let b = match other.plain_text.parse::<f32>() {
+		Ok(i) => i,
+		Err(_e) => panic!("DATA: compare: Invalid float"),
+	    };
+
+	    if operation_string == "<".to_string() {
+		return a < b;
+	    } else if operation_string == ">".to_string() {
+		return a > b;
+	    } else {
+		return false;
+            }
+	} else {
+	    return false;
+	}
+    }
+    
     // Perform the operation
     pub fn operation(&mut self, other:Data, operation_string:String) {
 	let output_type = self.clone().find_operation_output_type(other.clone());
@@ -139,6 +165,8 @@ impl Data {
 	    } else {
 		panic!("DATA: operation: Invalid operation");
             }
+	} else {
+	    panic!("DATA: operation: Unsupport type");
 	}
     }
 
