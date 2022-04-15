@@ -120,6 +120,25 @@ impl Data {
 	    } else {
 		panic!("DATA: operation: Invalid operation");
             } 
+	} else if output_type == "float".to_string() {
+	    let a = match self.plain_text.parse::<f32>() {
+		Ok(i) => i,
+		Err(_e) => panic!("DATA: operation: Invalid float"),
+	    };
+	    let b = match other.plain_text.parse::<f32>() {
+		Ok(i) => i,
+		Err(_e) => panic!("DATA: operation: Invalid float"),
+	    };
+
+	    if operation_string == "+".to_string() {
+		self.plain_text = (a+b).to_string();
+	    } else if operation_string == "*".to_string() {
+		self.plain_text = (a*b).to_string();
+	    } else if operation_string == "-".to_string() {
+		self.plain_text = (a-b).to_string();
+	    } else {
+		panic!("DATA: operation: Invalid operation");
+            }
 	}
     }
 
