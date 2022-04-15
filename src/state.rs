@@ -215,6 +215,9 @@ impl State {
 	if self.input_args.len() != 0 {
 	    panic!("STATE: function_cmd: Too many input arguments, have {} and need {}", given, needed);
 	}
+
+	// Update state
+	self.next_line = -1;
     }
     
     // Implmentation of the PRINT command
