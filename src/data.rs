@@ -125,8 +125,13 @@ impl Data {
 
     // Find output type of an binary operation
     fn find_operation_output_type(self, other:Data) -> String {
+	let self_num:bool = self.output_type == "float".to_string() || self.output_type == "int".to_string();
+	let other_num:bool = other.output_type == "float".to_string() || other.output_type == "int".to_string();
+	
 	if self.output_type == other.output_type {
 	    return self.output_type;
+	} else if self_num && other_num {
+	    return "float".to_string();
 	} else {
 	    panic!("DATA: find_operation_output_type: Incompatible types");
 	}
@@ -139,6 +144,8 @@ impl Data {
 	    self.output_type = "string".to_string();
 	} else if is_int(self.plain_text.clone()) {
 	    self.output_type = "int".to_string();
+	} else if is_float(self.plain_text.clone()) {
+	    self.output_type = "float".to_string();
 	} else if is_function(self.plain_text.clone()) {
 	    self.output_type = "function".to_string();
 	} else {
