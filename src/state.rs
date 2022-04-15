@@ -305,6 +305,8 @@ impl State {
 	// Check if equivalent
 	if relational == "=".to_string() && objecta.eq(&objectb) {
 	    goto = text[4].clone().parse::<i64>().unwrap();
+	} else if relational == "<>".to_string() && !objecta.eq(&objectb) {
+	    goto = text[4].clone().parse::<i64>().unwrap();
 	} else if objecta.compare(objectb, relational) {
 	    goto = text[4].clone().parse::<i64>().unwrap();
 	}
