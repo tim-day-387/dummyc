@@ -84,33 +84,15 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
     let mut in_brack = false;
     let mut iter = 0;
     let char_vec:Vec<char> = file_string.chars().collect();
-    
-    for c in char_vec.clone() {
-	if c == '"' {
-	    in_string = !in_string;
-	}
-
-	if in_string {
-	    i_in_string_or_res.push(iter);
-        }
-
-	iter = iter + 1;
-    }
-
-    iter = 0;
 
     for c in char_vec.clone() {
-	if c == '(' && !i_in_string_or_res.contains(&iter) {
-	    in_brack = !in_brack;
-	} else if c == ')' && !i_in_string_or_res.contains(&iter) {
-	    in_brack = !in_brack;
-	}
+	if c == '"' {in_string = !in_string;}
+	if in_string {i_in_string_or_res.push(iter);}
+	
+	if (c == '(' || c == ')') && !i_in_string_or_res.contains(&iter) {in_brack = !in_brack;}
+	if in_brack {i_in_string_or_res.push(iter);}
 
-	if in_brack {
-	    i_in_string_or_res.push(iter);
-        }
-
-	iter = iter + 1;
+	iter +=1;
     }
     
     for i in &RESERVED {
