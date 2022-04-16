@@ -125,6 +125,7 @@ impl State {
 
 	// Execute given command
 	if keyword == "FUNCTION".to_string() {self.function_cmd(text);}
+	else if keyword == "INPUT".to_string() {self.input_cmd(text);}
 	else if keyword == "PRINT".to_string() {self.print_cmd(text);}
 	else if keyword == "GOTO".to_string() {self.goto_cmd(text);}
 	else if keyword == "LET".to_string() {self.let_cmd(text);}
@@ -139,6 +140,58 @@ impl State {
 	else {self.next_line = i64::MAX;}
     }
 
+    // Implementation of the INPUT command
+    fn input_cmd(&mut self, text:Vec<String>) {
+	let mut line = "".to_string();	
+	let mut counter = 2;
+	let needed = (((text.len() - 2) - 1) / 2) + 1;
+	
+	// Collect input
+	std::io::stdin().read_line(&mut line).unwrap();
+	line = line.to_string().replace("\n", "");
+
+	// Parse input
+	let mut input:Vec<String> = split_arguments(line).into_iter().rev().collect();
+	let given = input.len();
+	
+	loop {
+	    // End if we run out of tokens
+	    if counter == text.len() {
+		break;
+	    }
+
+	    // Check if we have a punc token
+	    if text[counter].clone() == ",".to_string() {
+		counter = counter + 1;
+		continue;
+	    }
+
+	    // Generate data object
+	    let data_string:String;
+	    
+	    match input.pop() {
+		Some(value)=> data_string = value,
+		_=> panic!("STATE: function_cmd: Not enough input arguments, have {} and need {}", given, needed),
+	    }
+
+	    let data:Data = new_simplified(data_string, self.variables.clone());
+
+	    // Insert name and type
+	    self.variables.insert(text[counter].clone(), data);
+
+	    // Iterate token
+	    counter = counter + 1;
+	}
+
+	// Check if we had too many args
+	if self.input_args.len() != 0 {
+	    panic!("STATE: function_cmd: Too many input arguments, have {} and need {}", given, needed);
+	}
+
+	// Update state
+	self.next_line = -1;
+    }
+	
     // Implmentation of the FUNCTION command
     fn function_cmd(&mut self, text:Vec<String>) {
 	let given = self.input_args.len();
