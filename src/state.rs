@@ -99,7 +99,7 @@ impl State {
     }
 
     // Execute the given command
-    pub fn exec_command(&mut self, line:String, silence:bool, save:bool) {
+    fn exec_command(&mut self, line:String, silence:bool, save:bool) {
 	// Lex command
 	let text:Vec<String> = perform_lexing(line.clone());
 
@@ -147,34 +147,19 @@ impl State {
 	let keyword = text[1].clone().to_uppercase();
 
 	// Execute given command
-	if keyword == "FUNCTION".to_string() {
-	    self.function_cmd(text);
-	} else if keyword == "PRINT".to_string() {
-	    self.print_cmd(text);
-	} else if keyword == "GOTO".to_string() {
-	    self.goto_cmd(text);
-	} else if keyword == "LET".to_string() {
-	    self.let_cmd(text);
-	} else if keyword == "IF".to_string() {
-	    self.if_cmd(text);
-	} else if keyword == "GOSUB".to_string() {
-	    self.gosub_cmd(text);
-	} else if keyword == "RETURN".to_string() {
-	    self.return_cmd(text);
-	} else if keyword == "FOR".to_string() {
-	    self.for_cmd(text);
-	} else if keyword == "NEXT".to_string() {
-	    self.next_cmd(text);
-	} else if keyword == "REM".to_string() {
-	    self.rem_cmd(text);
-	} else if keyword == "STOP".to_string() {
-	    self.stop_cmd(text);
-	} else if keyword == "END".to_string() {
-	    self.end_cmd(text);
-	} else {
-	    // Update state
-	    self.next_line = i64::MAX;
-	}
+	if keyword == "FUNCTION".to_string() {self.function_cmd(text);}
+	else if keyword == "PRINT".to_string() {self.print_cmd(text);}
+	else if keyword == "GOTO".to_string() {self.goto_cmd(text);}
+	else if keyword == "LET".to_string() {self.let_cmd(text);}
+	else if keyword == "IF".to_string() {self.if_cmd(text);}
+	else if keyword == "GOSUB".to_string() {self.gosub_cmd(text);}
+	else if keyword == "RETURN".to_string() {self.return_cmd(text);}
+	else if keyword == "FOR".to_string() {self.for_cmd(text);}
+	else if keyword == "NEXT".to_string() {self.next_cmd(text);}
+	else if keyword == "REM".to_string() {self.rem_cmd(text);}
+	else if keyword == "STOP".to_string() {self.stop_cmd(text);}
+	else if keyword == "END".to_string() {self.end_cmd(text);}
+	else {self.next_line = i64::MAX;}
     }
 
     // Implmentation of the FUNCTION command
