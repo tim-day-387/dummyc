@@ -131,17 +131,8 @@ impl State {
 
     // Find subcommand to execute
     fn find_subcommand(&mut self, text:Vec<String>) {
-	// Check if command is present
-	if text.len() == 1 {
-	    // Update state
-	    self.next_line = -1;
-	    return;
-	} else if text.len() == 0 {
-	    // Update state
-	    self.next_line = -1;
-	    self.prev_line = -1;
-	    return;
-	}
+	// Check if command is present, else do nothing
+	if text.len() <= 1 {return;}
 
 	// Set keyword
 	let keyword = text[1].clone().to_uppercase();
