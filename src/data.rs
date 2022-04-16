@@ -76,21 +76,18 @@ impl Data {
     // Resolve any unresolved operations in the expression
     fn resolve(&mut self, vars:HashMap<String, Data>) {
 	// Split the expression over the operation
-	let split = split(self.plain_text.clone(), false);
-	let first_part_string:String = split.0;
-	let operation_string:String = split.1;
-	let second_part_string:String = split.2;
+	let (first_part, operation, second_part) = split(self.plain_text.clone(), false);
 
 	// If there is no operation, check if there is a variable
-	if operation_string == "".to_string() {
+	if operation == "".to_string() {
 	    self.get_var_value(vars);
 	    return;
 	}
 
-	let mut first_obj:Data = new_simplified(first_part_string, vars.clone());
-	let second_obj:Data = new_simplified(second_part_string, vars.clone());
+	let mut first_obj:Data = new_simplified(first_part, vars.clone());
+	let second_obj:Data = new_simplified(second_part, vars.clone());
 
-	first_obj.operation(second_obj, operation_string);
+	first_obj.operation(second_obj, operation);
 
 	*self = first_obj.clone();
     }
