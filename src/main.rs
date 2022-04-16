@@ -1,7 +1,6 @@
 // General Imports
 use std::env;
 use std::path::Path;
-use std::io::Write;
 
 // File Imports
 mod lexer;
@@ -53,39 +52,40 @@ fn interactive() {
     // Useful variables
     let mut line:String;
     let mut state = State::new();
-    let mut silence = true;
 
     // Starting Message
-    std::io::stdout().write("Start Prompt!\n".as_bytes()).unwrap();
-    let _ = std::io::stdout().flush();
+    println!("START PROMPT");
 
     // Interactive prompt main loop
-    loop {		
-	// Reset line variable
-	line = String::new();
+    loop {
+	println!("READY");
+	
+	loop {
+	    // Reset line variable
+	    line = String::new();
+	    
+	    // Collect input
+	    std::io::stdin().read_line(&mut line).unwrap();
+	    line = line.to_string().replace("\n", "");
+
+	    // Check if we should execute
+	    if line == "RUN" || line == "EXIT" {
+		break;
+	    }
+	    
+	    // Add line to state
+	    state.add_prev(line.clone());	    
+	}
 
 	// Execute commands given state
 	state.exec_prev();
 
-	// Pointer
-	std::io::stdout().write("~~> ".as_bytes()).unwrap();
-	let _ = std::io::stdout().flush();
+	// Reset state
+	state = State::new();
 
-	// Collect input
-	std::io::stdin().read_line(&mut line).unwrap();
-
-	// Check exit conditions
-	if line == "DEVSTOP\n".to_string() {
+	// Check if we should stop the program
+	if line == "EXIT" {
 	    break;
 	}
-
-	// Check silence conditions
-	if line == "DEVTALK\n".to_string() {
-	    silence = !silence;
-	    continue;
-	}
-
-	// Execute given command, update state
-	state.exec_command(line.clone(), silence, true);
     }
 }
