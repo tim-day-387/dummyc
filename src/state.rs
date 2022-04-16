@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::path::Path;
 use std::fs::File;
 use std::cmp;
-use std::io::{self, BufRead, Write};
+use std::io::{self, BufRead};
 
 // File Imports
 use lexer::*;
@@ -93,25 +93,15 @@ impl State {
 		break;
 	    } else {
 		// Execute given command, update state
-		self.exec_command(command.clone(), true, false);
+		self.exec_command(command.clone(), false);
             }
 	}
     }
 
     // Execute the given command
-    fn exec_command(&mut self, line:String, silence:bool, save:bool) {
+    fn exec_command(&mut self, line:String, save:bool) {
 	// Lex command
 	let text:Vec<String> = perform_lexing(line.clone());
-
-	// Write out command
-	if !silence {
-	    std::io::stdout().write("COMMAND TEXT: ".as_bytes()).unwrap();
-	    std::io::stdout().write(line.as_bytes()).unwrap();
-
-	    for token in text.clone() {
-		println!("TOKEN: ~~>{}<~~", token);
-	    }
-	}
 
 	// Check for shebang, and do nothing
 	if text[0].clone() == "#!/usr/bin/dummyc" {
