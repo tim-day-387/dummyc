@@ -51,7 +51,6 @@ fn remove_spaces(file_string:String) -> String {
 // Create a vector of tokens
 fn tokenize(file_string:String) -> Vec<String> {
     let mut output:Vec<String> = Vec::new();
-    let mut clean_output:Vec<String> = Vec::new();
     let mut cur:String = file_string.trim().to_string().clone();
     let mut offset = 0;
     let locations = find_res_tokens(file_string);
@@ -63,17 +62,11 @@ fn tokenize(file_string:String) -> Vec<String> {
 	cur = rest.to_string();
     }
 
-    if cur != "".to_string() {
-	output.push(cur);
-    }
+    if cur != "".to_string() {output.push(cur);}
 
-    for i in output.clone() {
-	if i != "".to_string() {
-	    clean_output.push(i);
-	}
-    }
-    
-    return clean_output;
+    output.retain(|x| x != &"".to_string());
+
+    return output;
 }
 
 // Find the beginnings and ends of all matching reserved tokens
