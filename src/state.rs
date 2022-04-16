@@ -41,6 +41,17 @@ impl State {
 	}
     }
 
+    // Add line for prev code
+    pub fn add_prev(&mut self, line:String) {
+	// Lex command
+	let text:Vec<String> = perform_lexing(line.clone());
+	let prev_line;
+	
+	// Record line
+	prev_line = text[0].clone().parse::<i64>().unwrap();
+	self.prev_code.push((prev_line, line.clone()));
+    }
+    
     // Load previous commmands from a file
     pub fn load_prev(&mut self, file_path:&Path) {
 	// Useful variables 
