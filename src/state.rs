@@ -246,10 +246,7 @@ impl State {
     // Implmentation of the LET command
     fn let_cmd(&mut self, text:Vec<String>) {
 	// Split statement
-	let text_split = split(text[2].clone(), true);
-	let var_name = text_split.0;
-	let _relational = text_split.1;
-	let data = text_split.2;
+	let (var_name, _relational, data) = split(text[2].clone(), true);
 
 	// Generate data object
 	let object = new_simplified(data, self.variables.clone());
@@ -266,10 +263,7 @@ impl State {
 	let mut goto = -1;
 
 	// Split statement
-	let text_split = split(text[2].clone(), true);
-	let dataa = text_split.0;
-	let relational = text_split.1;
-	let datab = text_split.2;
+	let (dataa, relational, datab) = split(text[2].clone(), true);
 
 	// Generate data objects
 	let objecta = new_simplified(dataa, self.variables.clone());
@@ -314,10 +308,7 @@ impl State {
 	let step:Data = new_simplified("1".to_string(), self.variables.clone());
 	
 	// Split statement
-	let text_split = split(text[2].clone(), true);
-	let var_name = text_split.0;
-	let _relational = text_split.1;
-	let data = text_split.2;
+	let (var_name, _relational, data) = split(text[2].clone(), true);
 
 	// Check if exists, then add if not
 	match self.variables.get(&var_name) {
