@@ -5,6 +5,9 @@
 #[cfg(test)]
 mod tests;
 
+// File Imports
+use lexer::*;
+
 // Constants
 const RELS:[char; 4] = ['=', '<', '>', '!'];
 const OPS:[char; 4] = ['+', '/', '*', '-'];
@@ -73,7 +76,8 @@ pub fn split_function(token:String) -> (String, String) {
 }
 
 // Split items over commas
-pub fn split_arguments(token:String) -> Vec<String> {
+pub fn split_arguments(unclean_token:String) -> Vec<String> {
+    let token = remove_spaces(unclean_token);
     let mut current:String = "".to_string();
     let mut in_string:bool = false;
     let mut paran_diff = 0;
