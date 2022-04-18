@@ -28,7 +28,7 @@ fn verify(tokens:Vec<String>) -> Vec<String> {
 }
 
 // Function to remove spaces
-fn remove_spaces(file_string:String) -> String {
+pub fn remove_spaces(file_string:String) -> String {
     let char_vec:Vec<char> = file_string.chars().collect();
     let mut output_string:String = "".to_string();
     let mut in_string = false;
