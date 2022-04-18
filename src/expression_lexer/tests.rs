@@ -40,8 +40,8 @@ fn split_4() {
 // Testing split_arguments()
 #[test]
 fn split_arguments_1() {
-    let given:String = "a=test(a, b),(1+(2+(3+4))),\"This is, a test\"".to_string();
-    let answer:Vec<String> = vec!["a=test(a, b)".to_string(), "(1+(2+(3+4)))".to_string(), "\"This is, a test\"".to_string()];
+    let given:String = "a=test(a,b),(1+(2+(3+4))),\"This is, a test\"".to_string();
+    let answer:Vec<String> = vec!["a=test(a,b)".to_string(), "(1+(2+(3+4)))".to_string(), "\"This is, a test\"".to_string()];
 
     assert_eq!(answer, split_arguments(given));
 }
