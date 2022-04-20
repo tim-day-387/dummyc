@@ -199,6 +199,12 @@ impl Data {
     // Get variable value
     fn get_var_value(&mut self, state:State) {
 	let var_value:&Data;
+
+	if self.plain_text == "pr_loc".to_string() {
+	    self.plain_text = state.print_location.to_string();
+	    self.simplify(state.clone());
+	    return;
+	}
 	
 	match state.variables.get(&self.plain_text) {
 	    Some(value)=> var_value = value,
