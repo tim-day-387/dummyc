@@ -54,6 +54,7 @@ impl Data {
 
 	// Useful variables
 	let mut lim_state = State::new();
+	lim_state.print_location = state.print_location;
 
 	// Add arguments
 	for args in arguments.clone() {
