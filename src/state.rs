@@ -14,6 +14,7 @@ use expression_lexer::*;
 use data::*;
 
 // State struct
+#[derive(PartialEq, Clone)]
 pub struct State {
     pub input_args:Vec<Data>,
     pub return_val:Data,
@@ -178,7 +179,7 @@ impl State {
 		_=> panic!("STATE: function_cmd: Not enough input arguments, have {} and need {}", given, needed),
 	    }
 
-	    let data:Data = new_simplified(data_string, self.variables.clone());
+	    let data:Data = new_simplified(data_string, self.clone());
 
 	    // Insert name and type
 	    self.variables.insert(text[counter].clone(), data);
@@ -284,7 +285,7 @@ impl State {
             }
 	    
 	    // Generate data object
-	    let object = new_simplified(text[counter].clone(), self.variables.clone());
+	    let object = new_simplified(text[counter].clone(), self.clone());
 
 	    // Print out text
 	    print!("{}", object.print_out_text);
@@ -310,7 +311,7 @@ impl State {
 	let (var_name, _relational, data) = split(text[2].clone(), true);
 
 	// Generate data object
-	let object = new_simplified(data, self.variables.clone());
+	let object = new_simplified(data, self.clone());
 
 	// Insert name and type
 	self.variables.insert(var_name.clone(), object.clone());
@@ -327,8 +328,8 @@ impl State {
 	let (dataa, relational, datab) = split(text[2].clone(), true);
 
 	// Generate data objects
-	let objecta = new_simplified(dataa, self.variables.clone());
-	let objectb = new_simplified(datab, self.variables.clone());
+	let objecta = new_simplified(dataa, self.clone());
+	let objectb = new_simplified(datab, self.clone());
 
 	// Check if equivalent
 	if relational == "=".to_string() && objecta.eq(&objectb) {
@@ -366,7 +367,7 @@ impl State {
 	let cur_value:Data;
 	
 	// Parse step
-	let step:Data = new_simplified("1".to_string(), self.variables.clone());
+	let step:Data = new_simplified("1".to_string(), self.clone());
 	
 	// Split statement
 	let (var_name, _relational, data) = split(text[2].clone(), true);
@@ -377,20 +378,20 @@ impl State {
 		// Advance counter by one step
 		let mut var_value = value.clone();
 		var_value.operation(step, "+".to_string());
-		var_value.simplify(self.variables.clone());
+		var_value.simplify(self.clone());
 		cur_value = var_value.clone();
 		self.variables.insert(var_name.clone(), var_value);
 	    },
 	    _=> {
 		// Create counter for the first time
-		let object = new_simplified(data, self.variables.clone());
+		let object = new_simplified(data, self.clone());
 		cur_value = object.clone();
 		self.variables.insert(var_name.clone(), object);
 	    },
 	}
 
 	// Final allowed value
-	let limit = new_simplified(text[4].clone(), self.variables.clone());
+	let limit = new_simplified(text[4].clone(), self.clone());
 
 	if !cur_value.eq(&limit) {
 	    self.for_return_to_line.insert(var_name.clone(), text[0].clone().parse::<i64>().unwrap());
