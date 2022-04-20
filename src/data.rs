@@ -6,7 +6,6 @@
 mod tests;
 
 // General Imports
-use std::collections::HashMap;
 use Path;
 
 // File Imports
@@ -33,20 +32,20 @@ impl Data {
     }
 
     // Simplify data output to one which can be stored and printed out
-    pub fn simplify(&mut self, vars:HashMap<String, Data>) {
+    pub fn simplify(&mut self, state:State) {
 	self.find_output_type();
 	
 	if self.output_type == "function".to_string() {
-	    self.function(vars);
+	    self.function(state);
 	} else if self.output_type == "unresolved".to_string() {
-	    self.resolve(vars);
+	    self.resolve(state);
 	}
 	
 	self.get_print_out();
     }
 
     // Execute the given function call
-    fn function(&mut self, vars:HashMap<String, Data>) {
+    fn function(&mut self, state:State) {
 	let name = split_function(self.plain_text.clone()).0.to_lowercase();
 	let arguments = split_arguments(split_function(self.plain_text.clone()).1);
 	let location = "./std/".to_string();
@@ -54,38 +53,38 @@ impl Data {
 	let file_path = Path::new(&string_path);
 
 	// Useful variables
-	let mut state = State::new();
+	let mut lim_state = State::new();
 
 	// Add arguments
 	for args in arguments.clone() {
-	    let data = new_simplified(args, vars.clone());
+	    let data = new_simplified(args, state.clone());
 
-	    state.input_args.insert(0, data);
+	    lim_state.input_args.insert(0, data);
 	}
 
 	// Add all lines in the code to prev_code
-	state.load_prev(file_path);
+	lim_state.load_prev(file_path);
 	
 	// Execute commands given state
-	state.exec_prev();
+	lim_state.exec_prev();
 
 	// Replace self with return value
-	*self = state.return_val.clone();
+	*self = lim_state.return_val.clone();
     }
     
     // Resolve any unresolved operations in the expression
-    fn resolve(&mut self, vars:HashMap<String, Data>) {
+    fn resolve(&mut self, state:State) {
 	// Split the expression over the operation
 	let (first_part, operation, second_part) = split(self.plain_text.clone(), false);
 
 	// If there is no operation, check if there is a variable
 	if operation == "".to_string() {
-	    self.get_var_value(vars);
+	    self.get_var_value(state);
 	    return;
 	}
 
-	let mut first_obj:Data = new_simplified(first_part, vars.clone());
-	let second_obj:Data = new_simplified(second_part, vars.clone());
+	let mut first_obj:Data = new_simplified(first_part, state.clone());
+	let second_obj:Data = new_simplified(second_part, state.clone());
 
 	first_obj.operation(second_obj, operation);
 
@@ -198,10 +197,10 @@ impl Data {
     }
 
     // Get variable value
-    fn get_var_value(&mut self, vars:HashMap<String, Data>) {
+    fn get_var_value(&mut self, state:State) {
 	let var_value:&Data;
 	
-	match vars.get(&self.plain_text) {
+	match state.variables.get(&self.plain_text) {
 	    Some(value)=> var_value = value,
 	    _=> panic!("DATA: get_var_value: Variable does not exist"),
 	}
@@ -225,10 +224,10 @@ impl Data {
 }
 
 // Constructor with simplification
-pub fn new_simplified(given_text:String, vars:HashMap<String, Data>) -> Data {
+pub fn new_simplified(given_text:String, state:State) -> Data {
     let mut output = Data::new(given_text);
 
-    output.simplify(vars);
+    output.simplify(state);
 
     return output;
 }
