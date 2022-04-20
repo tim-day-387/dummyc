@@ -23,6 +23,8 @@ pub struct State {
     pub prev_line:i64,
     pub return_to_line:Vec<i64>,
     pub for_return_to_line:HashMap<String, i64>,
+    pub print_location:i64,
+    pub print_zone:i64,
 }
 
 // State implementation
@@ -38,6 +40,8 @@ impl State {
 	    prev_line:-1,
 	    return_to_line:Vec::new(),
 	    for_return_to_line:HashMap::new(),
+	    print_location:0,
+	    print_zone:1,
 	}
     }
 
@@ -249,28 +253,32 @@ impl State {
     // Implmentation of the PRINT command
     fn print_cmd(&mut self, text:Vec<String>) {
 	let mut counter = 2;
-	let mut printed_already = 0;
-	let mut zone = 1;
+	let zone_len = 15;
+	let num_zones = 4;
+	let width = 60;
 
 	loop {
 	    // End if we run out of tokens
 	    if counter == text.len() && text[counter - 1].clone() == ";".to_string() {
 		break;
 	    } else if counter == text.len() {
+		self.print_location = 0;
 		println!("");
 		break;
             }
 
 	    // Check if we have a punc token
 	    if text[counter].clone() == ";".to_string() {
-		counter = counter + 1;
+		counter += 1;
 		continue;
             } else if text[counter].clone() == ",".to_string() {
-		for _i in 0..cmp::max((zone * 15) - printed_already, 0) {
+		self.print_zone = ((self.print_location - (self.print_location % zone_len)) / zone_len) % num_zones + 1;
+
+		for _i in 0..cmp::max((self.print_zone * zone_len) - self.print_location, 0) {
 		    print!(" ");
-		    printed_already += 1;
+		    self.print_location = (self.print_location + 1) % width;
 		}
-		zone += 1;
+		
 		counter += 1;
 		continue;
             }
@@ -280,12 +288,12 @@ impl State {
 
 	    // Print out text
 	    print!("{}", object.print_out_text);
-	    printed_already = printed_already + object.print_out_text.len();
+	    self.print_location = (self.print_location + object.print_out_text.len() as i64) % width;
 
 	    // Iterate token
 	    counter = counter + 1;
 	}
-
+	
 	// Update state
 	self.next_line = -1;
     }
