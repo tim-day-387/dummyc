@@ -1,0 +1,10 @@
+100 print "test"
+200 let a=+3.14
+300 let b=-4.5
+350 print a
+375 print b
+400 print a+b
+500 print +1+2
+600 print +1+-2
+700 print 0.12345
+800 print .454
