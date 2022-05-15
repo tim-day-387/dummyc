@@ -14,22 +14,22 @@ SECTION 15.2: TEST OPTIONAL SPELLING OF GOTO AND TRANSFER TO
                                BEGIN TEST.
 
 IF 1 FOLLOWS THIS LINE, TRANSFER USING 'GOTO' PERFORMED
-                                                                   1
+                                                                    1 
 IF 2 FOLLOWS THIS LINE, TRANSFER USING 'GO TO' PERFORMED
-                                                                   2
+                                                                    2 
 IF 3 FOLLOWS THIS LINE, TRANSFER USING 'GO   TO' PERFORMED
-                                                                   3
+                                                                    3 
 IF 4 FOLLOWS THIS LINE, TRANSFER TO REM-STATEMENT PERFORMED
-                                                                   4
+                                                                    4 
 IF 5 FOLLOWS THIS LINE, FORWARD TRANSFER PERFORMED
-                                                                   5
+                                                                    5 
 IF 6 FOLLOWS THIS LINE, BACKWARD TRANSFER PERFORMED
-                                                                   6
+                                                                    6 
 IF 7 FOLLOWS THIS LINE, BACKWARD TRANSFER PERFORMED
-                                                                   7
+                                                                    7 
 IF 8 FOLLOWS THESE TWO LINES, FORWARD TRANSFER PERFORMED,
    WITH LEADING ZERO IN LINE NUMBER OF THE GOTO
-                                                                   8
+                                                                    8 
 
 THE NEXT OUTPUT MUST BE THE '*** TEST PASSED...'
 MESSAGE FOR TEST TO PASS.
