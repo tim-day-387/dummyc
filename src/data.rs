@@ -225,12 +225,26 @@ impl Data {
 	    self.print_out_text.remove(0);
 	} else if self.output_type == "int".to_string() {
 	    match self.plain_text.clone().parse::<i32>() {
-		Ok(i) => self.print_out_text = i.to_string(),
+		Ok(i) => if i < 0 {
+		    self.print_out_text = format!("{}{}", i.to_string(), " ".to_string());
+		} else {
+		    self.print_out_text = format!("{}{}{}", " ".to_string(), i.to_string(), " ".to_string());
+		},
 		Err(_e) => panic!("DATA: get_print_out: Invalid integer"),
 	    };
 	} else if self.output_type == "float".to_string() {
 	    match self.plain_text.clone().parse::<f32>() {
-		Ok(i) => self.print_out_text = i.to_string(),
+		Ok(i) => if i < -1.0 {
+		    self.print_out_text = format!("{}{}", i.to_string(), " ".to_string());
+		} else if i < 0.0 {
+		    self.print_out_text = format!("{}{}", i.to_string(), " ".to_string());
+		    self.print_out_text.remove(1);
+		} else if i < 1.0 {
+		    self.print_out_text = format!("{}{}{}", " ".to_string(), i.to_string(), " ".to_string());
+		    self.print_out_text.remove(1);
+		} else {
+		    self.print_out_text = format!("{}{}{}", " ".to_string(), i.to_string(), " ".to_string());
+		},
 		Err(_e) => panic!("DATA: get_print_out: Invalid float"),
 	    };
 	} else {
