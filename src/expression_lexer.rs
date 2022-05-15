@@ -19,11 +19,13 @@ pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {
     let mut second_part_string:String = "".to_string();
     let mut in_exp:bool = false;
     let mut in_string:bool = false;
+    let mut seen_data:bool = false;
     let mut paran_diff = 0;
     
     // Splits expression based on operation
     for c in token.chars() {
 	if c == '"' {in_string = !in_string;}
+	if c.is_alphanumeric() {seen_data = true;}
 
 	if rels_or_ops {
 	    if RELS.contains(&c) && (paran_diff == 0) && !in_string {
@@ -32,7 +34,7 @@ pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {
 		continue;
 	    }
 	} else {
-	    if OPS.contains(&c) && (paran_diff == 0) && !in_exp && !in_string {
+	    if OPS.contains(&c) && (paran_diff == 0) && !in_exp && !in_string && seen_data {
 		operation_string.push(c);
 		in_exp = true;
 		continue;
