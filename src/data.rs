@@ -223,6 +223,16 @@ impl Data {
 	    self.print_out_text = self.plain_text.clone();
 	    self.print_out_text.pop();
 	    self.print_out_text.remove(0);
+	} else if self.output_type == "int".to_string() {
+	    match self.plain_text.clone().parse::<i32>() {
+		Ok(i) => self.print_out_text = i.to_string(),
+		Err(_e) => panic!("DATA: get_print_out: Invalid integer"),
+	    };
+	} else if self.output_type == "float".to_string() {
+	    match self.plain_text.clone().parse::<f32>() {
+		Ok(i) => self.print_out_text = i.to_string(),
+		Err(_e) => panic!("DATA: get_print_out: Invalid float"),
+	    };
 	} else {
 	    // Just use the plain text if nothing else
 	    self.print_out_text = self.plain_text.clone();
