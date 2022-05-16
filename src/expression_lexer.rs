@@ -118,6 +118,18 @@ pub fn is_float(token:String) -> bool {
     };
 }
 
+// Check if float in scientific notation
+pub fn is_sci_float(token:String) -> bool {
+    if token.contains("E") {
+	match token.parse::<f32>() {
+	    Ok(_i) => return true,
+	    Err(_e) => return false,
+	};
+    } else {
+	return false;
+    }
+}
+
 // Check if integer
 pub fn is_int(token:String) -> bool {
     match token.parse::<i32>() {
