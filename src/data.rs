@@ -96,7 +96,7 @@ impl Data {
     pub fn compare(self, other:Data, operation_string:String) -> bool {
 	let output_type = self.clone().find_operation_output_type(other.clone());
 
-	if output_type == "int".to_string() || output_type == "float".to_string() {
+	if output_type == "int".to_string() || output_type == "float".to_string() || output_type == "sci_float".to_string() {
 	    let a = match self.plain_text.parse::<f32>() {
 		Ok(i) => i,
 		Err(_e) => panic!("DATA: compare: Invalid float"),
@@ -143,7 +143,7 @@ impl Data {
 	    } else {
 		panic!("DATA: operation: Invalid operation");
             } 
-	} else if output_type == "float".to_string() {
+	} else if output_type == "float".to_string() || output_type == "sci_float".to_string() {
 	    let a = match self.plain_text.parse::<f32>() {
 		Ok(i) => i,
 		Err(_e) => panic!("DATA: operation: Invalid float"),
@@ -169,13 +169,17 @@ impl Data {
 
     // Find output type of an binary operation
     fn find_operation_output_type(self, other:Data) -> String {
-	let self_num:bool = self.output_type == "float".to_string() || self.output_type == "int".to_string();
-	let other_num:bool = other.output_type == "float".to_string() || other.output_type == "int".to_string();
+	let self_float:bool = self.output_type == "float".to_string() || self.output_type == "int".to_string();
+	let other_float:bool = other.output_type == "float".to_string() || other.output_type == "int".to_string();
+	let self_sci_float:bool = self_float || self.output_type == "sci_float".to_string();
+	let other_sci_float:bool = other_float || other.output_type == "sci_float".to_string();
 	
 	if self.output_type == other.output_type {
 	    return self.output_type;
-	} else if self_num && other_num {
+	} else if self_float && other_float {
 	    return "float".to_string();
+	} else if self_sci_float && other_sci_float {
+	    return "sci_float".to_string();
 	} else {
 	    panic!("DATA: find_operation_output_type: Incompatible types");
 	}
@@ -188,6 +192,8 @@ impl Data {
 	    self.output_type = "string".to_string();
 	} else if is_int(self.plain_text.clone()) {
 	    self.output_type = "int".to_string();
+	} else if is_sci_float(self.plain_text.clone()) {
+	    self.output_type = "sci_float".to_string();
 	} else if is_float(self.plain_text.clone()) {
 	    self.output_type = "float".to_string();
 	} else if is_function(self.plain_text.clone()) {
@@ -226,27 +232,59 @@ impl Data {
 	} else if self.output_type == "int".to_string() {
 	    match self.plain_text.clone().parse::<i32>() {
 		Ok(i) => if i < 0 {
-		    self.print_out_text = format!("{}{}", i.to_string(), " ".to_string());
+		    self.print_out_text = format!("{}{}", i, " ".to_string());
 		} else {
-		    self.print_out_text = format!("{}{}{}", " ".to_string(), i.to_string(), " ".to_string());
+		    self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
 		},
 		Err(_e) => panic!("DATA: get_print_out: Invalid integer"),
 	    };
 	} else if self.output_type == "float".to_string() {
 	    match self.plain_text.clone().parse::<f32>() {
 		Ok(i) => if i < -1.0 {
-		    self.print_out_text = format!("{}{}", i.to_string(), " ".to_string());
+		    self.print_out_text = format!("{}{}", i, " ".to_string());
 		} else if i < 0.0 {
-		    self.print_out_text = format!("{}{}", i.to_string(), " ".to_string());
+		    self.print_out_text = format!("{}{}", i, " ".to_string());
 		    self.print_out_text.remove(1);
 		} else if i < 1.0 {
-		    self.print_out_text = format!("{}{}{}", " ".to_string(), i.to_string(), " ".to_string());
+		    self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
 		    self.print_out_text.remove(1);
 		} else {
-		    self.print_out_text = format!("{}{}{}", " ".to_string(), i.to_string(), " ".to_string());
+		    self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
 		},
 		Err(_e) => panic!("DATA: get_print_out: Invalid float"),
 	    };
+	} else if self.output_type == "sci_float".to_string() {
+	    let mut output:String = "".to_string();
+	    let mut last = ' ';
+	    let mut point = false;
+	    let temp;
+	    
+	    match self.plain_text.clone().parse::<f32>() {
+		Ok(i) => if i < 0.0 {
+		    temp = format!("{:.E}{}", i, " ".to_string());
+		} else {
+		    temp = format!("{}{:.E}{}", " ".to_string(), i, " ".to_string());
+		},
+		Err(_e) => panic!("DATA: get_print_out: Invalid float"),
+	    };
+	    for c in temp.chars() {
+		if c == '.' {
+		    point = true;
+		}
+		
+		if c == 'E' && !point {
+		    output.push('.');
+		}
+
+		if last == 'E' && c != '-' {
+		    output.push('+');
+		}
+
+		output.push(c);
+		last = c;
+	    }
+
+	    self.print_out_text = output;
 	} else {
 	    // Just use the plain text if nothing else
 	    self.print_out_text = self.plain_text.clone();
