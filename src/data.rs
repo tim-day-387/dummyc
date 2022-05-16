@@ -245,6 +245,8 @@ impl Data {
 		} else if i < 0.0 {
 		    self.print_out_text = format!("{}{}", i, " ".to_string());
 		    self.print_out_text.remove(1);
+		} else if i == 0.0 {
+		    self.print_out_text = format!("{}{}{}", " ".to_string(), i.abs(), " ".to_string());
 		} else if i < 1.0 {
 		    self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
 		    self.print_out_text.remove(1);
