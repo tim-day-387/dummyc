@@ -192,10 +192,15 @@ impl Data {
 	    self.output_type = "string".to_string();
 	} else if is_int(self.plain_text.clone()) {
 	    self.output_type = "int".to_string();
-	} else if is_sci_float(self.plain_text.clone()) {
-	    self.output_type = "sci_float".to_string();
 	} else if is_float(self.plain_text.clone()) {
-	    self.output_type = "float".to_string();
+	    match self.plain_text.clone().parse::<f32>() {
+		Ok(i) => if (i.abs() < 1000000.0 && i.abs() > 0.000001) || i.abs() == 0.0 {
+		    self.output_type = "float".to_string();
+		} else {
+		    self.output_type = "sci_float".to_string();
+		},
+		Err(_e) => panic!("DATA: find_output_type: Invalid float"),
+	    };
 	} else if is_function(self.plain_text.clone()) {
 	    self.output_type = "function".to_string();
 	} else {
