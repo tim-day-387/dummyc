@@ -190,14 +190,26 @@ impl Data {
 	// Series of cases to find type
 	if is_string(self.plain_text.clone()) {
 	    self.output_type = "string".to_string();
-	} else if is_int(self.plain_text.clone()) {
-	    self.output_type = "int".to_string();
-	} else if is_float(self.plain_text.clone()) {
+	} else if is_float(self.plain_text.clone()) || is_int(self.plain_text.clone()) {
 	    match self.plain_text.clone().parse::<f32>() {
-		Ok(i) => if (i.abs() < 1000000.0 && i.abs() > 0.000001) || i.abs() == 0.0 {
-		    self.output_type = "float".to_string();
-		} else {
-		    self.output_type = "sci_float".to_string();
+		Ok(i) => {
+		    let signif;
+		    
+		    if i.abs() < 1.0 {
+			signif = i.abs().to_string().replace("0.", "").len();
+		    } else {
+			signif = i.abs().to_string().replace(".", "").len();
+		    }
+		    
+		    if signif <= 6 {
+			if is_int(self.plain_text.clone()) {
+			    self.output_type = "int".to_string();
+			} else {
+			    self.output_type = "float".to_string();
+			}
+		    } else {
+			self.output_type = "sci_float".to_string();
+		    }
 		},
 		Err(_e) => panic!("DATA: find_output_type: Invalid float"),
 	    };
