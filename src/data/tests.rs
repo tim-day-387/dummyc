@@ -16,5 +16,5 @@ fn type_2() {
     let mut given:Data = Data::new("This is another, different test.".to_string());
     given.find_output_type();
 
-    assert_eq!("unresolved".to_string(), given.output_type);
+    assert_eq!("symbol".to_string(), given.output_type);
 }

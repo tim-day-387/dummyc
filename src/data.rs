@@ -35,9 +35,11 @@ impl Data {
     pub fn simplify(&mut self, state:State) {
 	self.find_output_type();
 	
-	if self.output_type == "function".to_string() {
+	if self.output_type == "symbol_callable".to_string() {
 	    self.function(state);
-	} else if self.output_type == "unresolved".to_string() {
+	} else if self.output_type == "symbol".to_string() {
+	    self.get_var_value(state);
+	} else if self.output_type == "expression".to_string() {
 	    self.resolve(state);
 	}
 	
@@ -75,14 +77,7 @@ impl Data {
     
     // Resolve any unresolved operations in the expression
     fn resolve(&mut self, state:State) {
-	// Split the expression over the operation
 	let (first_part, operation, second_part) = split(self.plain_text.clone(), false);
-
-	// If there is no operation, check if there is a variable
-	if operation == "".to_string() {
-	    self.get_var_value(state);
-	    return;
-	}
 
 	let mut first_obj:Data = new_simplified(first_part, state.clone());
 	let second_obj:Data = new_simplified(second_part, state.clone());
@@ -214,9 +209,15 @@ impl Data {
 		Err(_e) => panic!("DATA: find_output_type: Invalid float"),
 	    };
 	} else if is_function(self.plain_text.clone()) {
-	    self.output_type = "function".to_string();
+	    self.output_type = "symbol_callable".to_string();
 	} else {
-	    self.output_type = "unresolved".to_string();
+	    let operation = split(self.plain_text.clone(), false).1;
+
+	    if operation == "".to_string() {
+		self.output_type = "symbol".to_string();
+	    } else {
+		self.output_type = "expression".to_string();
+            }
 	}
     }
 
