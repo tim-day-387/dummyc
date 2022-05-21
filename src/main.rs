@@ -1,3 +1,6 @@
+// Crates
+extern crate rand;
+
 // General Imports
 use std::env;
 use std::path::Path;

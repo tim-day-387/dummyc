@@ -7,6 +7,7 @@ mod tests;
 
 // General Imports
 use Path;
+use rand::*;
 
 // File Imports
 use expression_lexer::*;
@@ -36,14 +37,30 @@ impl Data {
 	self.find_output_type();
 	
 	if self.output_type == "symbol_callable".to_string() {
-	    self.function(state);
+	    self.resolve_callable(state);
 	} else if self.output_type == "symbol".to_string() {
-	    self.get_var_value(state);
+	    self.resolve_symbol(state);
 	} else if self.output_type == "expression".to_string() {
-	    self.resolve(state);
+	    self.resolve_expression(state);
 	}
 	
 	self.get_print_out();
+    }
+
+    // Resolve symbol_callable type data
+    fn resolve_callable(&mut self, state:State) {
+	self.function(state);
+    }
+
+    // Resolve symbol type data
+    fn resolve_symbol(&mut self, state:State) {
+	if self.plain_text.to_lowercase() == "rnd".to_string() {
+	    let mut rng = rand::thread_rng();
+	    let number:f64 = rng.gen();
+	    *self = new_simplified(number.to_string(), state);
+	} else {
+	    self.get_var_value(state);
+	}
     }
 
     // Execute the given function call
@@ -76,7 +93,7 @@ impl Data {
     }
     
     // Resolve any unresolved operations in the expression
-    fn resolve(&mut self, state:State) {
+    fn resolve_expression(&mut self, state:State) {
 	let (first_part, operation, second_part) = split(self.plain_text.clone(), false);
 
 	let mut first_obj:Data = new_simplified(first_part, state.clone());
