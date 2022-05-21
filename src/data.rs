@@ -49,7 +49,22 @@ impl Data {
 
     // Resolve symbol_callable type data
     fn resolve_callable(&mut self, state:State) {
-	self.function(state);
+	let name = split_function(self.plain_text.clone()).0.to_lowercase();
+	let arguments = split_arguments(split_function(self.plain_text.clone()).1);
+
+	if name == "int".to_string() && arguments.len() == 1 {
+	    let arg_data = new_simplified(arguments[0].clone(), state.clone());
+	    let number:i64;
+
+	    match arg_data.plain_text.parse::<f64>() {
+		Ok(i) => number = i.round() as i64,
+		Err(_e) => panic!("DATA: resolve_callable: Invalid float"),
+	    };
+
+	    *self = new_simplified(number.to_string(), state);
+	} else {
+	    self.function(state, name, arguments);
+	}
     }
 
     // Resolve symbol type data
@@ -64,9 +79,7 @@ impl Data {
     }
 
     // Execute the given function call
-    fn function(&mut self, state:State) {
-	let name = split_function(self.plain_text.clone()).0.to_lowercase();
-	let arguments = split_arguments(split_function(self.plain_text.clone()).1);
+    fn function(&mut self, state:State, name:String, arguments:Vec<String>) {
 	let location = "./std/".to_string();
 	let string_path = format!("{}{}{}", location, name, ".bas".to_string());
 	let file_path = Path::new(&string_path);
