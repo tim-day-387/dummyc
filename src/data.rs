@@ -113,6 +113,7 @@ impl Data {
 	let second_obj:Data = new_simplified(second_part, state.clone());
 
 	first_obj.operation(second_obj, operation);
+	first_obj.simplify(state);
 
 	*self = first_obj.clone();
     }
