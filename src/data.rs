@@ -6,6 +6,7 @@
 mod tests;
 
 // General Imports
+use std::cmp;
 use Path;
 use rand::*;
 
@@ -17,7 +18,7 @@ use state::*;
 #[derive(PartialEq, Clone)]
 pub struct Data {
     pub plain_text:String,
-    pub output_type:String,
+    pub output_type:i64,
     pub print_out_text:String,
 }
 
@@ -27,7 +28,7 @@ impl Data {
     pub fn new(given_text:String) -> Data {
 	Data {
 	    plain_text:given_text,
-	    output_type:"".to_string(),
+	    output_type:-1, // -1 - null; 0 - expression; 1000 - symbol; 2000 symbol_callable; 3000 - string; 4001-3 - int, float, sci_float
 	    print_out_text:"".to_string(),
 	}
     }
@@ -36,11 +37,11 @@ impl Data {
     pub fn simplify(&mut self, state:State) {
 	self.find_output_type();
 	
-	if self.output_type == "symbol_callable".to_string() {
+	if self.output_type == 2000 { // symbol_callable
 	    self.resolve_callable(state);
-	} else if self.output_type == "symbol".to_string() {
+	} else if self.output_type == 1000 { // symbol
 	    self.resolve_symbol(state);
-	} else if self.output_type == "expression".to_string() {
+	} else if self.output_type == 0 { // expression
 	    self.resolve_expression(state);
 	}
 	
@@ -118,11 +119,20 @@ impl Data {
 	*self = first_obj.clone();
     }
 
+    // Find output type from an operation
+    fn find_operation_output_type(self, other:Data) -> i64 {
+	if (self.output_type - other.output_type).abs() > 500 {
+	    panic!("DATA: find_operation_output_type: Incompatible types");
+	} else {
+	    return cmp::max(self.output_type, other.output_type);
+	}
+    }
+    
     // Perform the compare
     pub fn compare(self, other:Data, operation_string:String) -> bool {
 	let output_type = self.clone().find_operation_output_type(other.clone());
 
-	if output_type == "int".to_string() || output_type == "float".to_string() || output_type == "sci_float".to_string() {
+	if output_type == 4001 || output_type == 4002 || output_type == 4003 { // int or float or sci_float
 	    let a = match self.plain_text.parse::<f32>() {
 		Ok(i) => i,
 		Err(_e) => panic!("DATA: compare: Invalid float"),
@@ -146,11 +156,11 @@ impl Data {
     
     // Perform the operation
     pub fn operation(&mut self, other:Data, operation_string:String) {
-	let output_type = self.clone().find_operation_output_type(other.clone());
+	let output_type:i64 = self.clone().find_operation_output_type(other.clone());
 
-	if output_type == "string".to_string() {
+	if output_type == 3000 { // string
 	    self.plain_text = format!("{}{}{}{}", "\"".to_string(), self.print_out_text.clone(), other.print_out_text.clone(), "\"".to_string());
-	} else if output_type == "int".to_string() {
+	} else if output_type == 4001 { // int
 	    let a = match self.plain_text.parse::<i32>() {
 		Ok(i) => i,
 		Err(_e) => panic!("DATA: operation: Invalid integer"),
@@ -169,7 +179,7 @@ impl Data {
 	    } else {
 		panic!("DATA: operation: Invalid operation");
             } 
-	} else if output_type == "float".to_string() || output_type == "sci_float".to_string() {
+	} else if output_type == 4002 || output_type == 4003 { // float or sci_float
 	    let a = match self.plain_text.parse::<f32>() {
 		Ok(i) => i,
 		Err(_e) => panic!("DATA: operation: Invalid float"),
@@ -193,29 +203,11 @@ impl Data {
 	}
     }
 
-    // Find output type of an binary operation
-    fn find_operation_output_type(self, other:Data) -> String {
-	let self_float:bool = self.output_type == "float".to_string() || self.output_type == "int".to_string();
-	let other_float:bool = other.output_type == "float".to_string() || other.output_type == "int".to_string();
-	let self_sci_float:bool = self_float || self.output_type == "sci_float".to_string();
-	let other_sci_float:bool = other_float || other.output_type == "sci_float".to_string();
-	
-	if self.output_type == other.output_type {
-	    return self.output_type;
-	} else if self_float && other_float {
-	    return "float".to_string();
-	} else if self_sci_float && other_sci_float {
-	    return "sci_float".to_string();
-	} else {
-	    panic!("DATA: find_operation_output_type: Incompatible types");
-	}
-    }
-    
     // Determine output type
     fn find_output_type(&mut self) {
 	// Series of cases to find type
 	if is_string(self.plain_text.clone()) {
-	    self.output_type = "string".to_string();
+	    self.output_type = 3000; // string
 	} else if is_float(self.plain_text.clone()) || is_int(self.plain_text.clone()) {
 	    match self.plain_text.clone().parse::<f32>() {
 		Ok(i) => {
@@ -229,25 +221,25 @@ impl Data {
 		    
 		    if signif <= 6 {
 			if is_int(self.plain_text.clone()) {
-			    self.output_type = "int".to_string();
+			    self.output_type = 4001; // int
 			} else {
-			    self.output_type = "float".to_string();
+			    self.output_type = 4002; // float
 			}
 		    } else {
-			self.output_type = "sci_float".to_string();
+			self.output_type = 4003; // sci_float
 		    }
 		},
 		Err(_e) => panic!("DATA: find_output_type: Invalid float"),
 	    };
 	} else if is_function(self.plain_text.clone()) {
-	    self.output_type = "symbol_callable".to_string();
+	    self.output_type = 2000; // symbol_callable
 	} else {
 	    let operation = split(self.plain_text.clone(), false).1;
 
 	    if operation == "".to_string() {
-		self.output_type = "symbol".to_string();
+		self.output_type = 1000; // symbol
 	    } else {
-		self.output_type = "expression".to_string();
+		self.output_type = 0; // expression
             }
 	}
     }
@@ -270,15 +262,13 @@ impl Data {
 	*self = var_value.clone();
     }
 
-    // Find text to be printed out
+    // Find text to be printed out, handle formatting
     fn get_print_out(&mut self) {
-	// Series of cases to get output_string
-	if self.output_type == "string".to_string() {
-	    // Use the plain text but remove parans
+	if self.output_type == 3000 { // string
 	    self.print_out_text = self.plain_text.clone();
 	    self.print_out_text.pop();
 	    self.print_out_text.remove(0);
-	} else if self.output_type == "int".to_string() {
+	} else if self.output_type == 4001 { // int
 	    match self.plain_text.clone().parse::<i32>() {
 		Ok(i) => if i < 0 {
 		    self.print_out_text = format!("{}{}", i, " ".to_string());
@@ -287,7 +277,7 @@ impl Data {
 		},
 		Err(_e) => panic!("DATA: get_print_out: Invalid integer"),
 	    };
-	} else if self.output_type == "float".to_string() {
+	} else if self.output_type == 4002 { // float
 	    match self.plain_text.clone().parse::<f32>() {
 		Ok(i) => if i < -1.0 {
 		    self.print_out_text = format!("{}{}", i, " ".to_string());
@@ -304,7 +294,7 @@ impl Data {
 		},
 		Err(_e) => panic!("DATA: get_print_out: Invalid float"),
 	    };
-	} else if self.output_type == "sci_float".to_string() {
+	} else if self.output_type == 4003 { // sci_float
 	    let mut output:String = "".to_string();
 	    let mut last = ' ';
 	    let mut point = false;
@@ -319,17 +309,9 @@ impl Data {
 		Err(_e) => panic!("DATA: get_print_out: Invalid float"),
 	    };
 	    for c in temp.chars() {
-		if c == '.' {
-		    point = true;
-		}
-		
-		if c == 'E' && !point {
-		    output.push('.');
-		}
-
-		if last == 'E' && c != '-' {
-		    output.push('+');
-		}
+		if c == '.' {point = true;}
+		if c == 'E' && !point {output.push('.');}
+		if last == 'E' && c != '-' {output.push('+');}
 
 		output.push(c);
 		last = c;
@@ -337,7 +319,6 @@ impl Data {
 
 	    self.print_out_text = output;
 	} else {
-	    // Just use the plain text if nothing else
 	    self.print_out_text = self.plain_text.clone();
 	}
     }
