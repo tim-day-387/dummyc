@@ -10,7 +10,7 @@ use lexer::*;
 
 // Constants
 const RELS:[char; 4] = ['=', '<', '>', '!'];
-const OPS:[char; 4] = ['+', '/', '*', '-'];
+const OPS:[char; 5] = ['+', '/', '*', '-', '^'];
 
 // Split an expression across the relational
 pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {

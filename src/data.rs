@@ -164,8 +164,8 @@ impl Data {
 	if output_type == 3000 { // string
 	    self.plain_text = format!("{}{}{}{}", "\"".to_string(), self.print_out_text.clone(), other.print_out_text.clone(), "\"".to_string());
 	} else if output_type == 4001 { // int
-	    let a = match self.plain_text.parse::<i32>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid integer")};
-	    let b = match other.plain_text.parse::<i32>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid integer")};
+	    let a = match self.plain_text.parse::<i64>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid integer")};
+	    let b = match other.plain_text.parse::<i64>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid integer")};
 
 	    if operation_string == "+".to_string() {
 		self.plain_text = (a+b).to_string();
@@ -173,12 +173,16 @@ impl Data {
 		self.plain_text = (a*b).to_string();
 	    } else if operation_string == "-".to_string() {
 		self.plain_text = (a-b).to_string();
+	    } else if operation_string == "/".to_string() {
+		self.plain_text = (a/b).to_string();
+	    } else if operation_string == "^".to_string() {
+		self.plain_text = (a as f64).powf(b as f64).to_string();
 	    } else {
 		panic!("DATA: operation: Invalid operation");
             } 
 	} else if output_type == 4002 || output_type == 4003 { // float or sci_float
-	    let a = match self.plain_text.parse::<f32>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid float")};
-	    let b = match other.plain_text.parse::<f32>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid float")};
+	    let a = match self.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid float")};
+	    let b = match other.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid float")};
 
 	    if operation_string == "+".to_string() {
 		self.plain_text = (a+b).to_string();
@@ -186,6 +190,10 @@ impl Data {
 		self.plain_text = (a*b).to_string();
 	    } else if operation_string == "-".to_string() {
 		self.plain_text = (a-b).to_string();
+	    } else if operation_string == "/".to_string() {
+		self.plain_text = (a/b).to_string();
+	    } else if operation_string == "^".to_string() {
+		self.plain_text = a.powf(b).to_string();
 	    } else {
 		panic!("DATA: operation: Invalid operation");
             }
@@ -200,7 +208,7 @@ impl Data {
 	if is_string(self.plain_text.clone()) {
 	    self.output_type = 3000; // string
 	} else if is_float(self.plain_text.clone()) || is_int(self.plain_text.clone()) {
-	    match self.plain_text.clone().parse::<f32>() {
+	    match self.plain_text.clone().parse::<f64>() {
 		Ok(i) => {
 		    let signif;
 		    
@@ -260,7 +268,7 @@ impl Data {
 	    self.print_out_text.pop();
 	    self.print_out_text.remove(0);
 	} else if self.output_type == 4001 { // int
-	    match self.plain_text.clone().parse::<i32>() {
+	    match self.plain_text.clone().parse::<i64>() {
 		Ok(i) => if i < 0 {
 		    self.print_out_text = format!("{}{}", i, " ".to_string());
 		} else {
@@ -269,7 +277,7 @@ impl Data {
 		Err(_e) => panic!("DATA: get_print_out: Invalid integer"),
 	    };
 	} else if self.output_type == 4002 { // float
-	    match self.plain_text.clone().parse::<f32>() {
+	    match self.plain_text.clone().parse::<f64>() {
 		Ok(i) => if i < -1.0 {
 		    self.print_out_text = format!("{}{}", i, " ".to_string());
 		} else if i < 0.0 {
@@ -291,7 +299,7 @@ impl Data {
 	    let mut point = false;
 	    let temp;
 	    
-	    match self.plain_text.clone().parse::<f32>() {
+	    match self.plain_text.clone().parse::<f64>() {
 		Ok(i) => if i < 0.0 {
 		    temp = format!("{:.E}{}", i, " ".to_string());
 		} else {
