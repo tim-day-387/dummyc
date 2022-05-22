@@ -61,7 +61,20 @@ impl Data {
     fn resolve_callable(&mut self, state:State) {
 	let name = split_function(self.plain_text.clone()).0.to_lowercase();
 	let arguments = split_arguments(split_function(self.plain_text.clone()).1);
+	let location;
+	let mut text = "".to_string();
 
+	if arguments.len() == 1 {
+	    let location_string = Data::new_simplified(arguments[0].clone(), state.clone()).plain_text;
+	    
+	    location = match location_string.parse::<i64>() {
+		Ok(i) => i,
+		Err(_e) => -1,
+	    };
+	    
+	    text = format!("{}{}{}{}", name, "(", location, ")");
+	}
+	
 	if name == "int".to_string() && arguments.len() == 1 {
 	    let arg_data = Data::new_simplified(arguments[0].clone(), state.clone());
 	    let number:i64;
@@ -72,7 +85,8 @@ impl Data {
 	    };
 
 	    *self = Data::new_simplified(number.to_string(), state);
-	} else if self.does_var_exist(state.clone()) {
+	} else if Data::does_var_exist(text.clone(), state.clone()) {
+	    self.plain_text = text.clone();
 	    self.get_var_value(state.clone());
 	} else {
 	    self.function(state, name, arguments);
@@ -261,8 +275,8 @@ impl Data {
     }
 
     // Does a variable by that name exist?
-    fn does_var_exist(&mut self, state:State) -> bool {
-	match state.variables.get(&self.plain_text) {
+    fn does_var_exist(name:String, state:State) -> bool {
+	match state.variables.get(&name) {
 	    Some(_value)=> return true,
 	    _=> return false,
 	}
