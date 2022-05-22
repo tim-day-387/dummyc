@@ -24,6 +24,15 @@ pub struct Data {
 
 // Data implementation
 impl Data {
+    // Constructor with simplification
+    pub fn new_simplified(given_text:String, state:State) -> Data {
+	let mut output = Data::new(given_text);
+
+	output.simplify(state);
+
+	return output;
+    }
+
     // Constructor
     pub fn new(given_text:String) -> Data {
 	Data {
@@ -54,7 +63,7 @@ impl Data {
 	let arguments = split_arguments(split_function(self.plain_text.clone()).1);
 
 	if name == "int".to_string() && arguments.len() == 1 {
-	    let arg_data = new_simplified(arguments[0].clone(), state.clone());
+	    let arg_data = Data::new_simplified(arguments[0].clone(), state.clone());
 	    let number:i64;
 
 	    match arg_data.plain_text.parse::<f64>() {
@@ -62,7 +71,7 @@ impl Data {
 		Err(_e) => panic!("DATA: resolve_callable: Invalid float"),
 	    };
 
-	    *self = new_simplified(number.to_string(), state);
+	    *self = Data::new_simplified(number.to_string(), state);
 	} else {
 	    self.function(state, name, arguments);
 	}
@@ -73,7 +82,7 @@ impl Data {
 	if self.plain_text.to_lowercase() == "rnd".to_string() {
 	    let mut rng = rand::thread_rng();
 	    let number:f64 = rng.gen();
-	    *self = new_simplified(number.to_string(), state);
+	    *self = Data::new_simplified(number.to_string(), state);
 	} else {
 	    self.get_var_value(state);
 	}
@@ -91,7 +100,7 @@ impl Data {
 
 	// Add arguments
 	for args in arguments.clone() {
-	    let data = new_simplified(args, state.clone());
+	    let data = Data::new_simplified(args, state.clone());
 
 	    lim_state.input_args.insert(0, data);
 	}
@@ -110,8 +119,8 @@ impl Data {
     fn resolve_expression(&mut self, state:State) {
 	let (first_part, operation, second_part) = split(self.plain_text.clone(), false);
 
-	let mut first_obj:Data = new_simplified(first_part, state.clone());
-	let second_obj:Data = new_simplified(second_part, state.clone());
+	let mut first_obj:Data = Data::new_simplified(first_part, state.clone());
+	let second_obj:Data = Data::new_simplified(second_part, state.clone());
 
 	first_obj.operation(second_obj, operation);
 	first_obj.simplify(state);
@@ -133,14 +142,8 @@ impl Data {
 	let output_type = self.clone().find_operation_output_type(other.clone());
 
 	if output_type == 4001 || output_type == 4002 || output_type == 4003 { // int or float or sci_float
-	    let a = match self.plain_text.parse::<f32>() {
-		Ok(i) => i,
-		Err(_e) => panic!("DATA: compare: Invalid float"),
-	    };
-	    let b = match other.plain_text.parse::<f32>() {
-		Ok(i) => i,
-		Err(_e) => panic!("DATA: compare: Invalid float"),
-	    };
+	    let a = match self.plain_text.parse::<f32>() {Ok(i) => i, Err(_e) => panic!("DATA: compare: Invalid float")};
+	    let b = match other.plain_text.parse::<f32>() {Ok(i) => i, Err(_e) => panic!("DATA: compare: Invalid float")};
 
 	    if operation_string == "<".to_string() {
 		return a < b;
@@ -161,14 +164,8 @@ impl Data {
 	if output_type == 3000 { // string
 	    self.plain_text = format!("{}{}{}{}", "\"".to_string(), self.print_out_text.clone(), other.print_out_text.clone(), "\"".to_string());
 	} else if output_type == 4001 { // int
-	    let a = match self.plain_text.parse::<i32>() {
-		Ok(i) => i,
-		Err(_e) => panic!("DATA: operation: Invalid integer"),
-	    };
-	    let b = match other.plain_text.parse::<i32>() {
-		Ok(i) => i,
-		Err(_e) => panic!("DATA: operation: Invalid integer"),
-	    };
+	    let a = match self.plain_text.parse::<i32>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid integer")};
+	    let b = match other.plain_text.parse::<i32>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid integer")};
 
 	    if operation_string == "+".to_string() {
 		self.plain_text = (a+b).to_string();
@@ -180,14 +177,8 @@ impl Data {
 		panic!("DATA: operation: Invalid operation");
             } 
 	} else if output_type == 4002 || output_type == 4003 { // float or sci_float
-	    let a = match self.plain_text.parse::<f32>() {
-		Ok(i) => i,
-		Err(_e) => panic!("DATA: operation: Invalid float"),
-	    };
-	    let b = match other.plain_text.parse::<f32>() {
-		Ok(i) => i,
-		Err(_e) => panic!("DATA: operation: Invalid float"),
-	    };
+	    let a = match self.plain_text.parse::<f32>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid float")};
+	    let b = match other.plain_text.parse::<f32>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid float")};
 
 	    if operation_string == "+".to_string() {
 		self.plain_text = (a+b).to_string();
@@ -322,13 +313,4 @@ impl Data {
 	    self.print_out_text = self.plain_text.clone();
 	}
     }
-}
-
-// Constructor with simplification
-pub fn new_simplified(given_text:String, state:State) -> Data {
-    let mut output = Data::new(given_text);
-
-    output.simplify(state);
-
-    return output;
 }

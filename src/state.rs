@@ -46,6 +46,12 @@ impl State {
 	}
     }
 
+    // Returns an Iterator to the Reader of the lines of the file.
+    fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> where P: AsRef<Path>, {
+	let file = File::open(filename)?;
+	Ok(io::BufReader::new(file).lines())
+    }
+    
     // Add line for prev code
     pub fn add_prev(&mut self, line:String) {
 	// Lex command
@@ -63,7 +69,7 @@ impl State {
 	let mut first_token;
 
 	// Add all lines in the code to prev_code
-	if let Ok(lines) = read_lines(file_path) {
+	if let Ok(lines) = State::read_lines(file_path) {
             for line in lines {
 		if let Ok(ip) = line {
 		    first_token = perform_lexing(ip.clone())[0].clone();
@@ -179,7 +185,7 @@ impl State {
 		_=> panic!("STATE: function_cmd: Not enough input arguments, have {} and need {}", given, needed),
 	    }
 
-	    let data:Data = new_simplified(data_string, self.clone());
+	    let data:Data = Data::new_simplified(data_string, self.clone());
 
 	    // Insert name and type
 	    self.variables.insert(text[counter].clone(), data);
@@ -285,7 +291,7 @@ impl State {
             }
 	    
 	    // Generate data object
-	    let object = new_simplified(text[counter].clone(), self.clone());
+	    let object = Data::new_simplified(text[counter].clone(), self.clone());
 
 	    // Print out text
 	    print!("{}", object.print_out_text);
@@ -311,7 +317,7 @@ impl State {
 	let (var_name, _relational, data) = split(text[2].clone(), true);
 
 	// Generate data object
-	let object = new_simplified(data, self.clone());
+	let object = Data::new_simplified(data, self.clone());
 
 	// Insert name and type
 	self.variables.insert(var_name.clone(), object.clone());
@@ -328,8 +334,8 @@ impl State {
 	let (dataa, relational, datab) = split(text[2].clone(), true);
 
 	// Generate data objects
-	let objecta = new_simplified(dataa, self.clone());
-	let objectb = new_simplified(datab, self.clone());
+	let objecta = Data::new_simplified(dataa, self.clone());
+	let objectb = Data::new_simplified(datab, self.clone());
 
 	// Check if equivalent
 	if relational == "=".to_string() && objecta.eq(&objectb) {
@@ -367,7 +373,7 @@ impl State {
 	let cur_value:Data;
 	
 	// Parse step
-	let step:Data = new_simplified("1".to_string(), self.clone());
+	let step:Data = Data::new_simplified("1".to_string(), self.clone());
 	
 	// Split statement
 	let (var_name, _relational, data) = split(text[2].clone(), true);
@@ -384,14 +390,14 @@ impl State {
 	    },
 	    _=> {
 		// Create counter for the first time
-		let object = new_simplified(data, self.clone());
+		let object = Data::new_simplified(data, self.clone());
 		cur_value = object.clone();
 		self.variables.insert(var_name.clone(), object);
 	    },
 	}
 
 	// Final allowed value
-	let limit = new_simplified(text[4].clone(), self.clone());
+	let limit = Data::new_simplified(text[4].clone(), self.clone());
 
 	if !cur_value.eq(&limit) {
 	    self.for_return_to_line.insert(var_name.clone(), text[0].clone().parse::<i64>().unwrap());
@@ -439,12 +445,6 @@ impl State {
 	// Update state
 	self.next_line = i64::MAX;
     }
-}
-
-// Returns an Iterator to the Reader of the lines of the file.
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> where P: AsRef<Path>, {
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
 }
 
 
