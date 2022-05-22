@@ -57,10 +57,10 @@ impl Data {
 	self.get_print_out();
     }
 
-    // Resolve symbol_callable type data
-    fn resolve_callable(&mut self, state:State) {
-	let name = split_function(self.plain_text.clone()).0.to_lowercase();
-	let arguments = split_arguments(split_function(self.plain_text.clone()).1);
+    // Resolve array reference in actual var name
+    pub fn get_array_reference(given:String, state:State) -> String {
+	let name = split_function(given.clone()).0.to_lowercase();
+	let arguments = split_arguments(split_function(given.clone()).1);
 	let location;
 	let mut text = "".to_string();
 
@@ -74,7 +74,16 @@ impl Data {
 	    
 	    text = format!("{}{}{}{}", name, "(", location, ")");
 	}
-	
+
+	return text;
+    }
+
+    // Resolve symbol_callable type data
+    fn resolve_callable(&mut self, state:State) {
+	let name = split_function(self.plain_text.clone()).0.to_lowercase();
+	let arguments = split_arguments(split_function(self.plain_text.clone()).1);
+	let array_ref = Data::get_array_reference(self.plain_text.clone(), state.clone());
+
 	if name == "int".to_string() && arguments.len() == 1 {
 	    let arg_data = Data::new_simplified(arguments[0].clone(), state.clone());
 	    let number:i64;
@@ -85,8 +94,8 @@ impl Data {
 	    };
 
 	    *self = Data::new_simplified(number.to_string(), state);
-	} else if Data::does_var_exist(text.clone(), state.clone()) {
-	    self.plain_text = text.clone();
+	} else if Data::does_var_exist(array_ref.clone(), state.clone()) {
+	    self.plain_text = array_ref.clone();
 	    self.get_var_value(state.clone());
 	} else {
 	    self.function(state, name, arguments);

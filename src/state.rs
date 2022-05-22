@@ -345,23 +345,8 @@ impl State {
 	let object = Data::new_simplified(data, self.clone());
 
 	if is_function(var_name.clone()) {
-	    let name = split_function(var_name.clone()).0.to_lowercase();
-	    let arguments = split_arguments(split_function(var_name.clone()).1);
-	    let location;
-	    let mut text = "".to_string();
-
-	    if arguments.len() == 1 {
-		let location_string = Data::new_simplified(arguments[0].clone(), self.clone()).plain_text;
-		
-		location = match location_string.parse::<i64>() {
-		    Ok(i) => i,
-		    Err(_e) => -1,
-		};
-		
-		text = format!("{}{}{}{}", name, "(", location, ")");
-	    }
-
-	    self.variables.insert(text.clone(), object.clone());
+            let array_ref = Data::get_array_reference(var_name.clone(), self.clone());
+	    self.variables.insert(array_ref.clone(), object.clone());
 	} else {
 	    self.variables.insert(var_name.clone(), object.clone());
 	}
