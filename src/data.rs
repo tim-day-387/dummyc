@@ -83,6 +83,9 @@ impl Data {
 	    let mut rng = rand::thread_rng();
 	    let number:f64 = rng.gen();
 	    *self = Data::new_simplified(number.to_string(), state);
+	} else if self.plain_text.to_lowercase() == "pr_loc".to_string() {
+	    self.plain_text = state.print_location.to_string();
+	    self.simplify(state.clone());
 	} else {
 	    self.get_var_value(state);
 	}
@@ -246,12 +249,6 @@ impl Data {
     // Get variable value
     fn get_var_value(&mut self, state:State) {
 	let var_value:&Data;
-
-	if self.plain_text == "pr_loc".to_string() {
-	    self.plain_text = state.print_location.to_string();
-	    self.simplify(state.clone());
-	    return;
-	}
 	
 	match state.variables.get(&self.plain_text) {
 	    Some(value)=> var_value = value,
@@ -259,6 +256,14 @@ impl Data {
 	}
 
 	*self = var_value.clone();
+    }
+
+    // Does a variable by that name exist?
+    fn does_var_exist(&mut self, state:State) -> bool {
+	match state.variables.get(&self.plain_text) {
+	    Some(_value)=> return true,
+	    _=> return false,
+	}
     }
 
     // Find text to be printed out, handle formatting
