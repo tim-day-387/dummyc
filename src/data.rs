@@ -72,6 +72,8 @@ impl Data {
 	    };
 
 	    *self = Data::new_simplified(number.to_string(), state);
+	} else if self.does_var_exist(state.clone()) {
+	    self.get_var_value(state.clone());
 	} else {
 	    self.function(state, name, arguments);
 	}

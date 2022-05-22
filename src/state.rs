@@ -136,6 +136,7 @@ impl State {
 
 	// Execute given command
 	if keyword == "FUNCTION".to_string() {self.function_cmd(text);}
+	else if keyword == "DIM".to_string() {self.dim_cmd(text);}
 	else if keyword == "INPUT".to_string() {self.input_cmd(text);}
 	else if keyword == "PRINT".to_string() {self.print_cmd(text);}
 	else if keyword == "GOTO".to_string() {self.goto_cmd(text);}
@@ -149,6 +150,30 @@ impl State {
 	else if keyword == "STOP".to_string() {self.stop_cmd(text);}
 	else if keyword == "END".to_string() {self.end_cmd(text);}
 	else {self.next_line = i64::MAX;}
+    }
+
+    // Implementation of the DIM command
+    fn dim_cmd(&mut self, text:Vec<String>) {
+	// Split statement
+	let name = split_function(text[2].clone()).0;
+	let arguments = split_arguments(split_function(text[2].clone()).1);
+
+	if arguments.len() != 1 {
+	    panic!("STATE: dim_cmd: Wrong number of arguments");
+	}
+
+	let size_string = Data::new_simplified(arguments[0].clone(), self.clone()).plain_text;
+	let size = match size_string.parse::<i64>() {Ok(i) => i, Err(_e) => panic!("STATE: dim_cmd: Invalid integer")};
+
+	for i in 0..size {
+	    let data_dummy = Data::new("".to_string());
+
+	    // Insert name and type
+	    self.variables.insert(format!("{}{}{}{}", name, "(", i, ")"), data_dummy.clone());
+	}
+
+	// Update state
+	self.next_line = -1;
     }
 
     // Implementation of the INPUT command
