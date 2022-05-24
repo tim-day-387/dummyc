@@ -1,2 +1,2 @@
-thread 'main' panicked at 'DATA: get_var_value: Variable does not exist', src/data.rs:122:13
+thread 'main' panicked at 'DATA: get_var_value: Variable b does not exist', src/data.rs:282:13
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
