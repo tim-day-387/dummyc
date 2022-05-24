@@ -37,6 +37,15 @@ fn split_4() {
     assert_eq!(answer, split(given, true));
 }
 
+// Testing split()
+#[test]
+fn split_5() {
+    let given:String = "(1+1)".to_string();
+    let answer = ("1".to_string(), "+".to_string(), "1".to_string());
+
+    assert_eq!(answer, split(given, false));
+}
+
 // Testing split_arguments()
 #[test]
 fn split_arguments_1() {
@@ -144,4 +153,58 @@ fn is_function_4() {
     let answer = true;
 
     assert_eq!(answer, is_function(given));
+}
+
+// Testing is_function()
+#[test]
+fn is_function_5() {
+    let given:String = "(1+1)".to_string();
+    let answer = false;
+
+    assert_eq!(answer, is_function(given));
+}
+
+// Testing has_outer_parans()
+#[test]
+fn has_outer_parans_1() {
+    let given:String = "(1+1)+(2+2)".to_string();
+    let answer = false;
+
+    assert_eq!(answer, has_outer_parans(given));
+}
+
+// Testing has_outer_parans()
+#[test]
+fn has_outer_parans_2() {
+    let given:String = "(1\"+1)+(2\"+2)".to_string();
+    let answer = true;
+
+    assert_eq!(answer, has_outer_parans(given));
+}
+
+// Testing has_outer_parans()
+#[test]
+fn has_outer_parans_3() {
+    let given:String = "(1+(2+3)+4)".to_string();
+    let answer = true;
+
+    assert_eq!(answer, has_outer_parans(given));
+}
+
+// Testing has_outer_parans()
+#[test]
+fn has_outer_parans_4() {
+    let given:String = "(1+1)".to_string();
+    let answer = true;
+
+    assert_eq!(answer, has_outer_parans(given));
+}
+
+// Testing has_outer_parans()
+#[test]
+fn has_outer_parans_5() {
+    let given:String = "1".to_string();
+    let answer = false;
+
+    assert_eq!(answer, has_outer_parans(given));
 }

@@ -13,7 +13,7 @@ const RELS:[char; 4] = ['=', '<', '>', '!'];
 const OPS:[char; 5] = ['+', '/', '*', '-', '^'];
 
 // Split an expression across the relational
-pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {
+pub fn split(mut token:String, rels_or_ops:bool) -> (String, String, String) {
     let mut first_part_string:String = "".to_string();
     let mut operation_string:String = "".to_string();
     let mut second_part_string:String = "".to_string();
@@ -21,6 +21,10 @@ pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {
     let mut in_string:bool = false;
     let mut seen_data:bool = false;
     let mut paran_diff = 0;
+
+    if has_outer_parans(token.clone()) {
+	token = remove_outer_parans(token.clone());
+    }
     
     // Splits expression based on operation
     for c in token.chars() {
@@ -51,6 +55,10 @@ pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {
 
 	if !in_exp {first_part_string.push(c); continue;}
 	if in_exp {second_part_string.push(c); continue;}
+    }
+
+    if first_part_string == "".to_string() || second_part_string == "".to_string() {
+	panic!("EXPRESSION_LEXER: split: Tried to create empty split from {}", token.clone());
     }
 
     return (first_part_string, operation_string, second_part_string);
@@ -108,6 +116,35 @@ pub fn split_arguments(unclean_token:String) -> Vec<String> {
     output.push(current);
 
     return output;
+}
+
+// Remove outer parans
+fn remove_outer_parans(token:String) -> String {    
+    let mut copy_token = token.clone();
+    copy_token.pop();
+    copy_token.remove(0);
+
+    return copy_token;
+}
+
+// Check if has outer parans
+fn has_outer_parans(mut token:String) -> bool {
+    let mut in_string:bool = false;
+
+    if token.chars().nth(0) != Some('(') || token.chars().nth(token.len() - 1) != Some(')') {
+	return false;
+    } else {
+	token.pop();
+	token.remove(0);
+
+	for c in token.chars() {
+	    if c == '"' {in_string = !in_string;}
+	    if c == ')' && !in_string {return false;}
+	    if c == '(' && !in_string {return true;}
+	}
+
+	return true;
+    }
 }
 
 // Check if float
