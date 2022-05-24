@@ -26,9 +26,13 @@ pub struct Data {
 impl Data {
     // Constructor with simplification
     pub fn new_simplified(given_text:String, state:State) -> Data {
-	let mut output = Data::new(given_text);
+	let mut output = Data::new(given_text.clone());
 
 	output.simplify(state);
+
+	if given_text.clone() != "".to_string() && output.plain_text.clone() == "".to_string() {
+	    panic!("DATA: new_simplified: Can not reduce {} to empty data object", given_text.clone());
+	}
 
 	return output;
     }
@@ -47,11 +51,11 @@ impl Data {
 	self.find_output_type();
 	
 	if self.output_type == 2000 { // symbol_callable
-	    self.resolve_callable(state);
+	    self.resolve_callable(state.clone());
 	} else if self.output_type == 1000 { // symbol
 	    self.resolve_symbol(state);
 	} else if self.output_type == 0 { // expression
-	    self.resolve_expression(state);
+	    self.resolve_expression(state.clone());
 	}
 	
 	self.get_print_out();
@@ -261,9 +265,7 @@ impl Data {
 	} else if is_function(self.plain_text.clone()) {
 	    self.output_type = 2000; // symbol_callable
 	} else {
-	    let operation = split(self.plain_text.clone(), false).1;
-
-	    if operation == "".to_string() {
+	    if !is_expression(self.plain_text.clone()) {
 		self.output_type = 1000; // symbol
 	    } else {
 		self.output_type = 0; // expression
@@ -277,7 +279,7 @@ impl Data {
 	
 	match state.variables.get(&self.plain_text) {
 	    Some(value)=> var_value = value,
-	    _=> panic!("DATA: get_var_value: Variable does not exist"),
+	    _=> panic!("DATA: get_var_value: Variable {} does not exist", self.plain_text),
 	}
 
 	*self = var_value.clone();

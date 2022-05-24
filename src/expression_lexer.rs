@@ -151,9 +151,23 @@ pub fn is_string(token:String) -> bool {
     }
 }
 
+// Check if expression
+pub fn is_expression(token:String) -> bool {
+    let mut output = false;
+    
+    for c in token.chars() {
+	if RELS.contains(&c) || OPS.contains(&c) {
+	    output = true;
+	}
+    }
+
+    return !is_string(token.clone()) && output;
+}
+
 // Check if function call
 pub fn is_function(token:String) -> bool {
     let mut output = false;
+    let mut func_name_empty = true;
     let char_vec:Vec<char> = token.chars().collect();
     
     for c in char_vec.clone() {
@@ -162,10 +176,12 @@ pub fn is_function(token:String) -> bool {
 	    break;
 	}
 
-	if c == '(' && char_vec[token.len() - 1] == ')' {
+	if c == '(' && char_vec[token.len() - 1] == ')' && !func_name_empty {
 	    output = true;
 	    break;
 	}
+
+	func_name_empty = false;
     }
 
     return output;
