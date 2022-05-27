@@ -181,6 +181,10 @@ impl Data {
 		return a < b;
 	    } else if operation_string == ">".to_string() {
 		return a > b;
+	    } else if operation_string == ">=".to_string() {
+		return a >= b;
+	    } else if operation_string == "<=".to_string() {
+		return a <= b;
 	    } else {
 		return false;
             }
