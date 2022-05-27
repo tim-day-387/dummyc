@@ -399,10 +399,16 @@ impl State {
 
     // Implmentation of the FOR command
     fn for_cmd(&mut self, text:Vec<String>) {
+	let zero:Data = Data::new_simplified("0".to_string(), self.clone());
 	let cur_value:Data;
+	let step:Data;
 	
 	// Parse step
-	let step:Data = Data::new_simplified("1".to_string(), self.clone());
+	if text.len() == 5 {
+	    step = Data::new_simplified("1".to_string(), self.clone());
+	} else {
+	    step = Data::new_simplified(text[6].clone(), self.clone());
+	}
 	
 	// Split statement
 	let (var_name, _relational, data) = split(text[2].clone(), true);
@@ -412,7 +418,7 @@ impl State {
 	    Some(value)=> {
 		// Advance counter by one step
 		let mut var_value = value.clone();
-		var_value.operation(step, "+".to_string());
+		var_value.operation(step.clone(), "+".to_string());
 		var_value.simplify(self.clone());
 		cur_value = var_value.clone();
 		self.variables.insert(var_name.clone(), var_value);
@@ -427,8 +433,11 @@ impl State {
 
 	// Final allowed value
 	let limit = Data::new_simplified(text[4].clone(), self.clone());
+	let negative = step.clone().compare(zero.clone(), "<".to_string());
 
-	if !cur_value.eq(&limit) {
+	if cur_value.clone().compare(limit.clone(), "<".to_string()) && !negative {
+	    self.for_return_to_line.insert(var_name.clone(), text[0].clone().parse::<i64>().unwrap());
+	} else if cur_value.clone().compare(limit.clone(), ">".to_string()) && negative {
 	    self.for_return_to_line.insert(var_name.clone(), text[0].clone().parse::<i64>().unwrap());
 	}
 	
