@@ -5,6 +5,10 @@
 #[cfg(test)]
 mod tests;
 
+// General Imports
+use lazy_static::lazy_static;
+use regex::Regex;
+
 // File Imports
 use lexer::*;
 
@@ -169,10 +173,8 @@ pub fn _is_sci_float(token:String) -> bool {
 
 // Check if integer
 pub fn is_int(token:String) -> bool {
-    match token.parse::<i32>() {
-	Ok(_i) => return true,
-	Err(_e) => return false,
-    };
+    lazy_static! {static ref RE:Regex = Regex::new(r"^([0-9]+|\+[0-9]+|-[0-9]+)$").unwrap();}
+    return RE.is_match(&token);
 }
 
 // Check if string

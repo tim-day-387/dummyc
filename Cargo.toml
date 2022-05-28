@@ -4,4 +4,6 @@ version = "0.1.0"         # Current version, obeying semver
 authors = ["Timothy Day"]
 
 [dependencies]
-rand = "0.7.3"
+rand = "0.8.4"
+regex = "1.5"
+lazy_static = "1.4.0"

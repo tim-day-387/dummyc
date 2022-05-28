@@ -1,5 +1,7 @@
 // Crates
 extern crate rand;
+extern crate regex;
+extern crate lazy_static;
 
 // General Imports
 use std::env;

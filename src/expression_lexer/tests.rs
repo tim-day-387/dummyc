@@ -101,6 +101,15 @@ fn is_int_2() {
     assert_eq!(answer, is_int(given));
 }
 
+// Testing is_int()
+#[test]
+fn is_int_3() {
+    let given:String = "1+1".to_string();
+    let answer = false;
+
+    assert_eq!(answer, is_int(given));
+}
+
 // Testing is_string()
 #[test]
 fn is_string_1() {
