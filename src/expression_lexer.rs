@@ -179,15 +179,8 @@ pub fn is_int(token:String) -> bool {
 
 // Check if string
 pub fn is_string(token:String) -> bool {
-    let char_vec:Vec<char> = token.chars().collect();
-    let num_parans = token.matches("\"").count();
-
-    // Check if string
-    if num_parans == 2 && char_vec[0] == '"' && char_vec[token.len() -1] == '"' {
-	return true;
-    } else {
-	return false;
-    }
+    lazy_static! {static ref RE:Regex = Regex::new(r#"^(".*")$"#).unwrap();}
+    return RE.is_match(&token);
 }
 
 // Check if expression

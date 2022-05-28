@@ -123,6 +123,15 @@ fn is_string_1() {
 #[test]
 fn is_string_2() {
     let given:String = "\"This is \"\" a test\"".to_string();
+    let answer = true;
+
+    assert_eq!(answer, is_string(given));
+}
+
+// Testing is_string()
+#[test]
+fn is_string_3() {
+    let given:String = "This is \"\" a test\"".to_string();
     let answer = false;
 
     assert_eq!(answer, is_string(given));
