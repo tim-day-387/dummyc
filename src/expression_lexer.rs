@@ -153,27 +153,14 @@ fn has_outer_parans(mut token:String) -> bool {
 
 // Check if float
 pub fn is_float(token:String) -> bool {
-    match token.parse::<f32>() {
-	Ok(_i) => return true,
-	Err(_e) => return false,
-    };
-}
-
-// Check if float in scientific notation
-pub fn _is_sci_float(token:String) -> bool {
-    if token.contains("E") {
-	match token.parse::<f32>() {
-	    Ok(_i) => return true,
-	    Err(_e) => return false,
-	};
-    } else {
-	return false;
-    }
+    lazy_static! {static ref REA:Regex = Regex::new(r"^(|\+|-)([0-9]*)(\.[0-9]+)$").unwrap();}
+    lazy_static! {static ref REB:Regex = Regex::new(r"^(|\+|-)([0-9]*)(?:\.[0-9]*)?(([0-9]|[0-9]\.)(e|E))((|\+|-)[0-9]+)$").unwrap();}
+    return REA.is_match(&token) || REB.is_match(&token);
 }
 
 // Check if integer
 pub fn is_int(token:String) -> bool {
-    lazy_static! {static ref RE:Regex = Regex::new(r"^([0-9]+|\+[0-9]+|-[0-9]+)$").unwrap();}
+    lazy_static! {static ref RE:Regex = Regex::new(r"^(|\+|-)([0-9]+)$").unwrap();}
     return RE.is_match(&token);
 }
 
