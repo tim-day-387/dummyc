@@ -5,6 +5,10 @@
 #[cfg(test)]
 mod tests;
 
+// General Imports
+use lazy_static::lazy_static;
+use regex::Regex;
+
 // File Imports
 use expression_lexer::*;
 
@@ -12,6 +16,10 @@ use expression_lexer::*;
 const RESERVED:[&'static str; 24] = ["FUNCTION", "RESTORE", "RETURN", "GOSUB", "PRINT", "INPUT", "READ", "DATA", "STOP",
 				     "GOTO", "THEN", "NEXT", "STEP", "FOR", "REM", "LET", "DIM", "END", "DEF",
 				     "IF", "TO", "ON", ";", ","];
+lazy_static! {
+    static ref SHEBANG:Regex = Regex::new(r"^(#!.*)$").unwrap();
+}
+
 
 // Perform all lexer commands
 pub fn perform_lexing(file_string:String) -> Vec<String> {
@@ -112,13 +120,4 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
 }
 
 // Check if a shebang token
-pub fn is_shebang(token:String) -> bool {
-    let mut output = false;
-
-    // Check if token is shebang
-    if token.clone() == "#!/usr/bin/dummyc" {
-	output = true;
-    }
-
-    return output;
-}
+pub fn is_shebang(token:String) -> bool {return SHEBANG.is_match(&token);}
