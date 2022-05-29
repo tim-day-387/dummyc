@@ -20,6 +20,8 @@ lazy_static! {
     static ref SCI_FLOAT:Regex = Regex::new(r"^(|\+|-)([0-9]*)(?:\.[0-9]*)?(([0-9]|[0-9]\.)(e|E))((|\+|-)[0-9]+)$").unwrap();
     static ref STRING:Regex = Regex::new(r#"^(".*")$"#).unwrap();
     static ref INTEGER:Regex = Regex::new(r"^(|\+|-)([0-9]+)$").unwrap();
+    static ref FUNCTION:Regex = Regex::new(r"^([a-z|A-Z]+)(\(.*\))$").unwrap();
+    static ref EXPRESSION:Regex = Regex::new(r"^.*(=|<|>|!|\+|/|\*|-|\^).*$").unwrap();
 }
 
 // Split an expression across the relational
@@ -167,38 +169,7 @@ pub fn is_int(token:String) -> bool {return INTEGER.is_match(&token);}
 pub fn is_string(token:String) -> bool {return STRING.is_match(&token);}
 
 // Check if expression
-pub fn is_expression(token:String) -> bool {
-    let mut output = false;
-    
-    for c in token.chars() {
-	if RELS.contains(&c) || OPS.contains(&c) {
-	    output = true;
-	}
-    }
-
-    return !is_string(token.clone()) && output;
-}
+pub fn is_expression(token:String) -> bool {return EXPRESSION.is_match(&token) && !STRING.is_match(&token);}
 
 // Check if function call
-pub fn is_function(token:String) -> bool {
-    let mut output = false;
-    let mut func_name_empty = true;
-    let char_vec:Vec<char> = token.chars().collect();
-    
-    for c in char_vec.clone() {
-	if RELS.contains(&c) || OPS.contains(&c) {
-	    output = false;
-	    break;
-	}
-
-	if c == '(' && char_vec[token.len() - 1] == ')' && !func_name_empty {
-	    output = true;
-	    break;
-	}
-
-	func_name_empty = false;
-    }
-
-    return output;
-}
-
+pub fn is_function(token:String) -> bool {return FUNCTION.is_match(&token);}
