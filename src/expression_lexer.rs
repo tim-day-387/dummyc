@@ -15,6 +15,12 @@ use lexer::*;
 // Constants
 const RELS:[char; 4] = ['=', '<', '>', '!'];
 const OPS:[char; 5] = ['+', '/', '*', '-', '^'];
+lazy_static! {
+    static ref FLOAT:Regex = Regex::new(r"^(|\+|-)([0-9]*)(\.[0-9]+)$").unwrap();
+    static ref SCI_FLOAT:Regex = Regex::new(r"^(|\+|-)([0-9]*)(?:\.[0-9]*)?(([0-9]|[0-9]\.)(e|E))((|\+|-)[0-9]+)$").unwrap();
+    static ref STRING:Regex = Regex::new(r#"^(".*")$"#).unwrap();
+    static ref INTEGER:Regex = Regex::new(r"^(|\+|-)([0-9]+)$").unwrap();
+}
 
 // Split an expression across the relational
 pub fn split(mut token:String, rels_or_ops:bool) -> (String, String, String) {
@@ -151,24 +157,14 @@ fn has_outer_parans(mut token:String) -> bool {
     }
 }
 
-// Check if float
-pub fn is_float(token:String) -> bool {
-    lazy_static! {static ref REA:Regex = Regex::new(r"^(|\+|-)([0-9]*)(\.[0-9]+)$").unwrap();}
-    lazy_static! {static ref REB:Regex = Regex::new(r"^(|\+|-)([0-9]*)(?:\.[0-9]*)?(([0-9]|[0-9]\.)(e|E))((|\+|-)[0-9]+)$").unwrap();}
-    return REA.is_match(&token) || REB.is_match(&token);
-}
+// Check if float or sci_float
+pub fn is_float(token:String) -> bool {return FLOAT.is_match(&token) || SCI_FLOAT.is_match(&token);}
 
 // Check if integer
-pub fn is_int(token:String) -> bool {
-    lazy_static! {static ref RE:Regex = Regex::new(r"^(|\+|-)([0-9]+)$").unwrap();}
-    return RE.is_match(&token);
-}
+pub fn is_int(token:String) -> bool {return INTEGER.is_match(&token);}
 
 // Check if string
-pub fn is_string(token:String) -> bool {
-    lazy_static! {static ref RE:Regex = Regex::new(r#"^(".*")$"#).unwrap();}
-    return RE.is_match(&token);
-}
+pub fn is_string(token:String) -> bool {return STRING.is_match(&token);}
 
 // Check if expression
 pub fn is_expression(token:String) -> bool {
