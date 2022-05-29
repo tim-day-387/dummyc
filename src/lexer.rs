@@ -20,7 +20,6 @@ lazy_static! {
     static ref SHEBANG:Regex = Regex::new(r"^(#!.*)$").unwrap();
 }
 
-
 // Perform all lexer commands
 pub fn perform_lexing(file_string:String) -> Vec<String> {
     return verify(tokenize(remove_spaces(file_string)));
