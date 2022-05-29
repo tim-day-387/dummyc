@@ -31,7 +31,8 @@ pub fn split(mut token:String, rels_or_ops:bool) -> (String, String, String) {
     let mut second_part_string:String = "".to_string();
     let mut in_exp:bool = false;
     let mut in_string:bool = false;
-    let mut seen_data:bool = false;
+    let mut seen_op:bool = false;
+    let mut last_char:char = ' ';
     let mut paran_diff = 0;
 
     if has_outer_parans(token.clone()) {
@@ -39,34 +40,39 @@ pub fn split(mut token:String, rels_or_ops:bool) -> (String, String, String) {
     }
     
     // Splits expression based on operation
-    for c in token.chars() {
+    for c in token.chars().rev() {
 	if c == '"' {in_string = !in_string;}
-	if c.is_alphanumeric() {seen_data = true;}
 
 	if rels_or_ops {
 	    if RELS.contains(&c) && (paran_diff == 0) && !in_string {
-		operation_string.push(c);
+		operation_string.insert(0, c);
 		in_exp = true;
 		continue;
 	    }
 	} else {
-	    if OPS.contains(&c) && (paran_diff == 0) && !in_exp && !in_string && seen_data {
-		operation_string.push(c);
+	    if seen_op && !in_exp {
+		if OPS.contains(&c) {
+		    second_part_string.insert(0, last_char);
+		    operation_string.insert(0, c);
+		} else {
+		    operation_string.insert(0, last_char);
+		    first_part_string.insert(0, c);
+	        }
 		in_exp = true;
+		continue;
+	    }
+	    if OPS.contains(&c) && (paran_diff == 0) && !in_exp && !in_string {
+                last_char = c;
+		seen_op = true;
 		continue;
 	    }
 	}
 
-	if rels_or_ops {
-	    if c == '(' {paran_diff += 1;}
-	    if c == ')' {paran_diff += -1;}
-	} else {
-	    if c == '(' {paran_diff += 1; continue;}
-	    if c == ')' {paran_diff += -1; continue;}
-	}
+	if c == '(' {paran_diff += 1;}
+        if c == ')' {paran_diff += -1;}
 
-	if !in_exp {first_part_string.push(c); continue;}
-	if in_exp {second_part_string.push(c); continue;}
+	if !in_exp {second_part_string.insert(0, c);}
+	if in_exp {first_part_string.insert(0, c);}
     }
 
     if first_part_string == "".to_string() || second_part_string == "".to_string() {
