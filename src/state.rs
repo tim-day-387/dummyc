@@ -115,9 +115,7 @@ impl State {
 	let text:Vec<String> = perform_lexing(line.clone());
 
 	// Check for shebang, and do nothing
-	if text[0].clone() == "#!/usr/bin/dummyc" {
-	    return;
-	}
+	if is_shebang(text[0].clone()) {return;}
 
 	// Add line to previous code
 	self.prev_line = text[0].clone().parse::<i64>().unwrap();
