@@ -1,2 +1,2 @@
-thread 'main' panicked at 'LEXER: verify: Line either has no line number or has no reserved token', src/lexer.rs:69:5
+thread 'main' panicked at 'LEXER: verify: Line has no line number', src/lexer.rs:31:5
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
