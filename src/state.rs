@@ -189,16 +189,7 @@ impl State {
     fn input_cmd(&mut self, text:Vec<String>) {
 	let mut line = "".to_string();	
 	let mut counter = 2;
-	let needed = (((text.len() - 2) - 1) / 2) + 1;
-	
-	// Collect input
-	std::io::stdin().read_line(&mut line).unwrap();
-	line = line.to_string().replace("\n", "");
 
-	// Parse input
-	let mut input:Vec<String> = split_arguments(line).into_iter().rev().collect();
-	let given = input.len();
-	
 	loop {
 	    // End if we run out of tokens
 	    if counter == text.len() {
@@ -206,23 +197,25 @@ impl State {
 	    }
 
 	    // Check if we have a punc token
-	    if text[counter].clone() == ",".to_string() {
+	    if text[counter].clone() == ",".to_string() || text[counter].clone() == ";".to_string() {
 		counter = counter + 1;
 		continue;
 	    }
 
-	    // Generate data object
-	    let data_string:String;
-	    
-	    match input.pop() {
-		Some(value)=> data_string = value,
-		_=> panic!("STATE: function_cmd: Not enough input arguments, have {} and need {}", given, needed),
-	    }
-
-	    let data:Data = Data::new_simplified(data_string, self.clone());
-
 	    // Insert name and type
-	    self.variables.insert(text[counter].clone(), data);
+	    if is_string(text[counter].clone()) {
+		let command:Vec<String> = ["000".to_string(), "print".to_string(), text[counter].clone(), ";".to_string()].to_vec();
+		self.print_cmd(command);
+		println!("");
+            } else {
+		std::io::stdin().read_line(&mut line).unwrap();
+		line = line.to_string().replace("\n", "");
+
+		let data:Data = Data::new_simplified(line.clone(), self.clone());
+
+		self.variables.insert(text[counter].clone(), data);
+		line = "".to_string();
+	    }
 
 	    // Iterate token
 	    counter = counter + 1;
@@ -230,7 +223,7 @@ impl State {
 
 	// Check if we had too many args
 	if self.input_args.len() != 0 {
-	    panic!("STATE: function_cmd: Too many input arguments, have {} and need {}", given, needed);
+	    panic!("STATE: function_cmd: Too many input arguments");
 	}
 
 	// Update state
