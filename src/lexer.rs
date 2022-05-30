@@ -29,6 +29,8 @@ pub fn perform_lexing(file_string:String) -> Vec<String> {
 fn verify(tokens:Vec<String>) -> Vec<String> {
     if !is_int(tokens[0].clone()) && !is_shebang(tokens[0].clone()) {
 	panic!("LEXER: verify: Line either has no line number or has no reserved token");
+    } else if tokens.len() > 1 && !RESERVED.contains(&&tokens[1].clone().to_uppercase().as_str()) {
+	panic!("LEXER: verify: Line either has no line number or has no reserved token");
     } else {
 	return tokens;
     }
@@ -56,7 +58,35 @@ pub fn remove_spaces(file_string:String) -> String {
 }
 
 // Create a vector of tokens
-fn tokenize(file_string:String) -> Vec<String> {
+fn tokenize(line_string:String) -> Vec<String> {
+    let (line_number, rest) = split_line_number(line_string);
+    let mut output = rest_tokenize(rest);
+
+    output.insert(0, line_number);
+
+    return output;
+}
+
+// Get only line numer
+fn split_line_number(line_string:String) -> (String, String) {
+    let mut line_number:String = "".to_string();
+    let mut rest:String = "".to_string();
+    let mut done = false;
+
+    for c in line_string.chars() {
+	if c.is_digit(10) && !done {
+	    line_number.push(c);
+	} else {
+	    rest.push(c);
+	    done = true;
+	}
+    }
+
+    return (line_number, rest);
+}
+
+// Create a vector of tokens
+fn rest_tokenize(file_string:String) -> Vec<String> {
     let mut output:Vec<String> = Vec::new();
     let mut cur:String = file_string.trim().to_string().clone();
     let mut offset = 0;
