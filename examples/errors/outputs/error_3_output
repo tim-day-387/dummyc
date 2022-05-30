@@ -1,2 +1,2 @@
-thread 'main' panicked at 'LEXER: verify: Line has no reserved token', src/lexer.rs:33:5
+thread 'main' panicked at 'EXPRESSION_LEXER: split: Tried to create empty split from SAY"Test program"', src/expression_lexer.rs:46:7
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

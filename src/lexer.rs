@@ -25,12 +25,13 @@ pub fn perform_lexing(file_string:String) -> Vec<String> {
     return verify(tokenize(remove_spaces(file_string)));
 }
 
-// Create an error if the command is not formed properly
-fn verify(tokens:Vec<String>) -> Vec<String> {
+// Create an error if the command is not formed properly, add implied let statements
+fn verify(mut tokens:Vec<String>) -> Vec<String> {
     if !is_int(tokens[0].clone()) && !is_shebang(tokens[0].clone()) {
 	panic!("LEXER: verify: Line has no line number");
     } else if tokens.len() > 1 && !RESERVED.contains(&&tokens[1].clone().to_uppercase().as_str()) {
-	panic!("LEXER: verify: Line has no reserved token");
+	tokens.insert(1, "LET".to_string());
+	return tokens;
     } else {
 	return tokens;
     }
