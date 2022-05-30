@@ -13,16 +13,45 @@ use regex::Regex;
 use expression_lexer::*;
 
 // Constants
-const RESERVED:[&'static str; 24] = ["FUNCTION", "RESTORE", "RETURN", "GOSUB", "PRINT", "INPUT", "READ", "DATA", "STOP",
+const RESERVED:[&'static str; 25] = ["FUNCTION", "RESTORE", "RETURN", "GOSUB", "PRINT", "INPUT", "READ", "DATA", "STOP",
 				     "GOTO", "THEN", "NEXT", "STEP", "FOR", "REM", "LET", "DIM", "END", "DEF",
-				     "IF", "TO", "ON", ";", ","];
+				     "IF", "TO", "ON", ";", ":", ","];
 lazy_static! {
     static ref SHEBANG:Regex = Regex::new(r"^(#!.*)$").unwrap();
 }
 
+// Perform all lexer command for multiple commands per line
+pub fn perform_multi_lexing(line_string:String) -> Vec<Vec<String>> {
+    let tokens:Vec<String> = tokenize(remove_spaces(line_string));
+    let mut command:Vec<String> = Vec::new();
+    let mut output:Vec<Vec<String>>= Vec::new();
+    let line_number:String = tokens[0].clone();
+    let mut saw_rem = false;
+    let mut first = true;
+
+    command.push(line_number.clone());
+
+    for token in tokens {
+	if first {first = false; continue;}
+	if token.to_uppercase() == "REM".to_string() {saw_rem = true;}
+
+	if token == ":".to_string() && !saw_rem {
+	    output.push(verify(command));
+	    command = Vec::new();
+	    command.push(line_number.clone());
+	} else {
+	    command.push(token);
+	}
+    }
+
+    output.push(verify(command));
+
+    return output;
+}
+
 // Perform all lexer commands
-pub fn perform_lexing(file_string:String) -> Vec<String> {
-    return verify(tokenize(remove_spaces(file_string)));
+pub fn perform_lexing(line_string:String) -> Vec<String> {
+    return verify(tokenize(remove_spaces(line_string)));
 }
 
 // Create an error if the command is not formed properly, add implied let statements
@@ -69,7 +98,7 @@ fn tokenize(line_string:String) -> Vec<String> {
 }
 
 // Get only line numer
-fn split_line_number(line_string:String) -> (String, String) {
+pub fn split_line_number(line_string:String) -> (String, String) {
     let mut line_number:String = "".to_string();
     let mut rest:String = "".to_string();
     let mut done = false;

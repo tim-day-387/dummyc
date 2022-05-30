@@ -54,12 +54,8 @@ impl State {
     
     // Add line for prev code
     pub fn add_prev(&mut self, line:String) {
-	// Lex command
-	let text:Vec<String> = perform_lexing(line.clone());
-	let prev_line;
+	let prev_line = split_line_number(line.clone()).0.parse::<i64>().unwrap();
 	
-	// Record line
-	prev_line = text[0].clone().parse::<i64>().unwrap();
 	self.prev_code.push((prev_line, line.clone()));
     }
     
@@ -112,16 +108,31 @@ impl State {
     // Execute the given command
     fn exec_command(&mut self, line:String) {
 	// Lex command
-	let text:Vec<String> = perform_lexing(line.clone());
+	let commands:Vec<Vec<String>> = perform_multi_lexing(line.clone());
 
 	// Check for shebang, and do nothing
-	if is_shebang(text[0].clone()) {return;}
+	if is_shebang(commands[0][0].clone()) {return;}
 
-	// Add line to previous code
-	self.prev_line = text[0].clone().parse::<i64>().unwrap();
+	// Add line to previous code, set next line
+	self.prev_line = commands[0][0].clone().parse::<i64>().unwrap();
+	self.next_line = -1;
+
+	// Save first line redirect
+	let mut found_next_line = false;
+	let mut next_line = -1;
 
 	// Execute command specific method
-	self.find_subcommand(text);
+	for command in commands {
+	    self.find_subcommand(command);
+
+	    if self.next_line != -1 && !found_next_line {
+		found_next_line = true;
+		next_line = self.next_line;
+	    }
+	}
+
+	// Set next line
+	self.next_line = next_line;
     }
 
     // Find subcommand to execute
