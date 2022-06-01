@@ -71,7 +71,7 @@ impl State {
 		    first_token = split_line_number(ip.clone()).0;
 		    if first_token.clone() != "".to_string() {
 			self.prev_code.push((first_token.parse::<i64>().unwrap(), ip.clone()));
-		    } else {
+		    } else if !is_shebang(ip.clone()) {
 			panic!("STATE: load_prev: Line has no line number");
 		    }
 		}
