@@ -10,11 +10,16 @@ rm -rf packages
 mkdir -p packages/dummyc/DEBIAN
 mkdir -p packages/dummyc/usr/bin
 mkdir -p packages/dummyc/usr/share/man/man1
+mkdir -p packages/dummyc/usr/lib/dummyc/std
 
 # Copy files to locations
 cp docs/debian/control packages/dummyc/DEBIAN/control
 cp target/debug/dummyc packages/dummyc/usr/bin/dummyc
 cp docs/dummyc.1 packages/dummyc/usr/share/man/man1/dummyc.1
+
+for file in $(ls -1 std/ | grep -v "~"); do
+    cp std/$file packages/dummyc/usr/lib/dummyc/std
+done
 
 # Zip man page file
 gzip packages/dummyc/usr/share/man/man1/dummyc.1
@@ -24,8 +29,11 @@ cd packages
 dpkg-deb --build dummyc
 
 # Install the .deb
-if [ $1 == "--install" ]
+if [ $# == 1 ]
 then
-   cd ..
-   sudo dpkg -i packages/dummyc.deb
+    if [ $1 == "--install" ]
+    then
+	cd ..
+	sudo dpkg -i packages/dummyc.deb
+    fi
 fi

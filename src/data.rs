@@ -122,9 +122,16 @@ impl Data {
 
     // Execute the given function call
     fn function(&mut self, state:State, name:String, arguments:Vec<String>) {
-	let location = "./std/".to_string();
-	let string_path = format!("{}{}{}", location, name, ".bas".to_string());
-	let file_path = Path::new(&string_path);
+	let location_a = "./std/".to_string();
+	let location_b = "/usr/lib/dummyc/std/".to_string();
+	let string_path_a = format!("{}{}{}", location_a, name, ".bas".to_string());
+	let string_path_b = format!("{}{}{}", location_b, name, ".bas".to_string());
+	let file_path_a = Path::new(&string_path_a);
+	let file_path_b = Path::new(&string_path_b);
+	let file_path:&Path;
+
+	if file_path_a.exists() {file_path = file_path_a;}
+	else {file_path = file_path_b;}
 
 	// Useful variables
 	let mut lim_state = State::new();
