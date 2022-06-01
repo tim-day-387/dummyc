@@ -49,11 +49,6 @@ pub fn perform_multi_lexing(line_string:String) -> Vec<Vec<String>> {
     return output;
 }
 
-// Perform all lexer commands
-pub fn perform_lexing(line_string:String) -> Vec<String> {
-    return verify(tokenize(remove_spaces(line_string)));
-}
-
 // Create an error if the command is not formed properly, add implied let statements
 fn verify(mut tokens:Vec<String>) -> Vec<String> {
     if !is_int(tokens[0].clone()) && !is_shebang(tokens[0].clone()) {
@@ -98,7 +93,8 @@ fn tokenize(line_string:String) -> Vec<String> {
 }
 
 // Get only line numer
-pub fn split_line_number(line_string:String) -> (String, String) {
+pub fn split_line_number(unclean_line_string:String) -> (String, String) {
+    let line_string:String = remove_spaces(unclean_line_string);
     let mut line_number:String = "".to_string();
     let mut rest:String = "".to_string();
     let mut done = false;

@@ -68,9 +68,11 @@ impl State {
 	if let Ok(lines) = State::read_lines(file_path) {
             for line in lines {
 		if let Ok(ip) = line {
-		    first_token = perform_lexing(ip.clone())[0].clone();
-		    if !is_shebang(first_token.clone()) {
+		    first_token = split_line_number(ip.clone()).0;
+		    if first_token.clone() != "".to_string() {
 			self.prev_code.push((first_token.parse::<i64>().unwrap(), ip.clone()));
+		    } else {
+			panic!("STATE: load_prev: Line has no line number");
 		    }
 		}
             }

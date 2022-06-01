@@ -1,2 +1,2 @@
-thread 'main' panicked at 'LEXER: verify: Line has no line number', src/lexer.rs:31:5
+thread 'main' panicked at 'STATE: load_prev: Line has no line number', src/state.rs:75:13
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
