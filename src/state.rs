@@ -334,12 +334,6 @@ impl State {
 	self.next_line = -1;
     }
 
-    // Implmentation of the GOTO command
-    fn goto_cmd(&mut self, text:Vec<String>) {
-	// Update state
-	self.next_line = text[2].clone().parse::<i64>().unwrap();
-    }
-
     // Implmentation of the LET command
     fn let_cmd(&mut self, text:Vec<String>) {
 	// Split statement
@@ -469,24 +463,16 @@ impl State {
 	// Remove line to return to
 	self.for_return_to_line.remove(&var_name);
     }
+
+    // Implmentation of the GOTO command
+    fn goto_cmd(&mut self, text:Vec<String>) {self.next_line = text[2].clone().parse::<i64>().unwrap();}
     
     // Implmentation of the REM command
-    fn rem_cmd(&mut self, _text:Vec<String>) {
-	// Do nothing, this is just a placeholder
-	self.next_line = -1;
-    }
+    fn rem_cmd(&mut self, _text:Vec<String>) {self.next_line = -1;}
 
     // Implmentation of the STOP command
-    fn stop_cmd(&mut self, _text:Vec<String>) {
-	// Update state
-	self.next_line = i64::MAX;
-    }
+    fn stop_cmd(&mut self, _text:Vec<String>) {self.next_line = i64::MAX;}
     
     // Implmentation of the END command
-    fn end_cmd(&mut self, _text:Vec<String>) {
-	// Update state
-	self.next_line = i64::MAX;
-    }
+    fn end_cmd(&mut self, _text:Vec<String>) {self.next_line = i64::MAX;}
 }
-
-
