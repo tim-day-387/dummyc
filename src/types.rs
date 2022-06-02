@@ -10,6 +10,7 @@ use regex::Regex;
 use lazy_static::lazy_static;
 
 // Constants
+const STRICT:bool = false;
 lazy_static! {
     static ref FLOAT:Regex = Regex::new(r"^(|\+|-)([0-9]*)(\.[0-9]+)$").unwrap();
     static ref SCI_FLOAT:Regex = Regex::new(r"^(|\+|-)([0-9]*)(?:\.[0-9]*)?(([0-9]|[0-9]\.)(e|E))((|\+|-)[0-9]+)$").unwrap();
@@ -21,13 +22,38 @@ lazy_static! {
 
 // Determine output type
 pub fn find_type(token:String) -> i64 {
-    if is_string(token.clone()) {return 3000;}             // string
-    else if is_float(token.clone()) {return 4002;}         // float
-    else if is_int(token.clone()) {return 4001;}           // int
-    else if is_sci_float(token.clone()) {return 4003;}     // sci_float
-    else if is_function(token.clone()) {return 2000;}      // function
-    else if is_expression(token.clone()) {return 0;}       // expresssion
-    else {return 1000;}                                    // symbol
+    let string_test = is_string(token.clone());
+    let float_test = is_float(token.clone());
+    let int_test = is_int(token.clone());
+    let sci_float_test = is_sci_float(token.clone());
+    let function_test = is_function(token.clone());
+    let expression_test = is_expression(token.clone());
+
+    let all = [string_test, float_test, sci_float_test, int_test, function_test, expression_test];
+
+    let mut num_true = 0;
+
+    for i in 0..6 {
+	if all[i] {num_true = num_true + 1;}
+    }
+
+    if num_true > 1 && STRICT {
+	println!("string: {}", string_test);
+	println!("float: {}", float_test);
+	println!("int: {}", int_test);
+	println!("sci_float: {}", sci_float_test);
+	println!("function: {}", function_test);
+	println!("expression: {}", expression_test);
+	panic!("TYPES: find_type: {} are true", num_true);
+    }
+
+    if string_test {return 3000;}             // string
+    else if float_test {return 4002;}         // float
+    else if int_test {return 4001;}           // int
+    else if sci_float_test {return 4003;}     // sci_float
+    else if function_test {return 2000;}      // function
+    else if expression_test {return 0;}       // expresssion
+    else {return 1000;}                       // symbol
 }
 
 // Check if float
