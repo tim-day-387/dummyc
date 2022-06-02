@@ -24,7 +24,7 @@ pub fn find_type(token:String) -> i64 {
     // Series of cases to find type
     if is_string(token.clone()) {
 	return 3000; // string
-    } else if is_float(token.clone()) || is_int(token.clone()) {
+    } else if is_float(token.clone()) || is_int(token.clone()) || is_sci_float(token.clone()) {
 	match token.clone().parse::<f64>() {
 	    Ok(i) => {
 		let signif;
@@ -58,11 +58,89 @@ pub fn find_type(token:String) -> i64 {
     }
 }
 
-// Check if float or sci_float
-fn is_float(token:String) -> bool {return FLOAT.is_match(&token) || SCI_FLOAT.is_match(&token);}
+// Check if float
+fn is_float(token:String) -> bool {
+    let mut output = FLOAT.is_match(&token) || SCI_FLOAT.is_match(&token);
+
+    match token.clone().parse::<f64>() {
+	Ok(i) => {
+	    let signif;
+	    
+	    if i.abs() < 1.0 {
+		signif = i.abs().to_string().replace("0.", "").len();
+	    } else {
+		signif = i.abs().to_string().replace(".", "").len();
+	    }
+	    
+	    if signif <= 6 {
+		if is_int(token.clone()) {
+		    output = false && output; // int
+		} else {
+		    output = true && output; // float
+		}
+	    } else {
+		output = false && output; // sci_float
+	    }
+	},
+	Err(_e) => output = false && output,
+    }
+
+    return output;
+}
+
+// Check if sci_float
+fn is_sci_float(token:String) -> bool {
+    let mut output = FLOAT.is_match(&token) || SCI_FLOAT.is_match(&token);
+
+    match token.clone().parse::<f64>() {
+	Ok(i) => {
+	    let signif;
+	    
+	    if i.abs() < 1.0 {
+		signif = i.abs().to_string().replace("0.", "").len();
+	    } else {
+		signif = i.abs().to_string().replace(".", "").len();
+	    }
+	    
+	    if signif <= 6 {
+		if is_int(token.clone()) {
+		    output = false && output; // int
+		} else {
+		    output = false && output; // float
+		}
+	    } else {
+		output = true && output; // sci_float
+	    }
+	},
+	Err(_e) => output = false && output,
+    }
+
+    return output;
+}
 
 // Check if integer
-fn is_int(token:String) -> bool {return INTEGER.is_match(&token);}
+fn is_int(token:String) -> bool {
+    let mut output = INTEGER.is_match(&token);
+
+    match token.clone().parse::<f64>() {
+	Ok(i) => {
+	    let signif;
+	    
+	    if i.abs() < 1.0 {
+		signif = i.abs().to_string().replace("0.", "").len();
+	    } else {
+		signif = i.abs().to_string().replace(".", "").len();
+	    }
+	    
+	    if signif > 6 {
+		output = false && output; // sci_float
+	    }
+	},
+	Err(_e) => output = false && output,
+    }
+
+    return output;
+}
 
 // Check if string
 fn is_string(token:String) -> bool {return STRING.is_match(&token);}
