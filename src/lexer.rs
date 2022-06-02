@@ -10,7 +10,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 // File Imports
-use expression_lexer::*;
+use types::*;
 
 // Constants
 const RESERVED:[&'static str; 25] = ["FUNCTION", "RESTORE", "RETURN", "GOSUB", "PRINT", "INPUT", "READ", "DATA", "STOP",

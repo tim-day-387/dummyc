@@ -11,6 +11,7 @@ use std::io::{self, BufRead};
 // File Imports
 use lexer::*;
 use expression_lexer::*;
+use types::*;
 use data::*;
 
 // State struct

@@ -12,6 +12,7 @@ use rand::*;
 
 // File Imports
 use expression_lexer::*;
+use types::*;
 use state::*;
 
 // Data struct
@@ -247,41 +248,7 @@ impl Data {
 
     // Determine output type
     fn find_output_type(&mut self) {
-	// Series of cases to find type
-	if is_string(self.plain_text.clone()) {
-	    self.output_type = 3000; // string
-	} else if is_float(self.plain_text.clone()) || is_int(self.plain_text.clone()) {
-	    match self.plain_text.clone().parse::<f64>() {
-		Ok(i) => {
-		    let signif;
-		    
-		    if i.abs() < 1.0 {
-			signif = i.abs().to_string().replace("0.", "").len();
-		    } else {
-			signif = i.abs().to_string().replace(".", "").len();
-		    }
-		    
-		    if signif <= 6 {
-			if is_int(self.plain_text.clone()) {
-			    self.output_type = 4001; // int
-			} else {
-			    self.output_type = 4002; // float
-			}
-		    } else {
-			self.output_type = 4003; // sci_float
-		    }
-		},
-		Err(_e) => panic!("DATA: find_output_type: Invalid float"),
-	    };
-	} else if is_function(self.plain_text.clone()) {
-	    self.output_type = 2000; // symbol_callable
-	} else {
-	    if !is_expression(self.plain_text.clone()) {
-		self.output_type = 1000; // symbol
-	    } else {
-		self.output_type = 0; // expression
-            }
-	}
+	self.output_type = find_output_type(self.plain_text.clone());
     }
 
     // Get variable value

@@ -12,6 +12,7 @@ mod lexer;
 mod expression_lexer;
 mod state;
 mod data;
+mod types;
 use state::*;
 
 // Main function code
