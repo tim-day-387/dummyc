@@ -5,14 +5,14 @@
 use std::collections::HashMap;
 use std::path::Path;
 use std::fs::File;
-use std::cmp;
 use std::io::{self, BufRead};
+use std::cmp;
 
 // File Imports
-use lexer::*;
-use expression_lexer::*;
-use types::*;
-use data::*;
+use data::Data;
+use lexer::{is_shebang, perform_multi_lexing, split_line_number};
+use expression_lexer::{split, split_function, split_arguments};
+use types::{is_function, is_string};
 
 // State struct
 #[derive(PartialEq, Clone)]

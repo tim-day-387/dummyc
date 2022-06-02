@@ -6,14 +6,14 @@
 mod tests;
 
 // General Imports
-use std::cmp;
 use Path;
-use rand::*;
+use rand::Rng;
+use std::cmp;
 
 // File Imports
-use expression_lexer::*;
-use types::*;
-use state::*;
+use state::State;
+use types::find_output_type;
+use expression_lexer::{split, split_function, split_arguments};
 
 // Data struct
 #[derive(PartialEq, Clone)]

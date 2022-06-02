@@ -6,11 +6,11 @@
 mod tests;
 
 // General Imports
-use lazy_static::lazy_static;
 use regex::Regex;
+use lazy_static::lazy_static;
 
 // File Imports
-use types::*;
+use types::is_int;
 
 // Constants
 const RESERVED:[&'static str; 25] = ["FUNCTION", "RESTORE", "RETURN", "GOSUB", "PRINT", "INPUT", "READ", "DATA", "STOP",

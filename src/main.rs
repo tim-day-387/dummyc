@@ -3,17 +3,19 @@ extern crate rand;
 extern crate regex;
 extern crate lazy_static;
 
-// General Imports
-use std::env;
-use std::path::Path;
-
-// File Imports
+// Modules
 mod lexer;
 mod expression_lexer;
 mod state;
 mod data;
 mod types;
-use state::*;
+
+// General Imports
+use std::path::Path;
+use std::env;
+
+// File Imports
+use state::State;
 
 // Main function code
 fn main() {

@@ -6,7 +6,7 @@
 mod tests;
 
 // File Imports
-use lexer::*;
+use lexer::remove_spaces;
 
 // Constants
 const RELS:[char; 4] = ['=', '<', '>', '!'];
