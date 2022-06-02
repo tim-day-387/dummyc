@@ -21,41 +21,13 @@ lazy_static! {
 
 // Determine output type
 pub fn find_type(token:String) -> i64 {
-    // Series of cases to find type
-    if is_string(token.clone()) {
-	return 3000; // string
-    } else if is_float(token.clone()) || is_int(token.clone()) || is_sci_float(token.clone()) {
-	match token.clone().parse::<f64>() {
-	    Ok(i) => {
-		let signif;
-		
-		if i.abs() < 1.0 {
-		    signif = i.abs().to_string().replace("0.", "").len();
-		} else {
-		    signif = i.abs().to_string().replace(".", "").len();
-		}
-		
-		if signif <= 6 {
-		    if is_int(token.clone()) {
-			return 4001; // int
-		    } else {
-			return 4002; // float
-		    }
-		} else {
-		    return 4003; // sci_float
-		}
-	    },
-	    Err(_e) => panic!("DATA: find_output_type: Invalid float"),
-	};
-    } else if is_function(token.clone()) {
-	return 2000; // symbol_callable
-    } else {
-	if !is_expression(token.clone()) {
-	    return 1000; // symbol
-	} else {
-	    return 0; // expression
-        }
-    }
+    if is_string(token.clone()) {return 3000;}             // string
+    else if is_float(token.clone()) {return 4002;}         // float
+    else if is_int(token.clone()) {return 4001;}           // int
+    else if is_sci_float(token.clone()) {return 4003;}     // sci_float
+    else if is_function(token.clone()) {return 2000;}      // function
+    else if !is_expression(token.clone()) {return 1000;}   // symbol
+    else {return 0;}                                       // expression
 }
 
 // Check if float
