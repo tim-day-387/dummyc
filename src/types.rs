@@ -26,8 +26,8 @@ pub fn find_type(token:String) -> i64 {
     else if is_int(token.clone()) {return 4001;}           // int
     else if is_sci_float(token.clone()) {return 4003;}     // sci_float
     else if is_function(token.clone()) {return 2000;}      // function
-    else if !is_expression(token.clone()) {return 1000;}   // symbol
-    else {return 0;}                                       // expression
+    else if is_expression(token.clone()) {return 0;}       // expresssion
+    else {return 1000;}                                    // symbol
 }
 
 // Check if float
