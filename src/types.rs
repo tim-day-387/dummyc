@@ -20,7 +20,7 @@ lazy_static! {
 }
 
 // Determine output type
-pub fn find_output_type(token:String) -> i64 {
+pub fn find_type(token:String) -> i64 {
     // Series of cases to find type
     if is_string(token.clone()) {
 	return 3000; // string
@@ -59,16 +59,16 @@ pub fn find_output_type(token:String) -> i64 {
 }
 
 // Check if float or sci_float
-pub fn is_float(token:String) -> bool {return FLOAT.is_match(&token) || SCI_FLOAT.is_match(&token);}
+fn is_float(token:String) -> bool {return FLOAT.is_match(&token) || SCI_FLOAT.is_match(&token);}
 
 // Check if integer
-pub fn is_int(token:String) -> bool {return INTEGER.is_match(&token);}
+fn is_int(token:String) -> bool {return INTEGER.is_match(&token);}
 
 // Check if string
-pub fn is_string(token:String) -> bool {return STRING.is_match(&token);}
+fn is_string(token:String) -> bool {return STRING.is_match(&token);}
 
 // Check if expression
-pub fn is_expression(token:String) -> bool {return EXPRESSION.is_match(&token) && !STRING.is_match(&token);}
+fn is_expression(token:String) -> bool {return EXPRESSION.is_match(&token) && !STRING.is_match(&token);}
 
 // Check if function call
-pub fn is_function(token:String) -> bool {return FUNCTION.is_match(&token);}
+fn is_function(token:String) -> bool {return FUNCTION.is_match(&token);}

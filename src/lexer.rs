@@ -10,7 +10,7 @@ use regex::Regex;
 use lazy_static::lazy_static;
 
 // File Imports
-use types::is_int;
+use types::find_type;
 
 // Constants
 const RESERVED:[&'static str; 25] = ["FUNCTION", "RESTORE", "RETURN", "GOSUB", "PRINT", "INPUT", "READ", "DATA", "STOP",
@@ -51,7 +51,7 @@ pub fn perform_multi_lexing(line_string:String) -> Vec<Vec<String>> {
 
 // Create an error if the command is not formed properly, add implied let statements
 fn verify(mut tokens:Vec<String>) -> Vec<String> {
-    if !is_int(tokens[0].clone()) && !is_shebang(tokens[0].clone()) {
+    if (find_type(tokens[0].clone()) != 4001) && !is_shebang(tokens[0].clone()) {
 	panic!("LEXER: verify: Line has no line number");
     } else if tokens.len() > 1 && !RESERVED.contains(&&tokens[1].clone().to_uppercase().as_str()) {
 	tokens.insert(1, "LET".to_string());

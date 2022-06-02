@@ -10,9 +10,9 @@ use std::cmp;
 
 // File Imports
 use data::Data;
+use types::find_type;
 use lexer::{is_shebang, perform_multi_lexing, split_line_number};
 use expression_lexer::{split, split_function, split_arguments};
-use types::{is_function, is_string};
 
 // State struct
 #[derive(PartialEq, Clone)]
@@ -206,7 +206,7 @@ impl State {
 	    }
 
 	    // Insert name and type
-	    if is_string(text[counter].clone()) {
+	    if find_type(text[counter].clone()) == 3000 {
 		let command:Vec<String> = ["000".to_string(), "print".to_string(), text[counter].clone(), ";".to_string()].to_vec();
 		self.print_cmd(command);
 		println!("");
@@ -343,7 +343,7 @@ impl State {
 	// Generate data object
 	let object = Data::new_simplified(data, self.clone());
 
-	if is_function(var_name.clone()) {
+	if find_type(var_name.clone()) == 2000 {
             let array_ref = Data::get_array_reference(var_name.clone(), self.clone());
 	    self.variables.insert(array_ref.clone(), object.clone());
 	} else {

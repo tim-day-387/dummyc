@@ -12,7 +12,7 @@ use std::cmp;
 
 // File Imports
 use state::State;
-use types::find_output_type;
+use types::find_type;
 use expression_lexer::{split, split_function, split_arguments};
 
 // Data struct
@@ -248,7 +248,7 @@ impl Data {
 
     // Determine output type
     fn find_output_type(&mut self) {
-	self.output_type = find_output_type(self.plain_text.clone());
+	self.output_type = find_type(self.plain_text.clone());
     }
 
     // Get variable value
