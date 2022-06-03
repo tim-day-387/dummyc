@@ -4,6 +4,8 @@
 // Testing methods
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod find_type_tests;
 
 // General Imports
 use regex::Regex;
@@ -14,7 +16,7 @@ const STRICT:bool = false;
 lazy_static! {
     static ref FLOAT:Regex = Regex::new(r"^(|\+|-)([0-9]*)(\.[0-9]+)$").unwrap();
     static ref SCI_FLOAT:Regex = Regex::new(r"^(|\+|-)([0-9]*)(?:\.[0-9]*)?(([0-9]|[0-9]\.)(e|E))((|\+|-)[0-9]+)$").unwrap();
-    static ref STRING:Regex = Regex::new(r#"^(".*")$"#).unwrap();
+    static ref STRING:Regex = Regex::new(r#"^("[^"]*")$"#).unwrap();
     static ref INTEGER:Regex = Regex::new(r"^(|\+|-)([0-9]+)$").unwrap();
     static ref FUNCTION:Regex = Regex::new(r"^([a-z|A-Z]+)(\(.*\))$").unwrap();
     static ref EXPRESSION:Regex = Regex::new(r"^.*(=|<|>|!|\+|/|\*|-|\^).*$").unwrap();
