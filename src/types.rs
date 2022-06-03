@@ -11,15 +11,17 @@ mod find_type_tests;
 use regex::Regex;
 use lazy_static::lazy_static;
 
+// File Imports
+use expression_lexer::{split_function};
+
 // Constants
-const STRICT:bool = false;
 lazy_static! {
     static ref FLOAT:Regex = Regex::new(r"^(|\+|-)([0-9]*)(\.[0-9]+)$").unwrap();
     static ref SCI_FLOAT:Regex = Regex::new(r"^(|\+|-)([0-9]*)(?:\.[0-9]*)?(([0-9]|[0-9]\.)(e|E))((|\+|-)[0-9]+)$").unwrap();
     static ref STRING:Regex = Regex::new(r#"^("[^"]*")$"#).unwrap();
     static ref INTEGER:Regex = Regex::new(r"^(|\+|-)([0-9]+)$").unwrap();
     static ref FUNCTION:Regex = Regex::new(r"^([a-z|A-Z]+)(\(.*\))$").unwrap();
-    static ref EXPRESSION:Regex = Regex::new(r"^.*(=|<|>|!|\+|/|\*|-|\^).*$").unwrap();
+    static ref EXPRESSION:Regex = Regex::new(r"^.+(=|<|>|!|\+|/|\*|-|\^).+$").unwrap();
 }
 
 // Determine output type
@@ -39,13 +41,14 @@ pub fn find_type(token:String) -> i64 {
 	if all[i] {num_true = num_true + 1;}
     }
 
-    if num_true > 1 && STRICT {
+    if num_true > 1 {
 	println!("string: {}", string_test);
 	println!("float: {}", float_test);
 	println!("int: {}", int_test);
 	println!("sci_float: {}", sci_float_test);
 	println!("function: {}", function_test);
 	println!("expression: {}", expression_test);
+	println!("token: {}", token.clone());
 	panic!("TYPES: find_type: {} are true", num_true);
     }
 
@@ -146,7 +149,30 @@ fn is_int(token:String) -> bool {
 fn is_string(token:String) -> bool {return STRING.is_match(&token);}
 
 // Check if expression
-fn is_expression(token:String) -> bool {return EXPRESSION.is_match(&token) && !STRING.is_match(&token);}
+fn is_expression(token:String) -> bool {
+    return EXPRESSION.is_match(&token) &&
+	!STRING.is_match(&token) &&
+	!SCI_FLOAT.is_match(&token);
+}
 
 // Check if function call
-fn is_function(token:String) -> bool {return FUNCTION.is_match(&token);}
+fn is_function(token:String) -> bool {
+    let mut output = FUNCTION.is_match(&token);
+
+    if output {
+	let args = split_function(token.clone()).1;
+
+	for c in args.chars() {
+	    if c == ')' {
+		output = false;
+		break;
+	    }
+	    if c == '(' {
+		output = true;
+		break;
+	    }
+	}
+    }
+
+    return output;
+}

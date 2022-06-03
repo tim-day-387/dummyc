@@ -144,3 +144,30 @@ fn find_type_16() {
 
     assert_eq!(answer, find_type(given));
 }
+
+// Testing find_type()
+#[test]
+fn find_type_17() {
+    let given:String = "-12".to_string();
+    let answer = 4001;
+
+    assert_eq!(answer, find_type(given));
+}
+
+// Testing find_type()
+#[test]
+fn find_type_18() {
+    let given:String = "+3.14".to_string();
+    let answer = 4002;
+
+    assert_eq!(answer, find_type(given));
+}
+
+// Testing find_type()
+#[test]
+fn find_type_19() {
+    let given:String = "-123E-22".to_string();
+    let answer = 4003;
+
+    assert_eq!(answer, find_type(given));
+}
