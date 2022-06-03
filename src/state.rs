@@ -338,7 +338,7 @@ impl State {
     // Implmentation of the LET command
     fn let_cmd(&mut self, text:Vec<String>) {
 	// Split statement
-	let (var_name, _relational, data) = split(text[2].clone(), true);
+	let (var_name, _relational, data) = split(text[2].clone(), true, true);
 
 	// Generate data object
 	let object = Data::new_simplified(data, self.clone());
@@ -359,7 +359,7 @@ impl State {
 	let mut goto = -1;
 
 	// Split statement
-	let (dataa, relational, datab) = split(text[2].clone(), true);
+	let (dataa, relational, datab) = split(text[2].clone(), true, true);
 
 	// Generate data objects
 	let objecta = Data::new_simplified(dataa, self.clone());
@@ -410,7 +410,7 @@ impl State {
 	}
 	
 	// Split statement
-	let (var_name, _relational, data) = split(text[2].clone(), true);
+	let (var_name, _relational, data) = split(text[2].clone(), true, true);
 
 	// Check if exists, then add if not
 	match self.variables.get(&var_name) {

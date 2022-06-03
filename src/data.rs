@@ -157,7 +157,7 @@ impl Data {
     
     // Resolve any unresolved operations in the expression
     fn resolve_expression(&mut self, state:State) {
-	let (first_part, operation, second_part) = split(self.plain_text.clone(), false);
+	let (first_part, operation, second_part) = split(self.plain_text.clone(), false, true);
 
 	let mut first_obj:Data = Data::new_simplified(first_part, state.clone());
 	let second_obj:Data = Data::new_simplified(second_part, state.clone());

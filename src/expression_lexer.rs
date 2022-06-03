@@ -15,7 +15,7 @@ const OPS2:[char; 2] = ['/', '*'];
 const OPS3:[char; 2] = ['^', ' '];
 
 // Split an expression across the relational
-pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {
+pub fn split(token:String, rels_or_ops:bool, strict:bool) -> (String, String, String) {
     let output;
 
     if rels_or_ops {
@@ -30,7 +30,7 @@ pub fn split(token:String, rels_or_ops:bool) -> (String, String, String) {
 	else {output = third;}
     }
 
-    if output.0 == "".to_string() || output.1 == "".to_string() || output.2 == "".to_string() {
+    if strict && (output.0 == "".to_string() || output.1 == "".to_string() || output.2 == "".to_string()) {
       panic!("EXPRESSION_LEXER: split: Tried to create empty split from {}", token.clone());
     }
 

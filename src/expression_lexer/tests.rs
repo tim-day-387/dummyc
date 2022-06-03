@@ -7,7 +7,7 @@ fn split_1() {
     let given:String = "A=\"Fuh\"".to_string();
     let answer = ("A".to_string(), "=".to_string(), "\"Fuh\"".to_string());
 
-    assert_eq!(answer, split(given, true));
+    assert_eq!(answer, split(given, true, true));
 }
 
 // Testing split()
@@ -16,7 +16,7 @@ fn split_2() {
     let given:String = "B<=23423984723fffffjjjdjdj{}||[".to_string();
     let answer = ("B".to_string(), "<=".to_string(), "23423984723fffffjjjdjdj{}||[".to_string());
 
-    assert_eq!(answer, split(given, true));
+    assert_eq!(answer, split(given, true, true));
 }
 
 // Testing split()
@@ -25,7 +25,7 @@ fn split_3() {
     let given:String = "a=test(Sample,Sample,Sample)".to_string();
     let answer = ("a".to_string(), "=".to_string(), "test(Sample,Sample,Sample)".to_string());
 
-    assert_eq!(answer, split(given, true));
+    assert_eq!(answer, split(given, true, true));
 }
 
 // Testing split()
@@ -34,7 +34,7 @@ fn split_4() {
     let given:String = "a=test()".to_string();
     let answer = ("a".to_string(), "=".to_string(), "test()".to_string());
 
-    assert_eq!(answer, split(given, true));
+    assert_eq!(answer, split(given, true, true));
 }
 
 // Testing split()
@@ -43,7 +43,7 @@ fn split_5() {
     let given:String = "(1+1)".to_string();
     let answer = ("1".to_string(), "+".to_string(), "1".to_string());
 
-    assert_eq!(answer, split(given, false));
+    assert_eq!(answer, split(given, false, true));
 }
 
 // Testing split_arguments()

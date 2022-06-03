@@ -171,3 +171,12 @@ fn find_type_19() {
 
     assert_eq!(answer, find_type(given));
 }
+
+// Testing find_type()
+#[test]
+fn find_type_20() {
+    let given:String = "F(N-1)".to_string();
+    let answer = 2000;
+
+    assert_eq!(answer, find_type(given));
+}

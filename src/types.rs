@@ -12,7 +12,7 @@ use regex::Regex;
 use lazy_static::lazy_static;
 
 // File Imports
-use expression_lexer::{split_function};
+use expression_lexer::{split, split_function};
 
 // Constants
 lazy_static! {
@@ -152,7 +152,8 @@ fn is_string(token:String) -> bool {return STRING.is_match(&token);}
 fn is_expression(token:String) -> bool {
     return EXPRESSION.is_match(&token) &&
 	!STRING.is_match(&token) &&
-	!SCI_FLOAT.is_match(&token);
+	!SCI_FLOAT.is_match(&token) &&
+	split(token, false, false).1 != "".to_string();
 }
 
 // Check if function call
