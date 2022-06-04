@@ -18,6 +18,7 @@ use std::env;
 
 // File Imports
 use state::State;
+use errors::stateless_error;
 
 // Main function code
 fn main() {

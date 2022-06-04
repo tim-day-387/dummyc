@@ -7,6 +7,7 @@ mod tests;
 
 // General Imports
 use regex::Regex;
+use errors::stateless_error_vec_string;
 use lazy_static::lazy_static;
 
 // File Imports
@@ -56,7 +57,7 @@ fn verify(mut tokens:Vec<String>) -> Vec<String> {
 	let artifact_names = [].to_vec();
 	let function_name = "verify".to_string();
 	let message = "Line has no line number.".to_string();
-	stateless_error(artifacts, artifact_names, function_name, message);
+	stateless_error_vec_string(artifacts, artifact_names, function_name, message)
     } else if tokens.len() > 1 && !RESERVED.contains(&&tokens[1].clone().to_uppercase().as_str()) {
 	tokens.insert(1, "LET".to_string());
 	return tokens;

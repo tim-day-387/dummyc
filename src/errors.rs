@@ -1,6 +1,13 @@
 // Errors module
 #![forbid(unsafe_code)]
 
+// Produce an error without outputting state; Vec<String>
+pub fn stateless_error_vec_string(artifacts:Vec<String>, artifact_names:Vec<String>, function_name:String, message:String) -> Vec<String> {
+    stateless_error(artifacts, artifact_names, function_name, message);
+
+    quit::with_code(1);
+}
+
 // Produce an error without outputting state
 pub fn stateless_error(artifacts:Vec<String>, artifact_names:Vec<String>, function_name:String, message:String) {
     error_header(function_name, message);

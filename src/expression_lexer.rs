@@ -6,6 +6,7 @@
 mod tests;
 
 // File Imports
+use errors::stateless_error;
 use lexer::remove_spaces;
 
 // Constants
@@ -31,7 +32,11 @@ pub fn split(token:String, rels_or_ops:bool, strict:bool) -> (String, String, St
     }
 
     if strict && (output.0 == "".to_string() || output.1 == "".to_string() || output.2 == "".to_string()) {
-      panic!("EXPRESSION_LEXER: split: Tried to create empty split from {}", token.clone());
+	let artifacts = [token.clone()].to_vec();
+	let artifact_names = ["token".to_string()].to_vec();
+	let function_name = "split".to_string();
+	let message = "Tried to create empty split.".to_string();
+	stateless_error(artifacts, artifact_names, function_name, message);
     }
 
     return output;
