@@ -11,6 +11,7 @@ use std::cmp;
 // File Imports
 use data::Data;
 use types::find_type;
+use errors::{stateless_error, stateless_error_int};
 use lexer::{is_shebang, perform_multi_lexing, split_line_number};
 use expression_lexer::{split, split_function, split_arguments};
 
@@ -73,7 +74,11 @@ impl State {
 		    if first_token.clone() != "".to_string() {
 			self.prev_code.push((first_token.parse::<i64>().unwrap(), ip.clone()));
 		    } else if !is_shebang(ip.clone()) {
-			panic!("STATE: load_prev: Line has no line number");
+			let artifacts = [].to_vec();
+			let artifact_names = [].to_vec();
+			let function_name = "load_prev".to_string();
+			let message = "Line has no line number.".to_string();
+			stateless_error(artifacts, artifact_names, function_name, message);
 		    }
 		}
             }
@@ -171,11 +176,24 @@ impl State {
 	let arguments = split_arguments(split_function(text[2].clone()).1);
 
 	if arguments.len() != 1 {
-	    panic!("STATE: dim_cmd: Wrong number of arguments");
+	    let artifacts = [].to_vec();
+	    let artifact_names = [].to_vec();
+	    let function_name = "dim_cmd".to_string();
+	    let message = "Wrong number of arguments.".to_string();
+	    stateless_error(artifacts, artifact_names, function_name, message);
 	}
 
 	let size_string = Data::new_simplified(arguments[0].clone(), self.clone()).plain_text;
-	let size = match size_string.parse::<i64>() {Ok(i) => i, Err(_e) => panic!("STATE: dim_cmd: Invalid integer")};
+	let size = match size_string.parse::<i64>() {
+	    Ok(i) => i,
+	    Err(_e) => {
+		let artifacts = [].to_vec();
+		let artifact_names = [].to_vec();
+		let function_name = "dim_cmd".to_string();
+		let message = "Invalid integer.".to_string();
+		stateless_error_int(artifacts, artifact_names, function_name, message)
+            }
+	};
 
 	for i in 0..size {
 	    let data_dummy = Data::new("".to_string());
@@ -226,7 +244,11 @@ impl State {
 
 	// Check if we had too many args
 	if self.input_args.len() != 0 {
-	    panic!("STATE: function_cmd: Too many input arguments");
+	    let artifacts = [].to_vec();
+	    let artifact_names = [].to_vec();
+	    let function_name = "function_cmd".to_string();
+	    let message = "Too many input arguments.".to_string();
+	    stateless_error(artifacts, artifact_names, function_name, message);
 	}
 
 	// Update state
@@ -239,11 +261,17 @@ impl State {
 	let needed = (((text.len() - 2) - 1) / 2) + 1;
 
 	if text[2] == "RETURN".to_string() || text[2] == "return".to_string() {
-	    let var_value:&Data;
+	    let mut var_value:&Data = &Data::new("".to_string());
 	    
 	    match self.variables.get(&text[3]) {
 		Some(value)=> var_value = value,
-		_=> panic!("STATE: function_cmd: Variable does not exist"),
+		_=> {
+		    let artifacts = [].to_vec();
+		    let artifact_names = [].to_vec();
+		    let function_name = "function_cmd".to_string();
+		    let message = "Variable does not exist.".to_string();
+		    stateless_error(artifacts, artifact_names, function_name, message);
+		}
 	    }
 
 	    self.return_val = var_value.clone();
@@ -263,11 +291,17 @@ impl State {
 		}
 
 		// Generate data object
-		let arg:Data;
+		let mut arg:Data = Data::new("".to_string());
 		
 		match self.input_args.pop() {
 		    Some(value)=> arg = value,
-		    _=> panic!("STATE: function_cmd: Not enough input arguments, have {} and need {}", given, needed),
+		    _=> {
+			let artifacts = [given.to_string(), needed.to_string()].to_vec();
+			let artifact_names = ["given".to_string(), "needed".to_string()].to_vec();
+			let function_name = "function_cmd".to_string();
+			let message = "Not enough input arguments.".to_string();
+			stateless_error(artifacts, artifact_names, function_name, message);
+		    }
 		}
 
 		// Insert name and type
@@ -280,7 +314,11 @@ impl State {
 
 	// Check if we had too many args
 	if self.input_args.len() != 0 {
-	    panic!("STATE: function_cmd: Too many input arguments, have {} and need {}", given, needed);
+	    let artifacts = [given.to_string(), needed.to_string()].to_vec();
+	    let artifact_names = ["given".to_string(), "needed".to_string()].to_vec();
+	    let function_name = "function_cmd".to_string();
+	    let message = "Too many input arguments.".to_string();
+	    stateless_error(artifacts, artifact_names, function_name, message);
 	}
 
 	// Update state
@@ -389,7 +427,13 @@ impl State {
     fn return_cmd(&mut self, _text:Vec<String>) {
 	// Update state
 	match self.return_to_line.pop() {
-	    None => panic!("STATE: return_cmd: Nowhere to return to"),
+	    None => {
+		let artifacts = [].to_vec();
+		let artifact_names = [].to_vec();
+		let function_name = "return_cmd".to_string();
+		let message = "Nowhere to return to.".to_string();
+		stateless_error(artifacts, artifact_names, function_name, message);
+	    },
 	    Some(line_to_return_to) => self.prev_line = line_to_return_to,
 	}
 	
