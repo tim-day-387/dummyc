@@ -13,7 +13,7 @@ fn type_1() {
 // Testing output_type()
 #[test]
 fn type_2() {
-    let mut given:Data = Data::new("This is another, different test.".to_string());
+    let mut given:Data = Data::new("Thisisanotherdifferenttest".to_string());
     given.find_output_type();
 
     assert_eq!(1000, given.output_type);

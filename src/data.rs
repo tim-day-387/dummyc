@@ -113,7 +113,7 @@ impl Data {
 	    let mut rng = rand::thread_rng();
 	    let number:f64 = rng.gen();
 	    *self = Data::new_simplified(number.to_string(), state);
-	} else if self.plain_text.to_lowercase() == "pr_loc".to_string() {
+	} else if self.plain_text.to_lowercase() == "prloc".to_string() {
 	    self.plain_text = state.print_location.to_string();
 	    self.simplify(state.clone());
 	} else {

@@ -13,7 +13,7 @@ fn find_type_1() {
 // Testing find_type()
 #[test]
 fn find_type_2() {
-    let given:String = "3.1sdfsdf4159".to_string();
+    let given:String = "sdf$$$4159".to_string();
     let answer = 1000;
 
     assert_eq!(answer, find_type(given));
@@ -58,7 +58,7 @@ fn find_type_6() {
 // Testing find_type()
 #[test]
 fn find_type_7() {
-    let given:String = "\"This is \"\" a test\"".to_string();
+    let given:String = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".to_string();
     let answer = 1000;
 
     assert_eq!(answer, find_type(given));
@@ -67,7 +67,7 @@ fn find_type_7() {
 // Testing find_type()
 #[test]
 fn find_type_8() {
-    let given:String = "This is \"\" a test\"".to_string();
+    let given:String = "f999999999999999999999999999999999999$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$".to_string();
     let answer = 1000;
 
     assert_eq!(answer, find_type(given));
@@ -177,6 +177,24 @@ fn find_type_19() {
 fn find_type_20() {
     let given:String = "F(N-1)".to_string();
     let answer = 2000;
+
+    assert_eq!(answer, find_type(given));
+}
+
+// Testing find_type()
+#[test]
+fn find_type_21() {
+    let given:String = "SDF$".to_string();
+    let answer = 1000;
+
+    assert_eq!(answer, find_type(given));
+}
+
+// Testing find_type()
+#[test]
+fn find_type_22() {
+    let given:String = "F8".to_string();
+    let answer = 1000;
 
     assert_eq!(answer, find_type(given));
 }
