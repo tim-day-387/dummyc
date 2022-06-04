@@ -52,7 +52,11 @@ pub fn perform_multi_lexing(line_string:String) -> Vec<Vec<String>> {
 // Create an error if the command is not formed properly, add implied let statements
 fn verify(mut tokens:Vec<String>) -> Vec<String> {
     if (find_type(tokens[0].clone()) != 4001) && !is_shebang(tokens[0].clone()) {
-	panic!("LEXER: verify: Line has no line number");
+	let artifacts = [].to_vec();
+	let artifact_names = [].to_vec();
+	let function_name = "verify".to_string();
+	let message = "Line has no line number.".to_string();
+	stateless_error(artifacts, artifact_names, function_name, message);
     } else if tokens.len() > 1 && !RESERVED.contains(&&tokens[1].clone().to_uppercase().as_str()) {
 	tokens.insert(1, "LET".to_string());
 	return tokens;
