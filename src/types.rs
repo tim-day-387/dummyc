@@ -12,6 +12,7 @@ use regex::Regex;
 use lazy_static::lazy_static;
 
 // File Imports
+use errors::{stateless_error, unhandled_error_int};
 use expression_lexer::{split, split_function};
 
 // Constants
@@ -35,7 +36,7 @@ pub fn find_type(token:String) -> i64 {
     let expression_test = is_expression(token.clone());
     let symbol_test = is_symbol(token.clone());
 
-    let all = [string_test, float_test, sci_float_test, int_test, function_test, expression_test, symbol_test];
+    let all = [string_test, float_test, sci_float_test, int_test, function_test, expression_test, symbol_test].to_vec();
 
     let mut num_true = 0;
 
@@ -44,15 +45,17 @@ pub fn find_type(token:String) -> i64 {
     }
 
     if num_true > 1 || num_true == 0 {
-	println!("string: {}", string_test);
-	println!("float: {}", float_test);
-	println!("int: {}", int_test);
-	println!("sci_float: {}", sci_float_test);
-	println!("function: {}", function_test);
-	println!("expression: {}", expression_test);
-	println!("symbol: {}", symbol_test);
-	println!("token: {}", token.clone());
-	panic!("TYPES: find_type: {} are true", num_true);
+	let artifacts = [string_test.to_string(), float_test.to_string(),
+			 sci_float_test.to_string(), int_test.to_string(),
+			 function_test.to_string(), expression_test.to_string(),
+			 symbol_test.to_string(), token.clone()].to_vec();
+	let artifact_names = ["string".to_string(), "float".to_string(),
+			      "sci_float".to_string(), "int".to_string(),
+			      "function".to_string(), "expression".to_string(),
+			      "symbol".to_string(), "token".to_string()].to_vec();
+	let function_name = "find_type".to_string();
+	let message = "Object does not match any of the types.".to_string();
+        stateless_error(artifacts, artifact_names, function_name, message);
     }
 
     if string_test {return 3000;}             // string
@@ -62,7 +65,7 @@ pub fn find_type(token:String) -> i64 {
     else if function_test {return 2000;}      // function
     else if expression_test {return 0;}       // expresssion
     else if symbol_test {return 1000;}        // symbol
-    else {panic!("TYPES: find_type: {} are true", 0);}
+    else {unhandled_error_int()}
 }
 
 // Check if float

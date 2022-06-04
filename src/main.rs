@@ -2,6 +2,7 @@
 extern crate rand;
 extern crate regex;
 extern crate lazy_static;
+extern crate quit;
 
 // Modules
 mod lexer;
@@ -9,6 +10,7 @@ mod expression_lexer;
 mod state;
 mod data;
 mod types;
+mod errors;
 
 // General Imports
 use std::path::Path;
