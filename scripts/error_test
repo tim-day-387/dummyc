@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [ $# != 1 ]
+then
+  echo "Wrong number of arguments."
+  exit
+fi
+
 mkdir -p /tmp/error_outputs
 
 for file in $(ls -1 ./examples/errors/programs | grep -v "~"); do
@@ -11,8 +17,26 @@ then
     for file in $(ls -1 /tmp/error_outputs | grep -v "~"); do
 	cat "/tmp/error_outputs/$file" | grep "error" > "/tmp/error_outputs/${file}_post"
 	diff "./examples/errors/outputs/error_output" "/tmp/error_outputs/${file}_post" > "/tmp/diff"
-	echo -n "$file: " && [ -s /tmp/diff ] && (echo "Fail") || (echo "Pass")
+	echo -n "$file: " && [ -s /tmp/diff ] && (echo "fail") || (echo "pass")
     done
+fi
+
+if [ $1 -eq 2 ]
+then
+    num_pass=0
+    num_fail=0
+    num_total=0
+
+    for file in $(ls -1 /tmp/error_outputs | grep -v "~"); do
+	cat "/tmp/error_outputs/$file" | grep "error" > "/tmp/error_outputs/${file}_post"
+	diff "./examples/errors/outputs/error_output" "/tmp/error_outputs/${file}_post" > "/tmp/diff"
+	num_total=$(( $num_total + 1 ))
+	[ -s /tmp/diff ] && num_fail=$(( $num_fail + 1 )) || num_pass=$(( $num_pass + 1 ))
+    done
+
+    echo "Total:" $num_total
+    echo "=> passed:" $num_pass
+    echo "=> failed:" $num_fail
 fi
 
 rm -r /tmp/error_outputs/

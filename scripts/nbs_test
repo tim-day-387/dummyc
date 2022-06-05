@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [ $# != 1 ]
+then
+  echo "Wrong number of arguments."
+  exit
+fi
+
 for file in $(ls -1 ./examples/nbs/programs | grep -v "~"); do
     ./target/debug/dummyc "./examples/nbs/programs/$file" 1> "/tmp/${file%.*}_output" 2> /dev/null
 done
@@ -8,7 +14,7 @@ if [ $1 -eq 0 ]
 then
     for file in $(ls -1 ./examples/nbs/outputs | grep -v "~"); do
 	diff "./examples/nbs/outputs/$file" "/tmp/$file" > "/tmp/diff"
-	echo -n "$file: " && [ -s /tmp/diff ] && (echo "Fail") || (echo "Pass")
+	echo -n "$file: " && [ -s /tmp/diff ] && (echo "fail") || (echo "pass")
     done
 fi
 
@@ -18,4 +24,21 @@ then
 	echo "~~~~~~~~~~> $file: "
 	cat "/tmp/$file"
     done
+fi
+
+if [ $1 -eq 2 ]
+then
+    num_pass=0
+    num_fail=0
+    num_total=0
+
+    for file in $(ls -1 ./examples/nbs/outputs | grep -v "~"); do
+	diff "./examples/nbs/outputs/$file" "/tmp/$file" > "/tmp/diff"
+	num_total=$(( $num_total + 1 ))
+	[ -s /tmp/diff ] && num_fail=$(( $num_fail + 1 )) || num_pass=$(( $num_pass + 1 ))
+    done
+
+    echo "Total:" $num_total
+    echo "=> passed:" $num_pass
+    echo "=> failed:" $num_fail
 fi

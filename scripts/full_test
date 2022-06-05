@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [ $# != 1 ]
+then
+  echo "Wrong number of arguments."
+  exit
+fi
+
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ cargo test ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 cargo test
 
@@ -7,12 +13,12 @@ echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ cargo build ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cargo build
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ custom_test ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-./scripts/custom_test 0
+./scripts/custom_test $1
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ error_test ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-./scripts/error_test 0
+./scripts/error_test $1
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ nbs_test ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-./scripts/nbs_test 0
+./scripts/nbs_test $1
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
