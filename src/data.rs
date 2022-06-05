@@ -13,6 +13,7 @@ use std::cmp;
 // File Imports
 use state::State;
 use types::find_type;
+use errors::stateless_error;
 use expression_lexer::{split, split_function, split_arguments};
 
 // Data struct
@@ -32,7 +33,11 @@ impl Data {
 	output.simplify(state);
 
 	if given_text.clone() != "".to_string() && output.plain_text.clone() == "".to_string() {
-	    panic!("DATA: new_simplified: Can not reduce {} to empty data object", given_text.clone());
+	    let artifacts = [given_text.clone()].to_vec();
+	    let artifact_names = ["token".to_string()].to_vec();
+	    let function_name = "new_simplified".to_string();
+	    let message = "Cannot reduce to empty data object.".to_string();
+	    stateless_error(artifacts, artifact_names, function_name, message);
 	}
 
 	return output;
@@ -45,6 +50,22 @@ impl Data {
 	    output_type:-1, // -1 - null; 0 - expression; 1000 - symbol; 2000 symbol_callable; 3000 - string; 4001-3 - int, float, sci_float
 	    print_out_text:"".to_string(),
 	}
+    }
+
+    // Invalid float error
+    fn error_invalid_float(function_name:String) {
+	let artifacts = [].to_vec();
+	let artifact_names = [].to_vec();
+	let message = "Invalid float.".to_string();
+	stateless_error(artifacts, artifact_names, function_name, message);    
+    }
+
+    // Invalid int error
+    fn error_invalid_int(function_name:String) {
+	let artifacts = [].to_vec();
+	let artifact_names = [].to_vec();
+	let message = "Invalid integer.".to_string();
+	stateless_error(artifacts, artifact_names, function_name, message);    
     }
 
     // Simplify data output to one which can be stored and printed out
@@ -91,11 +112,11 @@ impl Data {
 
 	if name == "int".to_string() && arguments.len() == 1 {
 	    let arg_data = Data::new_simplified(arguments[0].clone(), state.clone());
-	    let number:i64;
+	    let mut number:i64 = -1;
 
 	    match arg_data.plain_text.parse::<f64>() {
 		Ok(i) => number = i.round() as i64,
-		Err(_e) => panic!("DATA: resolve_callable: Invalid float"),
+		Err(_e) => Data::error_invalid_float("resolve_callable".to_string()),
 	    };
 
 	    *self = Data::new_simplified(number.to_string(), state);
@@ -171,7 +192,12 @@ impl Data {
     // Find output type from an operation
     fn find_operation_output_type(self, other:Data) -> i64 {
 	if (self.output_type - other.output_type).abs() > 500 {
-	    panic!("DATA: find_operation_output_type: Incompatible types");
+	    let artifacts = [].to_vec();
+	    let artifact_names = [].to_vec();
+	    let function_name = "find_operation_output_type".to_string();
+	    let message = "Incompatible types.".to_string();
+	    stateless_error(artifacts, artifact_names, function_name, message);
+	    return -1;
 	} else {
 	    return cmp::max(self.output_type, other.output_type);
 	}
@@ -182,8 +208,8 @@ impl Data {
 	let output_type = self.clone().find_operation_output_type(other.clone());
 
 	if output_type == 4001 || output_type == 4002 || output_type == 4003 { // int or float or sci_float
-	    let a = match self.plain_text.parse::<f32>() {Ok(i) => i, Err(_e) => panic!("DATA: compare: Invalid float")};
-	    let b = match other.plain_text.parse::<f32>() {Ok(i) => i, Err(_e) => panic!("DATA: compare: Invalid float")};
+	    let a = match self.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_float("compare".to_string()); return false;}};
+	    let b = match other.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_float("compare".to_string()); return false;}};
 
 	    if operation_string == "<".to_string() {
 		return a < b;
@@ -208,8 +234,8 @@ impl Data {
 	if output_type == 3000 { // string
 	    self.plain_text = format!("{}{}{}{}", "\"".to_string(), self.print_out_text.clone(), other.print_out_text.clone(), "\"".to_string());
 	} else if output_type == 4001 { // int
-	    let a = match self.plain_text.parse::<i64>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid integer")};
-	    let b = match other.plain_text.parse::<i64>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid integer")};
+	    let a = match self.plain_text.parse::<i64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_int("operation".to_string()); return;}};
+	    let b = match other.plain_text.parse::<i64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_int("operation".to_string()); return;}};
 
 	    if operation_string == "+".to_string() {
 		self.plain_text = (a+b).to_string();
@@ -222,11 +248,15 @@ impl Data {
 	    } else if operation_string == "^".to_string() {
 		self.plain_text = (a as f64).powf(b as f64).to_string();
 	    } else {
-		panic!("DATA: operation: Invalid operation");
+		let artifacts = [].to_vec();
+		let artifact_names = [].to_vec();
+		let function_name = "operation".to_string();
+		let message = "Invalid operation.".to_string();
+		stateless_error(artifacts, artifact_names, function_name, message);
             } 
 	} else if output_type == 4002 || output_type == 4003 { // float or sci_float
-	    let a = match self.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid float")};
-	    let b = match other.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => panic!("DATA: operation: Invalid float")};
+	    let a = match self.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_float("operation".to_string()); return;}};
+	    let b = match other.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_float("operation".to_string()); return;}};
 
 	    if operation_string == "+".to_string() {
 		self.plain_text = (a+b).to_string();
@@ -239,10 +269,18 @@ impl Data {
 	    } else if operation_string == "^".to_string() {
 		self.plain_text = a.powf(b).to_string();
 	    } else {
-		panic!("DATA: operation: Invalid operation");
+		let artifacts = [].to_vec();
+		let artifact_names = [].to_vec();
+		let function_name = "operation".to_string();
+		let message = "Invalid operation.".to_string();
+		stateless_error(artifacts, artifact_names, function_name, message);
             }
 	} else {
-	    panic!("DATA: operation: Unsupport type");
+	    let artifacts = [].to_vec();
+	    let artifact_names = [].to_vec();
+	    let function_name = "operation".to_string();
+	    let message = "Unsupported type.".to_string();
+	    stateless_error(artifacts, artifact_names, function_name, message);
 	}
     }
 
@@ -253,11 +291,17 @@ impl Data {
 
     // Get variable value
     fn get_var_value(&mut self, state:State) {
-	let var_value:&Data;
+	let mut var_value:&Data = &Data::new("".to_string());
 	
 	match state.variables.get(&self.plain_text) {
 	    Some(value)=> var_value = value,
-	    _=> panic!("DATA: get_var_value: Variable {} does not exist", self.plain_text),
+	    _=> {
+		let artifacts = [self.plain_text.clone()].to_vec();
+		let artifact_names = ["variable".to_string()].to_vec();
+		let function_name = "get_var_value".to_string();
+		let message = "Variable does not exist.".to_string();
+		stateless_error(artifacts, artifact_names, function_name, message);
+	    }
 	}
 
 	*self = var_value.clone();
@@ -284,7 +328,7 @@ impl Data {
 		} else {
 		    self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
 		},
-		Err(_e) => panic!("DATA: get_print_out: Invalid integer"),
+		Err(_e) => Data::error_invalid_int("get_print_out".to_string()),
 	    };
 	} else if self.output_type == 4002 { // float
 	    match self.plain_text.clone().parse::<f64>() {
@@ -301,13 +345,13 @@ impl Data {
 		} else {
 		    self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
 		},
-		Err(_e) => panic!("DATA: get_print_out: Invalid float"),
+		Err(_e) => Data::error_invalid_float("get_print_out".to_string()),
 	    };
 	} else if self.output_type == 4003 { // sci_float
 	    let mut output:String = "".to_string();
 	    let mut last = ' ';
 	    let mut point = false;
-	    let temp;
+	    let mut temp = "".to_string();
 	    
 	    match self.plain_text.clone().parse::<f64>() {
 		Ok(i) => if i < 0.0 {
@@ -315,7 +359,7 @@ impl Data {
 		} else {
 		    temp = format!("{}{:.E}{}", " ".to_string(), i, " ".to_string());
 		},
-		Err(_e) => panic!("DATA: get_print_out: Invalid float"),
+		Err(_e) => Data::error_invalid_float("get_print_out".to_string()),
 	    };
 	    for c in temp.chars() {
 		if c == '.' {point = true;}
