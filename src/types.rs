@@ -12,7 +12,7 @@ use regex::Regex;
 use lazy_static::lazy_static;
 
 // File Imports
-use errors::{stateless_error, unhandled_error_int};
+use errors::{stateless_error, unhandled_error};
 use expression_lexer::{split, split_function};
 
 // Constants
@@ -65,7 +65,7 @@ pub fn find_type(token:String) -> i64 {
     else if function_test {return 2000;}      // function
     else if expression_test {return 0;}       // expresssion
     else if symbol_test {return 1000;}        // symbol
-    else {unhandled_error_int()}
+    else {unhandled_error(); return -1;}
 }
 
 // Check if float

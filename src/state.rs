@@ -11,7 +11,7 @@ use std::cmp;
 // File Imports
 use data::Data;
 use types::find_type;
-use errors::{stateless_error, stateless_error_int};
+use errors::stateless_error;
 use lexer::{is_shebang, perform_multi_lexing, split_line_number};
 use expression_lexer::{split, split_function, split_arguments};
 
@@ -191,7 +191,8 @@ impl State {
 		let artifact_names = [].to_vec();
 		let function_name = "dim_cmd".to_string();
 		let message = "Invalid integer.".to_string();
-		stateless_error_int(artifacts, artifact_names, function_name, message)
+		stateless_error(artifacts, artifact_names, function_name, message);
+		return;
             }
 	};
 
