@@ -6,7 +6,7 @@ pub fn stateless_error(artifacts:Vec<String>, artifact_names:Vec<String>, functi
     error_header(function_name, message);
 
     for i in 0..artifacts.len() {
-	println!("=> {}: {}", artifact_names[i], artifacts[i]); 
+	eprintln!("=> {}: {}", artifact_names[i], artifacts[i]); 
     }
     
     error_footer();
@@ -25,12 +25,12 @@ pub fn unhandled_error() {
 
 // Error header
 fn error_header(function_name:String, message:String) {
-    println!("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ error_found ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    println!("Function Name: {}", function_name);
-    println!("Message: {}", message);
+    eprintln!("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ error_found ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    eprintln!("Function Name: {}", function_name);
+    eprintln!("Message: {}", message);
 }
 
 // Error footer
 fn error_footer() {
-    println!("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    eprintln!("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 }
