@@ -35,6 +35,14 @@ then
     done
 
     echo "Total:" $num_total
+
+    if [ $num_total == $num_pass ]
+    then
+	echo "Status: Testing Passed"
+    else
+	echo "Status: Testing Failed"
+    fi
+
     echo "=> passed:" $num_pass
     echo "=> failed:" $num_fail
 fi
