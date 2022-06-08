@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [ $# != 1 ]
+then
+  echo "Wrong number of arguments."
+  exit
+fi
+
+for file in $(ls -1 $1 | grep -v "~"); do
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "Name: $file"
+    echo "Output: ~"
+    timeout 5 dummyc $1/$file 1> /dev/null
+    echo "End: ~"
+done
+
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
