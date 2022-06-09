@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ $# != 1 ]
+if [ $# != 2 ]
 then
   echo "Wrong number of arguments."
   exit
@@ -10,7 +10,16 @@ for file in $(ls -1 $1 | grep -v "~"); do
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "Name: $file"
     echo "Output: ~"
-    timeout 5 dummyc $1/$file 1> /dev/null
+
+    if [ $2 -eq 1 ]
+    then
+	timeout 5 dummyc $1/$file 2> /dev/null
+    fi
+    if [ $2 -eq 2 ]
+    then
+	timeout 5 dummyc $1/$file 1> /dev/null
+    fi
+
     echo "End: ~"
 done
 
