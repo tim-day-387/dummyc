@@ -190,6 +190,14 @@ impl State {
 	println!("");
     }
 
+    // Conditionally go to next line
+    fn pt_cond_next_line(&mut self) {
+	if self.print_location != 0 {
+	    self.print_location = 0;
+	    println!("");
+	}
+    }
+
     // Print out
     fn pt_output_text(&mut self, text:String) {
 	print!("{}", text);
@@ -236,26 +244,18 @@ impl State {
 
     // Implementation of the INPUT command
     fn input_cmd(&mut self, text:Vec<String>) {
-	let mut line = "".to_string();	
-	let mut counter = 2;
+        let mut line = "".to_string();
 
-	loop {
-	    // End if we run out of tokens
-	    if counter == text.len() {
-		break;
-	    }
+	self.pt_cond_next_line();
 
-	    // Check if we have a punc token
+	for counter in 2..text.len() {
 	    if text[counter].clone() == ",".to_string() || text[counter].clone() == ";".to_string() {
-		counter = counter + 1;
 		continue;
-	    }
+	    } else if find_type(text[counter].clone()) == 3000 {
+                let object = Data::new_simplified(text[counter].clone(), self.clone());
 
-	    // Insert name and type
-	    if find_type(text[counter].clone()) == 3000 {
-		let command:Vec<String> = ["000".to_string(), "print".to_string(), text[counter].clone(), ";".to_string()].to_vec();
-		self.print_cmd(command);
-		println!("");
+		self.pt_output_text(object.print_out_text);
+		self.pt_next_line();
             } else {
 		std::io::stdin().read_line(&mut line).unwrap();
 		line = line.to_string().replace("\n", "");
@@ -265,9 +265,6 @@ impl State {
 		self.variables.insert(text[counter].clone(), data);
 		line = "".to_string();
 	    }
-
-	    // Iterate token
-	    counter = counter + 1;
 	}
 
 	// Check if we had too many args
