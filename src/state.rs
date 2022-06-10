@@ -15,6 +15,11 @@ use errors::stateless_error;
 use lexer::{is_shebang, perform_multi_lexing, split_line_number};
 use expression_lexer::{split, split_function, split_arguments};
 
+// Constants
+const ZONE_LEN:i64 = 15;
+const NUM_ZONES:i64 = 4;
+const WIDTH:i64 = 60;
+
 // State struct
 #[derive(PartialEq, Clone)]
 pub struct State {
@@ -167,6 +172,28 @@ impl State {
 	else if keyword == "STOP".to_string() {self.stop_cmd(text);}
 	else if keyword == "END".to_string() {self.end_cmd(text);}
 	else {self.next_line = i64::MAX;}
+    }
+
+    // Move to next print zone
+    fn pt_next_print_zone(&mut self) {
+	self.print_zone = ((self.print_location - (self.print_location % ZONE_LEN)) / ZONE_LEN) % NUM_ZONES + 1;
+
+	for _i in 0..cmp::max((self.print_zone * ZONE_LEN) - self.print_location, 0) {
+	    print!(" ");
+	    self.print_location = (self.print_location + 1) % WIDTH;
+	}
+    }
+
+    // Go to next line
+    fn pt_next_line(&mut self) {
+	self.print_location = 0;
+	println!("");
+    }
+
+    // Print out
+    fn pt_output_text(&mut self, text:String) {
+	print!("{}", text);
+	self.print_location = (self.print_location + text.len() as i64) % WIDTH;
     }
 
     // Implementation of the DIM command
@@ -325,49 +352,24 @@ impl State {
 	// Update state
 	self.next_line = -1;
     }
-    
+
     // Implmentation of the PRINT command
     fn print_cmd(&mut self, text:Vec<String>) {
-	let mut counter = 2;
-	let zone_len = 15;
-	let num_zones = 4;
-	let width = 60;
-
-	loop {
-	    // End if we run out of tokens
-	    if counter == text.len() && text[counter - 1].clone() == ";".to_string() {
-		break;
-	    } else if counter == text.len() {
-		self.print_location = 0;
-		println!("");
-		break;
-            }
-
-	    // Check if we have a punc token
+	for counter in 2..text.len() {
 	    if text[counter].clone() == ";".to_string() {
-		counter += 1;
 		continue;
             } else if text[counter].clone() == ",".to_string() {
-		self.print_zone = ((self.print_location - (self.print_location % zone_len)) / zone_len) % num_zones + 1;
-
-		for _i in 0..cmp::max((self.print_zone * zone_len) - self.print_location, 0) {
-		    print!(" ");
-		    self.print_location = (self.print_location + 1) % width;
-		}
-		
-		counter += 1;
+		self.pt_next_print_zone();
 		continue;
             }
 	    
-	    // Generate data object
 	    let object = Data::new_simplified(text[counter].clone(), self.clone());
 
-	    // Print out text
-	    print!("{}", object.print_out_text);
-	    self.print_location = (self.print_location + object.print_out_text.len() as i64) % width;
+	    self.pt_output_text(object.print_out_text);
+	}
 
-	    // Iterate token
-	    counter = counter + 1;
+	if text[text.len() - 1].clone() != ";".to_string() {
+	    self.pt_next_line();
 	}
 	
 	// Update state
