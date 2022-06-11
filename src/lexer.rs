@@ -14,8 +14,9 @@ use lazy_static::lazy_static;
 use types::find_type;
 
 // Constants
-const RESERVED:[&'static str; 25] = ["FUNCTION", "RESTORE", "RETURN", "GOSUB", "PRINT", "INPUT", "READ", "DATA", "STOP",
-				     "GOTO", "THEN", "NEXT", "STEP", "FOR", "REM", "LET", "DIM", "END", "DEF",
+const RESERVED:[&'static str; 27] = ["FUNCTION", "RESTORE", "RETURN", "OPTION", "GOSUB", "PRINT",
+				     "INPUT", "READ", "BASE", "DATA", "STOP", "GOTO", "THEN", "NEXT",
+				     "STEP", "FOR", "REM", "LET", "DIM", "END", "DEF",
 				     "IF", "TO", "ON", ";", ":", ","];
 lazy_static! {
     static ref SHEBANG:Regex = Regex::new(r"^(#!.*)$").unwrap();

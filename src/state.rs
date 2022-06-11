@@ -33,6 +33,7 @@ pub struct State {
     pub for_return_to_line:HashMap<String, i64>,
     pub print_location:i64,
     pub print_zone:i64,
+    pub array_offset:i64
 }
 
 // State implementation
@@ -50,6 +51,7 @@ impl State {
 	    for_return_to_line:HashMap::new(),
 	    print_location:0,
 	    print_zone:1,
+	    array_offset:0
 	}
     }
 
@@ -159,6 +161,7 @@ impl State {
 	// Execute given command
 	if keyword == "FUNCTION".to_string() {self.function_cmd(text);}
 	else if keyword == "DIM".to_string() {self.dim_cmd(text);}
+	else if keyword == "OPTION".to_string() {self.option_cmd(text);}
 	else if keyword == "INPUT".to_string() {self.input_cmd(text);}
 	else if keyword == "PRINT".to_string() {self.print_cmd(text);}
 	else if keyword == "GOTO".to_string() {self.goto_cmd(text);}
@@ -204,6 +207,26 @@ impl State {
 	self.print_location = (self.print_location + text.len() as i64) % WIDTH;
     }
 
+    // Implementation of the OPTION comand
+    fn option_cmd(&mut self, text:Vec<String>) {
+	let offset:Data = Data::new_simplified(text[3].clone(), self.clone());
+
+	self.array_offset = match offset.plain_text.parse::<i64>() {
+	    Ok(i) => i,
+	    Err(_e) => {
+		let artifacts = [].to_vec();
+		let artifact_names = [].to_vec();
+		let function_name = "option_cmd".to_string();
+		let message = "Base is not an integer.".to_string();
+		stateless_error(artifacts, artifact_names, function_name, message);
+		-1
+	    }
+	};
+
+	// Update state
+	self.next_line = -1;
+    }
+
     // Implementation of the DIM command
     fn dim_cmd(&mut self, text:Vec<String>) {
 	// Split statement
@@ -235,7 +258,7 @@ impl State {
 	    let data_dummy = Data::new("".to_string());
 
 	    // Insert name and type
-	    self.variables.insert(format!("{}{}{}{}", name, "(", i, ")"), data_dummy.clone());
+	    self.variables.insert(format!("{}{}{}{}", name, "(", (i + self.array_offset), ")"), data_dummy.clone());
 	}
 
 	// Update state
