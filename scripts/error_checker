@@ -19,6 +19,10 @@ for file in $(ls -1 $1 | grep -v "~"); do
     then
 	timeout 5 dummyc $1/$file 1> /dev/null
     fi
+    if [ $2 -eq 3 ]
+    then
+	timeout 5 dummyc $1/$file
+    fi
 
     echo "End: ~"
 done
