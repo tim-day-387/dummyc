@@ -18,3 +18,4 @@ jobs:
     - uses: actions/checkout@v2
     - name: full test script
       run: ./scripts/full_test 0
+      shell: bash
