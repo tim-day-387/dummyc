@@ -6,15 +6,17 @@ then
   exit
 fi
 
+mkdir ./test
+
 for file in $(ls -1 ./examples/nbs/programs | grep -v "~"); do
-    ./target/debug/dummyc "./examples/nbs/programs/$file" 1> "/tmp/${file%.*}_output" 2> /dev/null
+    ./target/debug/dummyc "./examples/nbs/programs/$file" 1> "./test/${file%.*}_output" 2> /dev/null
 done
 
 if [ $1 -eq 0 ]
 then
     for file in $(ls -1 ./examples/nbs/outputs | grep -v "~"); do
-	diff "./examples/nbs/outputs/$file" "/tmp/$file" > "/tmp/diff"
-	echo -n "$file: " && [ -s /tmp/diff ] && (echo "fail") || (echo "pass")
+	diff "./examples/nbs/outputs/$file" "./test/$file" > "./test/diff"
+	echo -n "$file: " && [ -s ./test/diff ] && (echo "fail") || (echo "pass")
     done
 fi
 
@@ -22,7 +24,7 @@ if [ $1 -eq 1 ]
 then
     for file in $(ls -1 ./examples/nbs/outputs | grep -v "~"); do
 	echo "~~~~~~~~~~> $file: "
-	cat "/tmp/$file"
+	cat "./test/$file"
     done
 fi
 
@@ -33,9 +35,9 @@ then
     num_total=0
 
     for file in $(ls -1 ./examples/nbs/outputs | grep -v "~"); do
-	diff "./examples/nbs/outputs/$file" "/tmp/$file" > "/tmp/diff"
+	diff "./examples/nbs/outputs/$file" "./test/$file" > "./test/diff"
 	num_total=$(( $num_total + 1 ))
-	[ -s /tmp/diff ] && num_fail=$(( $num_fail + 1 )) || num_pass=$(( $num_pass + 1 ))
+	[ -s ./test/diff ] && num_fail=$(( $num_fail + 1 )) || num_pass=$(( $num_pass + 1 ))
     done
 
     echo "Total:" $num_total
@@ -50,3 +52,5 @@ then
     echo "=> passed:" $num_pass
     echo "=> failed:" $num_fail
 fi
+
+rm -r ./test
