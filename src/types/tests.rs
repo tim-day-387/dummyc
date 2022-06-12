@@ -46,6 +46,15 @@ fn is_int_3() {
     assert_eq!(answer, is_int(given));
 }
 
+// Testing is_int()
+#[test]
+fn is_int_4() {
+    let given:String = "-98765500000".to_string();
+    let answer = true;
+
+    assert_eq!(answer, is_int(given));
+}
+
 // Testing is_string()
 #[test]
 fn is_string_1() {

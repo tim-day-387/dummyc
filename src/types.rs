@@ -129,28 +129,7 @@ fn is_sci_float(token:String) -> bool {
 }
 
 // Check if integer
-fn is_int(token:String) -> bool {
-    let mut output = INTEGER.is_match(&token);
-
-    match token.clone().parse::<f64>() {
-	Ok(i) => {
-	    let signif;
-	    
-	    if i.abs() < 1.0 {
-		signif = i.abs().to_string().replace("0.", "").len();
-	    } else {
-		signif = i.abs().to_string().replace(".", "").len();
-	    }
-	    
-	    if signif > 6 {
-		output = false && output; // sci_float
-	    }
-	},
-	Err(_e) => output = false && output,
-    }
-
-    return output;
-}
+fn is_int(token:String) -> bool {return INTEGER.is_match(&token);}
 
 // Check if string
 fn is_string(token:String) -> bool {return STRING.is_match(&token);}
