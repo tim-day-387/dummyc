@@ -1,5 +1,5 @@
 # Dummy Interpreter
-[![Rust](https://github.com/tim-day-387/dummy_compiler/actions/workflows/rust.yml/badge.svg)](https://github.com/tim-day-387/dummy_compiler/actions/workflows/rust.yml)
+[![linux_build](https://github.com/tim-day-387/dummy_compiler/actions/workflows/linux_build.yml/badge.svg)](https://github.com/tim-day-387/dummy_compiler/actions/workflows/linux_build.yml)
 
 # About
 
