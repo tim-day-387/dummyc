@@ -17,5 +17,5 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: full test script
-      run: ./scripts/full_test 1
+      run: ./scripts/full_test 2
       shell: bash
