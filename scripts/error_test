@@ -20,7 +20,7 @@ if [ $1 -eq 0 ]
 then
     for file in $(ls -1 ./test/error_outputs | grep -v "~"); do
 	cat "./test/error_outputs/$file" | grep "error" > "./test/error_outputs/${file}_post"
-	diff "$OUT_LOC/error_output" "./test/error_outputs/${file}_post" > "./test/diff"
+	diff --strip-trailing-cr "$OUT_LOC/error_output" "./test/error_outputs/${file}_post" > "./test/diff"
 	echo -n "$file: " && [ -s ./test/diff ] && (echo "fail") || (echo "pass")
     done
 fi
@@ -33,7 +33,7 @@ then
 
     for file in $(ls -1 ./test/error_outputs | grep -v "~"); do
 	cat "./test/error_outputs/$file" | grep "error" > "./test/error_outputs/${file}_post"
-	diff "$OUT_LOC/error_output" "./test/error_outputs/${file}_post" > "./test/diff"
+	diff --strip-trailing-cr "$OUT_LOC/error_output" "./test/error_outputs/${file}_post" > "./test/diff"
 	num_total=$(( $num_total + 1 ))
 
 	if [ -s ./test/diff ]
