@@ -41,7 +41,15 @@ then
     for file in $(ls -1 $OUT_LOC | grep -v "~"); do
 	diff "$OUT_LOC/$file" "./test/$file" > "./test/diff"
 	num_total=$(( $num_total + 1 ))
-	[ -s ./test/diff ] && num_fail=$(( $num_fail + 1 )) || num_pass=$(( $num_pass + 1 ))
+
+	if [ -s ./test/diff ]
+	then
+	    num_fail=$(( $num_fail + 1 ))
+	    echo "=> $file"
+	    cat "./test/diff"
+	else
+	    num_pass=$(( $num_pass + 1 ))
+	fi
     done
 
     echo "Total:" $num_total
