@@ -1,28 +1,32 @@
 #!/usr/bin/env bash
 
-if [ $# != 1 ]
+if [ $# != 3 ]
 then
   echo "Wrong number of arguments."
   exit
 fi
 
+MODE=$1
+PROG_LOC=$2
+OUT_LOC=$3
+
 mkdir ./test
 
-for file in $(ls -1 ./examples/custom/programs | grep -v "~"); do
-    ./target/debug/dummyc "./examples/custom/programs/$file" 1> "./test/${file%.*}_output" 2> /dev/null
+for file in $(ls -1 $PROG_LOC | grep -v "~"); do
+    ./target/debug/dummyc "$PROG_LOC/$file" 1> "./test/${file%.*}_output" 2> /dev/null
 done
 
 if [ $1 -eq 0 ]
 then
-    for file in $(ls -1 ./examples/custom/outputs | grep -v "~"); do
-	diff "./examples/custom/outputs/$file" "./test/$file" > "./test/diff"
+    for file in $(ls -1 $OUT_LOC | grep -v "~"); do
+	diff "$OUT_LOC/$file" "./test/$file" > "./test/diff"
 	echo -n "$file: " && [ -s ./test/diff ] && (echo "fail") || (echo "pass")
     done
 fi
 
 if [ $1 -eq 1 ]
 then
-    for file in $(ls -1 ./examples/custom/outputs | grep -v "~"); do
+    for file in $(ls -1 $OUT_LOC | grep -v "~"); do
 	echo "~~~~~~~~~~> $file: "
 	cat "./test/$file"
     done
@@ -34,8 +38,8 @@ then
     num_fail=0
     num_total=0
 
-    for file in $(ls -1 ./examples/custom/outputs | grep -v "~"); do
-	diff "./examples/custom/outputs/$file" "./test/$file" > "./test/diff"
+    for file in $(ls -1 $OUT_LOC | grep -v "~"); do
+	diff "$OUT_LOC/$file" "./test/$file" > "./test/diff"
 	num_total=$(( $num_total + 1 ))
 	[ -s ./test/diff ] && num_fail=$(( $num_fail + 1 )) || num_pass=$(( $num_pass + 1 ))
     done

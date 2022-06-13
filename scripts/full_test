@@ -13,15 +13,15 @@ echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ cargo build ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 cargo build
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ custom_test ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-./scripts/custom_test $1
+./scripts/program_test $1 ./examples/custom/programs ./examples/custom/outputs
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ error_test ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-./scripts/error_test $1
+./scripts/error_test $1 ./examples/errors/programs ./examples/errors/outputs
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ nbs_test ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-./scripts/nbs_test $1
+./scripts/program_test $1 ./examples/nbs/programs ./examples/nbs/outputs
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ nbs_error_test ~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-./scripts/nbs_error_test $1
+./scripts/error_test $1 ./examples/nbs_errors/programs ./examples/nbs_errors/outputs
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
