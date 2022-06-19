@@ -33,7 +33,9 @@ pub struct State {
     pub for_return_to_line:HashMap<String, i64>,
     pub print_location:i64,
     pub print_zone:i64,
-    pub array_offset:i64
+    pub array_offset:i64,
+    pub data_stack:Vec<Data>,
+    pub data_stack_original:Vec<Data>
 }
 
 // State implementation
@@ -51,7 +53,9 @@ impl State {
 	    for_return_to_line:HashMap::new(),
 	    print_location:0,
 	    print_zone:1,
-	    array_offset:0
+	    array_offset:0,
+	    data_stack:Vec::new(),
+	    data_stack_original:Vec::new()
 	}
     }
 
@@ -206,10 +210,11 @@ impl State {
 	if text.len() <= 1 {return;}
 
 	// Set keyword
-	let _keyword = text[1].clone().to_uppercase();
+	let keyword = text[1].clone().to_uppercase();
 
 	// Execute given command
-	self.next_line = -1;
+	if keyword == "DATA".to_string() {self.data_cmd(text);}
+	else {self.next_line = -1;}
     }
 
     // Move to next print zone
@@ -240,6 +245,23 @@ impl State {
     fn pt_output_text(&mut self, text:String) {
 	print!("{}", text);
 	self.print_location = (self.print_location + text.len() as i64) % WIDTH;
+    }
+
+    // Implementation of the DATA command
+    fn data_cmd(&mut self, text:Vec<String>) {
+	for counter in 2..text.len() {
+	    if text[counter].clone() == ",".to_string() {
+		continue;
+	    } else {
+		let data = Data::new_simplified(text[counter].clone(), self.clone());
+
+		self.data_stack.push(data.clone());
+		self.data_stack_original.push(data.clone());
+            }
+	}
+
+	// Update state
+	self.next_line = -1;
     }
 
     // Implementation of the OPTION comand
