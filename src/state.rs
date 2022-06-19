@@ -55,6 +55,15 @@ impl State {
 	}
     }
 
+    // Reset state to defaults after a scan
+    fn reset(&mut self) {
+	self.next_line = -1;
+	self.prev_line = -1;
+	self.return_to_line = Vec::new();
+	self.for_return_to_line = HashMap::new();
+	self.array_offset = 0;
+    }
+
     // Returns an Iterator to the Reader of the lines of the file.
     fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> where P: AsRef<Path>, {
 	let file = File::open(filename)?;
@@ -92,8 +101,18 @@ impl State {
 	}
     }
 
+    // Execute all scans needed for the program
+    pub fn exec_all_scans(&mut self) {
+	let scans = [1, 0].to_vec();
+
+	for i in scans {
+	    self.reset();
+	    self.exec_scan(i);
+	}
+    }
+
     // Execute all previous commands, given state
-    pub fn exec_prev(&mut self) {    
+    fn exec_scan(&mut self, scan_type:i64) {
 	// Execute any previous commands
 	loop {
 	    let mut command:String = "".to_string();
@@ -115,13 +134,13 @@ impl State {
 		break;
 	    } else {
 		// Execute given command, update state
-		self.exec_command(command.clone());
+		self.exec_command(command.clone(), scan_type);
             }
 	}
     }
 
     // Execute the given command
-    fn exec_command(&mut self, line:String) {
+    fn exec_command(&mut self, line:String, scan_type:i64) {
 	// Lex command
 	let commands:Vec<Vec<String>> = perform_multi_lexing(line.clone());
 
@@ -138,7 +157,11 @@ impl State {
 
 	// Execute command specific method
 	for command in commands {
-	    self.find_subcommand(command);
+	    if scan_type == 0 {
+		self.normal_scan(command);
+	    } else if scan_type == 1 {
+                self.data_scan(command);
+	    }
 
 	    if self.next_line != -1 && !found_next_line {
 		found_next_line = true;
@@ -150,8 +173,8 @@ impl State {
 	self.next_line = next_line;
     }
 
-    // Find subcommand to execute
-    fn find_subcommand(&mut self, text:Vec<String>) {
+    // Execute the command normally
+    fn normal_scan(&mut self, text:Vec<String>) {
 	// Check if command is present, else do nothing
 	if text.len() <= 1 {return;}
 
@@ -174,7 +197,19 @@ impl State {
 	else if keyword == "REM".to_string() {self.rem_cmd(text);}
 	else if keyword == "STOP".to_string() {self.stop_cmd(text);}
 	else if keyword == "END".to_string() {self.end_cmd(text);}
-	else {self.next_line = i64::MAX;}
+	else {self.next_line = -1;}
+    }
+
+    // Only load data
+    fn data_scan(&mut self, text:Vec<String>) {
+	// Check if command is present, else do nothing
+	if text.len() <= 1 {return;}
+
+	// Set keyword
+	let _keyword = text[1].clone().to_uppercase();
+
+	// Execute given command
+	self.next_line = -1;
     }
 
     // Move to next print zone

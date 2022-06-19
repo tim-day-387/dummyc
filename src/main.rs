@@ -59,7 +59,7 @@ fn script(file_path:&Path) {
     state.load_prev(file_path);
     
     // Execute commands given state
-    state.exec_prev();
+    state.exec_all_scans();
 }
 
 // Interactive prompt for the BASIC interpreter
@@ -93,7 +93,7 @@ fn interactive() {
 	}
 
 	// Execute commands given state
-	state.exec_prev();
+	state.exec_all_scans();
 
 	// Reset state
 	state = State::new();

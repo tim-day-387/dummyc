@@ -170,7 +170,7 @@ impl Data {
 	lim_state.load_prev(file_path);
 	
 	// Execute commands given state
-	lim_state.exec_prev();
+	lim_state.exec_all_scans();
 
 	// Replace self with return value
 	*self = lim_state.return_val.clone();
