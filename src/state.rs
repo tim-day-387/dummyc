@@ -201,6 +201,8 @@ impl State {
 	else if keyword == "REM".to_string() {self.rem_cmd(text);}
 	else if keyword == "STOP".to_string() {self.stop_cmd(text);}
 	else if keyword == "END".to_string() {self.end_cmd(text);}
+	else if keyword == "READ".to_string() {self.read_cmd(text);}
+	else if keyword == "RESTORE".to_string() {self.restore_cmd(text);}
 	else {self.next_line = -1;}
     }
 
@@ -247,6 +249,41 @@ impl State {
 	self.print_location = (self.print_location + text.len() as i64) % WIDTH;
     }
 
+    // Implementation of the READ command
+    fn read_cmd(&mut self, text:Vec<String>) {
+	for counter in 2..text.len() {
+	    if text[counter].clone() == ",".to_string() {
+		continue;
+	    } else {
+		let data = self.data_stack.pop();
+
+		match data {
+		    Some(i) => {
+			self.variables.insert(text[counter].clone(), i);
+		    },
+		    None => {
+			let artifacts = [].to_vec();
+			let artifact_names = [].to_vec();
+			let function_name = "read_cmd".to_string();
+			let message = "No data to read.".to_string();
+			stateless_error(artifacts, artifact_names, function_name, message);
+		    },
+		};
+	    }
+	}
+
+	// Update state
+	self.next_line = -1;
+    }
+
+    // Implementation of the RESTORE command
+    fn restore_cmd(&mut self, _text:Vec<String>) {
+	self.data_stack = self.data_stack_original.clone();
+
+	// Update state
+	self.next_line = -1;
+    }
+
     // Implementation of the DATA command
     fn data_cmd(&mut self, text:Vec<String>) {
 	for counter in 2..text.len() {
@@ -255,8 +292,8 @@ impl State {
 	    } else {
 		let data = Data::new_simplified(text[counter].clone(), self.clone());
 
-		self.data_stack.push(data.clone());
-		self.data_stack_original.push(data.clone());
+		self.data_stack.insert(0, data.clone());
+		self.data_stack_original.insert(0, data.clone());
             }
 	}
 
