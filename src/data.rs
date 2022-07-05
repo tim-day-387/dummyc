@@ -68,6 +68,14 @@ impl Data {
 	stateless_error(artifacts, artifact_names, function_name, message);    
     }
 
+    // Divide by zero error
+    fn error_divide_zero(function_name:String) {
+	let artifacts = [].to_vec();
+	let artifact_names = [].to_vec();
+	let message = "Attempted to divide by zero.".to_string();
+	stateless_error(artifacts, artifact_names, function_name, message);
+    }
+
     // Simplify data output to one which can be stored and printed out
     pub fn simplify(&mut self, state:State) {
 	self.find_output_type();
@@ -244,7 +252,11 @@ impl Data {
 	    } else if operation_string == "-".to_string() {
 		self.plain_text = (a-b).to_string();
 	    } else if operation_string == "/".to_string() {
-		self.plain_text = (a/b).to_string();
+		if b == 0 {
+		    Data::error_divide_zero("operation".to_string());
+		} else {
+		    self.plain_text = (a/b).to_string();
+		}
 	    } else if operation_string == "^".to_string() {
 		self.plain_text = (a as f64).powf(b as f64).to_string();
 	    } else {
@@ -265,7 +277,11 @@ impl Data {
 	    } else if operation_string == "-".to_string() {
 		self.plain_text = (a-b).to_string();
 	    } else if operation_string == "/".to_string() {
-		self.plain_text = (a/b).to_string();
+		if b == 0.0 {
+		    Data::error_divide_zero("operation".to_string());
+		} else {
+		    self.plain_text = (a/b).to_string();
+		}
 	    } else if operation_string == "^".to_string() {
 		self.plain_text = a.powf(b).to_string();
 	    } else {
