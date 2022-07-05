@@ -271,17 +271,11 @@ impl State {
 		};
 	    }
 	}
-
-	// Update state
-	self.next_line = -1;
     }
 
     // Implementation of the RESTORE command
     fn restore_cmd(&mut self, _text:Vec<String>) {
 	self.data_stack = self.data_stack_original.clone();
-
-	// Update state
-	self.next_line = -1;
     }
 
     // Implementation of the DATA command
@@ -296,9 +290,6 @@ impl State {
 		self.data_stack_original.insert(0, data.clone());
             }
 	}
-
-	// Update state
-	self.next_line = -1;
     }
 
     // Implementation of the OPTION comand
@@ -316,9 +307,6 @@ impl State {
 		-1
 	    }
 	};
-
-	// Update state
-	self.next_line = -1;
     }
 
     // Implementation of the DIM command
@@ -354,9 +342,6 @@ impl State {
 	    // Insert name and type
 	    self.variables.insert(format!("{}{}{}{}", name, "(", (i + self.array_offset), ")"), data_dummy.clone());
 	}
-
-	// Update state
-	self.next_line = -1;
     }
 
     // Implementation of the INPUT command
@@ -392,9 +377,6 @@ impl State {
 	    let message = "Too many input arguments.".to_string();
 	    stateless_error(artifacts, artifact_names, function_name, message);
 	}
-
-	// Update state
-	self.next_line = -1;
     }
 	
     // Implmentation of the FUNCTION command
@@ -462,9 +444,6 @@ impl State {
 	    let message = "Too many input arguments.".to_string();
 	    stateless_error(artifacts, artifact_names, function_name, message);
 	}
-
-	// Update state
-	self.next_line = -1;
     }
 
     // Implmentation of the PRINT command
@@ -485,9 +464,6 @@ impl State {
 	if text[text.len() - 1].clone() != ";".to_string() {
 	    self.pt_next_line();
 	}
-	
-	// Update state
-	self.next_line = -1;
     }
 
     // Implmentation of the LET command
@@ -504,9 +480,6 @@ impl State {
 	} else {
 	    self.variables.insert(var_name.clone(), object.clone());
 	}
-
-	// Update state
-	self.next_line = -1;
     }
 
     // Implmentation of the IF command
@@ -553,8 +526,6 @@ impl State {
 	    },
 	    Some(line_to_return_to) => self.prev_line = line_to_return_to,
 	}
-	
-	self.next_line = -1;
     }
 
     // Implmentation of the FOR command
@@ -600,9 +571,6 @@ impl State {
 	} else if cur_value.clone().compare(limit.clone(), ">".to_string()) && negative {
 	    self.for_return_to_line.insert(var_name.clone(), text[0].clone().parse::<i64>().unwrap());
 	}
-	
-	// Update state
-	self.next_line = -1;
     }
 
     // Implmentation of the NEXT command
@@ -630,7 +598,7 @@ impl State {
     fn goto_cmd(&mut self, text:Vec<String>) {self.next_line = text[2].clone().parse::<i64>().unwrap();}
     
     // Implmentation of the REM command
-    fn rem_cmd(&mut self, _text:Vec<String>) {self.next_line = -1;}
+    fn rem_cmd(&mut self, _text:Vec<String>) {}
 
     // Implmentation of the STOP command
     fn stop_cmd(&mut self, _text:Vec<String>) {self.next_line = i64::MAX;}
