@@ -107,12 +107,7 @@ impl State {
 
     // Execute all scans needed for the program
     pub fn exec_all_scans(&mut self) {
-	let scans = [1, 0].to_vec();
-
-	for i in scans {
-	    self.reset();
-	    self.exec_scan(i);
-	}
+	[1, 0].map(|x| {self.reset(); self.exec_scan(x)});
     }
 
     // Execute all previous commands, given state
