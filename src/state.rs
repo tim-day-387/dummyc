@@ -80,28 +80,28 @@ impl State {
 	
 	self.prev_code.push((prev_line, line.clone()));
     }
-    
+
     // Load previous commmands from a file
     pub fn load_prev(&mut self, file_path:&Path) {
-	// Useful variables 
-	let mut first_token;
+	let lines = match State::read_lines(file_path) {
+	    Ok(i) => i,
+	    Err(_e) => return
+	};
 
-	// Add all lines in the code to prev_code
-	if let Ok(lines) = State::read_lines(file_path) {
-            for line in lines {
-		if let Ok(ip) = line {
-		    first_token = split_line_number(ip.clone()).0;
-		    if first_token.clone() != "".to_string() {
-			self.prev_code.push((first_token.parse::<i64>().unwrap(), ip.clone()));
-		    } else if !is_shebang(ip.clone()) {
-			let artifacts = [].to_vec();
-			let artifact_names = [].to_vec();
-			let function_name = "load_prev".to_string();
-			let message = "Line has no line number.".to_string();
-			stateless_error(artifacts, artifact_names, function_name, message);
-		    }
-		}
-            }
+	lines.map(|x| self.load_prev_command(x.unwrap())).for_each(drop);
+    }
+
+    // Load one commmand
+    pub fn load_prev_command(&mut self, line:String) {
+	match split_line_number(line.clone()).0.parse::<i64>() {
+	    Ok(i) => self.prev_code.push((i, line.clone())),
+	    Err(_e) => if !is_shebang(line.clone()) {
+		let artifacts = [].to_vec();
+		let artifact_names = [].to_vec();
+		let function_name = "load_prev".to_string();
+		let message = "Line has no line number.".to_string();
+		stateless_error(artifacts, artifact_names, function_name, message);
+	    }
 	}
     }
 
