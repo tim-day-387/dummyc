@@ -246,26 +246,23 @@ impl State {
 
     // Implementation of the READ command
     fn read_cmd(&mut self, text:Vec<String>) {
-	for counter in 2..text.len() {
-	    if text[counter].clone() == ",".to_string() {
-		continue;
-	    } else {
-		let data = self.data_stack.pop();
+	text.iter().skip(2).map(|x| self.save_data_to_var(x.to_string())).for_each(drop);
+    }
 
-		match data {
-		    Some(i) => {
-			self.variables.insert(text[counter].clone(), i);
-		    },
-		    None => {
-			let artifacts = [].to_vec();
-			let artifact_names = [].to_vec();
-			let function_name = "read_cmd".to_string();
-			let message = "No data to read.".to_string();
-			stateless_error(artifacts, artifact_names, function_name, message);
-		    },
-		};
-	    }
-	}
+    // Save data to var
+    fn save_data_to_var(&mut self, text:String) {
+	if text == ",".to_string() {return}
+
+	match self.data_stack.pop() {
+	    Some(i) => {self.variables.insert(text, i);},
+	    None => {
+		let artifacts = [].to_vec();
+		let artifact_names = [].to_vec();
+		let function_name = "read_cmd".to_string();
+		let message = "No data to read.".to_string();
+		stateless_error(artifacts, artifact_names, function_name, message);
+	    },
+	};
     }
 
     // Implementation of the RESTORE command
