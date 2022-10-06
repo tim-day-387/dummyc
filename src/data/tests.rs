@@ -1,6 +1,7 @@
 // File Imports
 use data::*;
 
+
 // Testing output_type()
 #[test]
 fn type_1() {
@@ -10,6 +11,7 @@ fn type_1() {
     assert_eq!(3000, given.output_type);
 }
 
+
 // Testing output_type()
 #[test]
 fn type_2() {
@@ -18,6 +20,7 @@ fn type_2() {
 
     assert_eq!(1000, given.output_type);
 }
+
 
 // Testing simplify()
 #[test]
@@ -40,6 +43,7 @@ fn simplify_1() {
     assert_eq!(answer.eq(&given), true);
 }
 
+
 // Testing simplify()
 #[test]
 fn simplify_2() {
@@ -61,6 +65,7 @@ fn simplify_2() {
     assert_eq!(answer.eq(&given), true);
 }
 
+
 // Testing simplify()
 #[test]
 fn simplify_3() {
@@ -81,6 +86,7 @@ fn simplify_3() {
     
     assert_eq!(answer.eq(&given), true);
 }
+
 
 // Testing simplify()
 #[test]

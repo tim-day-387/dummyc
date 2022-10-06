@@ -1,20 +1,24 @@
 // Data module
 #![forbid(unsafe_code)]
 
+
 // Testing methods
 #[cfg(test)]
 mod tests;
+
 
 // General Imports
 use Path;
 use rand::Rng;
 use std::cmp;
 
+
 // File Imports
 use state::State;
 use types::find_type;
 use errors::stateless_error;
 use expression_lexer::{split, split_function, split_arguments};
+
 
 // Data struct
 #[derive(PartialEq, Clone)]
@@ -23,6 +27,7 @@ pub struct Data {
     pub output_type:i64,
     pub print_out_text:String,
 }
+
 
 // Data implementation
 impl Data {
@@ -43,6 +48,7 @@ impl Data {
 	return output;
     }
 
+
     // Constructor
     pub fn new(given_text:String) -> Data {
 	Data {
@@ -52,6 +58,7 @@ impl Data {
 	}
     }
 
+
     // Invalid float error
     fn error_invalid_float(function_name:String) {
 	let artifacts = [].to_vec();
@@ -59,6 +66,7 @@ impl Data {
 	let message = "Invalid float.".to_string();
 	stateless_error(artifacts, artifact_names, function_name, message);    
     }
+
 
     // Invalid int error
     fn error_invalid_int(function_name:String) {
@@ -68,6 +76,7 @@ impl Data {
 	stateless_error(artifacts, artifact_names, function_name, message);    
     }
 
+
     // Divide by zero error
     fn error_divide_zero(function_name:String) {
 	let artifacts = [].to_vec();
@@ -75,6 +84,7 @@ impl Data {
 	let message = "Attempted to divide by zero.".to_string();
 	stateless_error(artifacts, artifact_names, function_name, message);
     }
+
 
     // Simplify data output to one which can be stored and printed out
     pub fn simplify(&mut self, state:State) {
@@ -90,6 +100,7 @@ impl Data {
 	
 	self.get_print_out();
     }
+
 
     // Resolve array reference in actual var name
     pub fn get_array_reference(given:String, state:State) -> String {
@@ -111,6 +122,7 @@ impl Data {
 
 	return text;
     }
+
 
     // Resolve symbol_callable type data
     fn resolve_callable(&mut self, state:State) {
@@ -136,6 +148,7 @@ impl Data {
 	}
     }
 
+
     // Resolve symbol type data
     fn resolve_symbol(&mut self, state:State) {
 	if self.plain_text.to_lowercase() == "rnd".to_string() {
@@ -149,6 +162,7 @@ impl Data {
 	    self.get_var_value(state);
 	}
     }
+
 
     // Execute the given function call
     fn function(&mut self, state:State, name:String, arguments:Vec<String>) {
@@ -184,6 +198,7 @@ impl Data {
 	*self = lim_state.return_val.clone();
     }
     
+
     // Resolve any unresolved operations in the expression
     fn resolve_expression(&mut self, state:State) {
 	let (first_part, operation, second_part) = split(self.plain_text.clone(), false, true);
@@ -196,6 +211,7 @@ impl Data {
 
 	*self = first_obj.clone();
     }
+
 
     // Find output type from an operation
     fn find_operation_output_type(self, other:Data) -> i64 {
@@ -211,6 +227,7 @@ impl Data {
 	}
     }
     
+
     // Perform the compare
     pub fn compare(self, other:Data, operation_string:String) -> bool {
 	let output_type = self.clone().find_operation_output_type(other.clone());
@@ -235,6 +252,7 @@ impl Data {
 	}
     }
     
+
     // Perform the operation
     pub fn operation(&mut self, other:Data, operation_string:String) {
 	let output_type:i64 = self.clone().find_operation_output_type(other.clone());
@@ -300,10 +318,12 @@ impl Data {
 	}
     }
 
+
     // Determine output type
     fn find_output_type(&mut self) {
 	self.output_type = find_type(self.plain_text.clone());
     }
+
 
     // Get variable value
     fn get_var_value(&mut self, state:State) {
@@ -323,6 +343,7 @@ impl Data {
 	*self = var_value.clone();
     }
 
+
     // Does a variable by that name exist?
     fn does_var_exist(name:String, state:State) -> bool {
 	match state.variables.get(&name) {
@@ -330,6 +351,7 @@ impl Data {
 	    _=> return false,
 	}
     }
+
 
     // Find text to be printed out, handle formatting
     fn get_print_out(&mut self) {

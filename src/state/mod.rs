@@ -1,12 +1,14 @@
 // State module
 #![forbid(unsafe_code)]
 
+
 // General Imports
 use std::collections::HashMap;
 use std::path::Path;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::cmp;
+
 
 // File Imports
 use data::Data;
@@ -15,10 +17,12 @@ use errors::stateless_error;
 use lexer::{is_shebang, perform_multi_lexing, split_line_number};
 use expression_lexer::{split, split_function, split_arguments};
 
+
 // Constants
 const ZONE_LEN:i64 = 15;
 const NUM_ZONES:i64 = 4;
 const WIDTH:i64 = 60;
+
 
 // State struct
 #[derive(PartialEq, Clone)]
@@ -37,6 +41,7 @@ pub struct State {
     pub data_stack:Vec<Data>,
     pub data_stack_original:Vec<Data>
 }
+
 
 // State implementation
 impl State {
@@ -59,6 +64,7 @@ impl State {
 	}
     }
 
+
     // Reset state to defaults after a scan
     fn reset(&mut self) {
 	self.next_line = -1;
@@ -68,18 +74,21 @@ impl State {
 	self.array_offset = 0;
     }
 
+
     // Returns an Iterator to the Reader of the lines of the file.
     fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> where P: AsRef<Path>, {
 	let file = File::open(filename)?;
 	Ok(io::BufReader::new(file).lines())
     }
     
+
     // Add line for prev code
     pub fn add_prev(&mut self, line:String) {
 	let prev_line = split_line_number(line.clone()).0.parse::<i64>().unwrap();
 	
 	self.prev_code.push((prev_line, line.clone()));
     }
+
 
     // Load previous commmands from a file
     pub fn load_prev(&mut self, file_path:&Path) {
@@ -90,6 +99,7 @@ impl State {
 
 	lines.map(|x| self.load_prev_command(x.unwrap())).for_each(drop);
     }
+
 
     // Load one commmand
     pub fn load_prev_command(&mut self, line:String) {
@@ -105,10 +115,12 @@ impl State {
 	}
     }
 
+
     // Execute all scans needed for the program
     pub fn exec_all_scans(&mut self) {
 	[1, 0].map(|x| {self.reset(); self.exec_scan(x)});
     }
+
 
     // Execute all previous commands, given state
     fn exec_scan(&mut self, scan_type:i64) {
@@ -137,6 +149,7 @@ impl State {
             }
 	}
     }
+
 
     // Execute the given command
     fn exec_command(&mut self, line:String, scan_type:i64) {
@@ -172,6 +185,7 @@ impl State {
 	self.next_line = next_line;
     }
 
+
     // Execute the command normally
     fn normal_scan(&mut self, text:Vec<String>) {
 	// Check if command is present, else do nothing
@@ -201,6 +215,7 @@ impl State {
 	else {self.next_line = -1;}
     }
 
+
     // Only load data
     fn data_scan(&mut self, text:Vec<String>) {
 	// Check if command is present, else do nothing
@@ -214,6 +229,7 @@ impl State {
 	else {self.next_line = -1;}
     }
 
+
     // Move to next print zone
     fn pt_next_print_zone(&mut self) {
 	self.print_zone = ((self.print_location - (self.print_location % ZONE_LEN)) / ZONE_LEN) % NUM_ZONES + 1;
@@ -224,11 +240,13 @@ impl State {
 	}
     }
 
+
     // Go to next line
     fn pt_next_line(&mut self) {
 	self.print_location = 0;
 	println!("");
     }
+
 
     // Conditionally go to next line
     fn pt_cond_next_line(&mut self) {
@@ -238,16 +256,19 @@ impl State {
 	}
     }
 
+
     // Print out
     fn pt_output_text(&mut self, text:String) {
 	print!("{}", text);
 	self.print_location = (self.print_location + text.len() as i64) % WIDTH;
     }
 
+
     // Implementation of the READ command
     fn read_cmd(&mut self, text:Vec<String>) {
 	text.iter().skip(2).map(|x| self.save_data_to_var(x.to_string())).for_each(drop);
     }
+
 
     // Save data to var
     fn save_data_to_var(&mut self, text:String) {
@@ -265,10 +286,12 @@ impl State {
 	};
     }
 
+
     // Implementation of the RESTORE command
     fn restore_cmd(&mut self, _text:Vec<String>) {
 	self.data_stack = self.data_stack_original.clone();
     }
+
 
     // Implementation of the DATA command
     fn data_cmd(&mut self, text:Vec<String>) {
@@ -283,6 +306,7 @@ impl State {
             }
 	}
     }
+
 
     // Implementation of the OPTION comand
     fn option_cmd(&mut self, text:Vec<String>) {
@@ -300,6 +324,7 @@ impl State {
 	    }
 	};
     }
+
 
     // Implementation of the DIM command
     fn dim_cmd(&mut self, text:Vec<String>) {
@@ -336,6 +361,7 @@ impl State {
 	}
     }
 
+
     // Implementation of the INPUT command
     fn input_cmd(&mut self, text:Vec<String>) {
         let mut line = "".to_string();
@@ -371,6 +397,7 @@ impl State {
 	}
     }
 	
+
     // Implmentation of the FUNCTION command
     fn function_cmd(&mut self, text:Vec<String>) {
 	let given = self.input_args.len();
@@ -438,6 +465,7 @@ impl State {
 	}
     }
 
+
     // Implmentation of the PRINT command
     fn print_cmd(&mut self, text:Vec<String>) {
 	for counter in 2..text.len() {
@@ -458,6 +486,7 @@ impl State {
 	}
     }
 
+
     // Implmentation of the LET command
     fn let_cmd(&mut self, text:Vec<String>) {
 	// Split statement
@@ -473,6 +502,7 @@ impl State {
 	    self.variables.insert(var_name.clone(), object.clone());
 	}
     }
+
 
     // Implmentation of the IF command
     fn if_cmd(&mut self, text:Vec<String>) {
@@ -498,12 +528,14 @@ impl State {
 	self.next_line = goto;
     }
 
+
     // Implmentation of the GOSUB command
     fn gosub_cmd(&mut self, text:Vec<String>) {
 	// Update state
 	self.return_to_line.push(text[0].clone().parse::<i64>().unwrap());
 	self.next_line = text[2].clone().parse::<i64>().unwrap();
     }
+
 
     // Implmentation of the RETURN command
     fn return_cmd(&mut self, _text:Vec<String>) {
@@ -519,6 +551,7 @@ impl State {
 	    Some(line_to_return_to) => self.prev_line = line_to_return_to,
 	}
     }
+
 
     // Implmentation of the FOR command
     fn for_cmd(&mut self, text:Vec<String>) {
@@ -565,6 +598,7 @@ impl State {
 	}
     }
 
+
     // Implmentation of the NEXT command
     fn next_cmd(&mut self, text:Vec<String>) {
 	let var_name = text[2].clone();
@@ -586,15 +620,19 @@ impl State {
 	self.for_return_to_line.remove(&var_name);
     }
 
+
     // Implmentation of the GOTO command
     fn goto_cmd(&mut self, text:Vec<String>) {self.next_line = text[2].clone().parse::<i64>().unwrap();}
     
+
     // Implmentation of the REM command
     fn rem_cmd(&mut self, _text:Vec<String>) {}
+
 
     // Implmentation of the STOP command
     fn stop_cmd(&mut self, _text:Vec<String>) {self.next_line = i64::MAX;}
     
+
     // Implmentation of the END command
     fn end_cmd(&mut self, _text:Vec<String>) {self.next_line = i64::MAX;}
 }

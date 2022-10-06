@@ -1,6 +1,7 @@
 // File Imports
 use types::*;
 
+
 // Testing is_float()
 #[test]
 fn is_float_1() {
@@ -9,6 +10,7 @@ fn is_float_1() {
 
     assert_eq!(answer, is_float(given));
 }
+
 
 // Testing is_float()
 #[test]
@@ -19,6 +21,7 @@ fn is_float_2() {
     assert_eq!(answer, is_float(given));
 }
 
+
 // Testing is_int()
 #[test]
 fn is_int_1() {
@@ -27,6 +30,7 @@ fn is_int_1() {
 
     assert_eq!(answer, is_int(given));
 }
+
 
 // Testing is_int()
 #[test]
@@ -37,6 +41,7 @@ fn is_int_2() {
     assert_eq!(answer, is_int(given));
 }
 
+
 // Testing is_int()
 #[test]
 fn is_int_3() {
@@ -45,6 +50,7 @@ fn is_int_3() {
 
     assert_eq!(answer, is_int(given));
 }
+
 
 // Testing is_int()
 #[test]
@@ -55,6 +61,7 @@ fn is_int_4() {
     assert_eq!(answer, is_int(given));
 }
 
+
 // Testing is_string()
 #[test]
 fn is_string_1() {
@@ -63,6 +70,7 @@ fn is_string_1() {
 
     assert_eq!(answer, is_string(given));
 }
+
 
 // Testing is_string()
 #[test]
@@ -73,6 +81,7 @@ fn is_string_2() {
     assert_eq!(answer, is_string(given));
 }
 
+
 // Testing is_string()
 #[test]
 fn is_string_3() {
@@ -81,6 +90,7 @@ fn is_string_3() {
 
     assert_eq!(answer, is_string(given));
 }
+
 
 // Testing is_string()
 #[test]
@@ -91,6 +101,7 @@ fn is_string_4() {
     assert_eq!(answer, is_string(given));
 }
 
+
 // Testing is_expression()
 #[test]
 fn is_expression_1() {
@@ -99,6 +110,7 @@ fn is_expression_1() {
 
     assert_eq!(answer, is_expression(given));
 }
+
 
 // Testing is_function()
 #[test]
@@ -109,6 +121,7 @@ fn is_function_1() {
     assert_eq!(answer, is_function(given));
 }
 
+
 // Testing is_function()
 #[test]
 fn is_function_2() {
@@ -117,6 +130,7 @@ fn is_function_2() {
 
     assert_eq!(answer, is_function(given));
 }
+
 
 // Testing is_function()
 #[test]
@@ -127,6 +141,7 @@ fn is_function_3() {
     assert_eq!(answer, is_function(given));
 }
 
+
 // Testing is_function()
 #[test]
 fn is_function_4() {
@@ -136,6 +151,7 @@ fn is_function_4() {
     assert_eq!(answer, is_function(given));
 }
 
+
 // Testing is_function()
 #[test]
 fn is_function_5() {
@@ -144,6 +160,7 @@ fn is_function_5() {
 
     assert_eq!(answer, is_function(given));
 }
+
 
 // Testing is_function()
 #[test]

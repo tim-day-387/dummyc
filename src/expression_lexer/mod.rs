@@ -1,19 +1,23 @@
 // Expression_lexer module
 #![forbid(unsafe_code)]
 
+
 // Testing methods
 #[cfg(test)]
 mod tests;
 
+
 // File Imports
 use errors::stateless_error;
 use lexer::remove_spaces;
+
 
 // Constants
 const RELS:[char; 4] = ['=', '<', '>', '!'];
 const OPS1:[char; 2] = ['+', '-'];
 const OPS2:[char; 2] = ['/', '*'];
 const OPS3:[char; 2] = ['^', ' '];
+
 
 // Split an expression across the relational
 pub fn split(token:String, rels_or_ops:bool, strict:bool) -> (String, String, String) {
@@ -41,6 +45,7 @@ pub fn split(token:String, rels_or_ops:bool, strict:bool) -> (String, String, St
 
     return output;
 }
+
 
 // Split an expression across the relational
 pub fn split_priority(mut token:String, rels_or_ops:bool, priority:i64) -> (String, String, String) {
@@ -104,6 +109,7 @@ pub fn split_priority(mut token:String, rels_or_ops:bool, priority:i64) -> (Stri
     return (first_part_string, operation_string, second_part_string);
 }
 
+
 // Get function name
 pub fn split_function(token:String) -> (String, String) {
     let mut name = "".to_string();
@@ -124,6 +130,7 @@ pub fn split_function(token:String) -> (String, String) {
 
     return (name, arguments);
 }
+
 
 // Split items over commas
 pub fn split_arguments(unclean_token:String) -> Vec<String> {
@@ -158,6 +165,7 @@ pub fn split_arguments(unclean_token:String) -> Vec<String> {
     return output;
 }
 
+
 // Remove outer parans
 fn remove_outer_parans(token:String) -> String {    
     let mut copy_token = token.clone();
@@ -166,6 +174,7 @@ fn remove_outer_parans(token:String) -> String {
 
     return copy_token;
 }
+
 
 // Check if has outer parans
 fn has_outer_parans(mut token:String) -> bool {

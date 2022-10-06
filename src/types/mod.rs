@@ -1,19 +1,23 @@
 // Types module
 #![forbid(unsafe_code)]
 
+
 // Testing methods
 #[cfg(test)]
 mod tests;
 #[cfg(test)]
 mod find_type_tests;
 
+
 // General Imports
 use regex::Regex;
 use lazy_static::lazy_static;
 
+
 // File Imports
 use errors::{stateless_error, unhandled_error};
 use expression_lexer::{split, split_function};
+
 
 // Constants
 lazy_static! {
@@ -25,6 +29,7 @@ lazy_static! {
     static ref EXPRESSION:Regex = Regex::new(r"^.+(=|<|>|!|\+|/|\*|-|\^).+$").unwrap();
     static ref SYMBOL:Regex = Regex::new(r"^([a-z]|[A-Z])+(\$|[0-9])*$").unwrap();
 }
+
 
 // Determine output type
 pub fn find_type(token:String) -> i64 {
@@ -68,6 +73,7 @@ pub fn find_type(token:String) -> i64 {
     else {unhandled_error(); return -1;}
 }
 
+
 // Check if float
 fn is_float(token:String) -> bool {
     let mut output = FLOAT.is_match(&token) || SCI_FLOAT.is_match(&token);
@@ -97,6 +103,7 @@ fn is_float(token:String) -> bool {
 
     return output;
 }
+
 
 // Check if sci_float
 fn is_sci_float(token:String) -> bool {
@@ -128,14 +135,18 @@ fn is_sci_float(token:String) -> bool {
     return output;
 }
 
+
 // Check if integer
 fn is_int(token:String) -> bool {return INTEGER.is_match(&token);}
+
 
 // Check if string
 fn is_string(token:String) -> bool {return STRING.is_match(&token);}
 
+
 // Check if symbol
 fn is_symbol(token:String) -> bool {return SYMBOL.is_match(&token);}
+
 
 // Check if expression
 fn is_expression(token:String) -> bool {
@@ -144,6 +155,7 @@ fn is_expression(token:String) -> bool {
 	!SCI_FLOAT.is_match(&token) &&
 	split(token, false, false).1 != "".to_string();
 }
+
 
 // Check if function call
 fn is_function(token:String) -> bool {

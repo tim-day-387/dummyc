@@ -4,6 +4,7 @@ extern crate regex;
 extern crate lazy_static;
 extern crate quit;
 
+
 // Modules
 mod lexer;
 mod expression_lexer;
@@ -12,13 +13,16 @@ mod data;
 mod types;
 mod errors;
 
+
 // General Imports
 use std::path::Path;
 use std::env;
 
+
 // File Imports
 use state::State;
 use errors::stateless_error;
+
 
 // Main function code
 fn main() {
@@ -26,7 +30,7 @@ fn main() {
     let mut path_set = false;
     let args: Vec<String> = env::args().collect(); 
     let mut basic_path = Path::new(".");
-
+    
     // Parse arguments
     for n in 1..args.len() {
 	// Check if path is set
@@ -50,6 +54,7 @@ fn main() {
     }	
 }
 
+
 // File interpreter
 fn script(file_path:&Path) {
     // Useful variables
@@ -61,6 +66,7 @@ fn script(file_path:&Path) {
     // Execute commands given state
     state.exec_all_scans();
 }
+
 
 // Interactive prompt for the BASIC interpreter
 fn interactive() {

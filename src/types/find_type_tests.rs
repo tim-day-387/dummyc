@@ -1,6 +1,7 @@
 // File Imports
 use types::*;
 
+
 // Testing find_type()
 #[test]
 fn find_type_1() {
@@ -9,6 +10,7 @@ fn find_type_1() {
 
     assert_eq!(answer, find_type(given));
 }
+
 
 // Testing find_type()
 #[test]
@@ -19,6 +21,7 @@ fn find_type_2() {
     assert_eq!(answer, find_type(given));
 }
 
+
 // Testing find_type()
 #[test]
 fn find_type_3() {
@@ -27,6 +30,7 @@ fn find_type_3() {
 
     assert_eq!(answer, find_type(given));
 }
+
 
 // Testing find_type()
 #[test]
@@ -37,6 +41,7 @@ fn find_type_4() {
     assert_eq!(answer, find_type(given));
 }
 
+
 // Testing find_type()
 #[test]
 fn find_type_5() {
@@ -45,6 +50,7 @@ fn find_type_5() {
 
     assert_eq!(answer, find_type(given));
 }
+
 
 // Testing find_type()
 #[test]
@@ -55,6 +61,7 @@ fn find_type_6() {
     assert_eq!(answer, find_type(given));
 }
 
+
 // Testing find_type()
 #[test]
 fn find_type_7() {
@@ -63,6 +70,7 @@ fn find_type_7() {
 
     assert_eq!(answer, find_type(given));
 }
+
 
 // Testing find_type()
 #[test]
@@ -73,6 +81,7 @@ fn find_type_8() {
     assert_eq!(answer, find_type(given));
 }
 
+
 // Testing find_type()
 #[test]
 fn find_type_9() {
@@ -81,6 +90,7 @@ fn find_type_9() {
 
     assert_eq!(answer, find_type(given));
 }
+
 
 // Testing find_type()
 #[test]
@@ -91,6 +101,7 @@ fn find_type_10() {
     assert_eq!(answer, find_type(given));
 }
 
+
 // Testing find_type()
 #[test]
 fn find_type_11() {
@@ -99,6 +110,7 @@ fn find_type_11() {
 
     assert_eq!(answer, find_type(given));
 }
+
 
 // Testing find_type()
 #[test]
@@ -109,6 +121,7 @@ fn find_type_12() {
     assert_eq!(answer, find_type(given));
 }
 
+
 // Testing find_type()
 #[test]
 fn find_type_13() {
@@ -117,6 +130,7 @@ fn find_type_13() {
 
     assert_eq!(answer, find_type(given));
 }
+
 
 // Testing find_type()
 #[test]
@@ -127,6 +141,7 @@ fn find_type_14() {
     assert_eq!(answer, find_type(given));
 }
 
+
 // Testing find_type()
 #[test]
 fn find_type_15() {
@@ -135,6 +150,7 @@ fn find_type_15() {
 
     assert_eq!(answer, find_type(given));
 }
+
 
 // Testing find_type()
 #[test]
@@ -145,6 +161,7 @@ fn find_type_16() {
     assert_eq!(answer, find_type(given));
 }
 
+
 // Testing find_type()
 #[test]
 fn find_type_17() {
@@ -153,6 +170,7 @@ fn find_type_17() {
 
     assert_eq!(answer, find_type(given));
 }
+
 
 // Testing find_type()
 #[test]
@@ -163,6 +181,7 @@ fn find_type_18() {
     assert_eq!(answer, find_type(given));
 }
 
+
 // Testing find_type()
 #[test]
 fn find_type_19() {
@@ -171,6 +190,7 @@ fn find_type_19() {
 
     assert_eq!(answer, find_type(given));
 }
+
 
 // Testing find_type()
 #[test]
@@ -181,6 +201,7 @@ fn find_type_20() {
     assert_eq!(answer, find_type(given));
 }
 
+
 // Testing find_type()
 #[test]
 fn find_type_21() {
@@ -189,6 +210,7 @@ fn find_type_21() {
 
     assert_eq!(answer, find_type(given));
 }
+
 
 // Testing find_type()
 #[test]

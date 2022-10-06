@@ -1,17 +1,21 @@
 // Lexer module
 #![forbid(unsafe_code)]
 
+
 // Testing methods
 #[cfg(test)]
 mod tests;
+
 
 // General Imports
 use regex::Regex;
 use errors::stateless_error;
 use lazy_static::lazy_static;
 
+
 // File Imports
 use types::find_type;
+
 
 // Constants
 const RESERVED:[&'static str; 27] = ["FUNCTION", "RESTORE", "RETURN", "OPTION", "GOSUB", "PRINT",
@@ -21,6 +25,7 @@ const RESERVED:[&'static str; 27] = ["FUNCTION", "RESTORE", "RETURN", "OPTION", 
 lazy_static! {
     static ref SHEBANG:Regex = Regex::new(r"^(#!.*)$").unwrap();
 }
+
 
 // Perform all lexer command for multiple commands per line
 pub fn perform_multi_lexing(line_string:String) -> Vec<Vec<String>> {
@@ -51,6 +56,7 @@ pub fn perform_multi_lexing(line_string:String) -> Vec<Vec<String>> {
     return output;
 }
 
+
 // Create an error if the command is not formed properly, add implied let statements
 fn verify(mut tokens:Vec<String>) -> Vec<String> {
     if (find_type(tokens[0].clone()) != 4001) && !is_shebang(tokens[0].clone()) {
@@ -67,6 +73,7 @@ fn verify(mut tokens:Vec<String>) -> Vec<String> {
 	return tokens;
     }
 }
+
 
 // Function to remove spaces
 pub fn remove_spaces(file_string:String) -> String {
@@ -89,6 +96,7 @@ pub fn remove_spaces(file_string:String) -> String {
     return output_string;
 }
 
+
 // Create a vector of tokens
 fn tokenize(line_string:String) -> Vec<String> {
     let (line_number, rest) = split_line_number(line_string);
@@ -98,6 +106,7 @@ fn tokenize(line_string:String) -> Vec<String> {
 
     return output;
 }
+
 
 // Get only line numer
 pub fn split_line_number(unclean_line_string:String) -> (String, String) {
@@ -117,6 +126,7 @@ pub fn split_line_number(unclean_line_string:String) -> (String, String) {
 
     return (line_number, rest);
 }
+
 
 // Create a vector of tokens
 fn rest_tokenize(file_string:String) -> Vec<String> {
@@ -138,6 +148,7 @@ fn rest_tokenize(file_string:String) -> Vec<String> {
 
     return output;
 }
+
 
 // Find the beginnings and ends of all matching reserved tokens
 fn find_res_tokens(file_string:String) -> Vec<usize> {
@@ -180,6 +191,7 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
     
     return locations;
 }
+
 
 // Check if a shebang token
 pub fn is_shebang(token:String) -> bool {return SHEBANG.is_match(&token);}

@@ -1,6 +1,7 @@
 // File Imports
 use lexer::*;
 
+
 // Testing tokenize()
 #[test]
 fn tokenize_1() {
@@ -9,6 +10,7 @@ fn tokenize_1() {
 
     assert_eq!(answer, tokenize(given));
 }
+
 
 // Testing tokenize()
 #[test]
@@ -19,6 +21,7 @@ fn tokenize_2() {
     assert_eq!(answer, tokenize(given));
 }    
 
+
 // Testing tokenize()
 #[test]
 fn tokenize_3() {
@@ -27,6 +30,7 @@ fn tokenize_3() {
 
     assert_eq!(answer, tokenize(given));
 }
+
 
 // Testing tokenize()
 #[test]
@@ -37,6 +41,7 @@ fn tokenize_4() {
     assert_eq!(answer, tokenize(given));
 }
 
+
 // Testing tokenize()
 #[test]
 fn tokenize_5() {
@@ -45,6 +50,7 @@ fn tokenize_5() {
 
     assert_eq!(answer, tokenize(given));
 }
+
 
 // Testing tokenize()
 #[test]
@@ -55,6 +61,7 @@ fn tokenize_6() {
     assert_eq!(answer, tokenize(given));
 }
 
+
 // Testing tokenize()
 #[test]
 fn tokenize_7() {
@@ -63,6 +70,7 @@ fn tokenize_7() {
 
     assert_eq!(answer, tokenize(given));
 }
+
 
 // Testing tokenize()
 #[test]
@@ -73,6 +81,7 @@ fn tokenize_8() {
     assert_eq!(answer, tokenize(given));
 }
 
+
 // Testing tokenize()
 #[test]
 fn tokenize_9() {
@@ -81,6 +90,7 @@ fn tokenize_9() {
 
     assert_eq!(answer, tokenize(given));
 }
+
 
 // Testing tokenize()
 #[test]
@@ -91,6 +101,7 @@ fn tokenize_10() {
     assert_eq!(answer, tokenize(given));
 }
 
+
 // Testing tokenize()
 #[test]
 fn tokenize_11() {
@@ -99,6 +110,7 @@ fn tokenize_11() {
 
     assert_eq!(answer, tokenize(given));
 }
+
 
 // Testing tokenize()
 #[test]
@@ -109,6 +121,7 @@ fn tokenize_12() {
     assert_eq!(answer, tokenize(given));
 }
 
+
 // Testing tokenize()
 #[test]
 fn tokenize_13() {
@@ -117,6 +130,7 @@ fn tokenize_13() {
 
     assert_eq!(answer, tokenize(given));
 }
+
 
 // Testing tokenize()
 #[test]
@@ -127,6 +141,7 @@ fn tokenize_14() {
     assert_eq!(answer, tokenize(given));
 }
 
+
 // Testing tokenize()
 #[test]
 fn tokenize_15() {
@@ -135,6 +150,7 @@ fn tokenize_15() {
 
     assert_eq!(answer, tokenize(given));
 }
+
 
 // Testing tokenize()
 #[test]
@@ -145,6 +161,7 @@ fn tokenize_16() {
     assert_eq!(answer, tokenize(given));
 }
 
+
 // Testing tokenize()
 #[test]
 fn tokenize_17() {
@@ -153,6 +170,7 @@ fn tokenize_17() {
 
     assert_eq!(answer, tokenize(given));
 }
+
 
 // Testing remove_spaces()
 #[test]
@@ -163,6 +181,7 @@ fn remove_spaces_1() {
     assert_eq!(answer, remove_spaces(given));
 }
 
+
 // Testing remove_spaces()
 #[test]
 fn remove_spaces_2() {
@@ -171,6 +190,7 @@ fn remove_spaces_2() {
 
     assert_eq!(answer, remove_spaces(given));
 }
+
 
 // Testing remove_spaces()
 #[test]

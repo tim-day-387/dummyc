@@ -1,6 +1,7 @@
 // File Imports
 use expression_lexer::*;
 
+
 // Testing split()
 #[test]
 fn split_1() {
@@ -9,6 +10,7 @@ fn split_1() {
 
     assert_eq!(answer, split(given, true, true));
 }
+
 
 // Testing split()
 #[test]
@@ -19,6 +21,7 @@ fn split_2() {
     assert_eq!(answer, split(given, true, true));
 }
 
+
 // Testing split()
 #[test]
 fn split_3() {
@@ -27,6 +30,7 @@ fn split_3() {
 
     assert_eq!(answer, split(given, true, true));
 }
+
 
 // Testing split()
 #[test]
@@ -37,6 +41,7 @@ fn split_4() {
     assert_eq!(answer, split(given, true, true));
 }
 
+
 // Testing split()
 #[test]
 fn split_5() {
@@ -45,6 +50,7 @@ fn split_5() {
 
     assert_eq!(answer, split(given, false, true));
 }
+
 
 // Testing split_arguments()
 #[test]
@@ -55,6 +61,7 @@ fn split_arguments_1() {
     assert_eq!(answer, split_arguments(given));
 }
 
+
 // Testing split_arguments()
 #[test]
 fn split_arguments_2() {
@@ -63,6 +70,7 @@ fn split_arguments_2() {
 
     assert_eq!(answer, split_arguments(given));
 }
+
 
 // Testing has_outer_parans()
 #[test]
@@ -73,6 +81,7 @@ fn has_outer_parans_1() {
     assert_eq!(answer, has_outer_parans(given));
 }
 
+
 // Testing has_outer_parans()
 #[test]
 fn has_outer_parans_2() {
@@ -81,6 +90,7 @@ fn has_outer_parans_2() {
 
     assert_eq!(answer, has_outer_parans(given));
 }
+
 
 // Testing has_outer_parans()
 #[test]
@@ -91,6 +101,7 @@ fn has_outer_parans_3() {
     assert_eq!(answer, has_outer_parans(given));
 }
 
+
 // Testing has_outer_parans()
 #[test]
 fn has_outer_parans_4() {
@@ -99,6 +110,7 @@ fn has_outer_parans_4() {
 
     assert_eq!(answer, has_outer_parans(given));
 }
+
 
 // Testing has_outer_parans()
 #[test]
