@@ -191,28 +191,27 @@ impl State {
 	// Check if command is present, else do nothing
 	if text.len() <= 1 {return;}
 
-	// Set keyword
-	let keyword = text[1].clone().to_uppercase();
-
 	// Execute given command
-	if keyword == "FUNCTION".to_string() {self.function_cmd(text);}
-	else if keyword == "DIM".to_string() {self.dim_cmd(text);}
-	else if keyword == "OPTION".to_string() {self.option_cmd(text);}
-	else if keyword == "INPUT".to_string() {self.input_cmd(text);}
-	else if keyword == "PRINT".to_string() {self.print_cmd(text);}
-	else if keyword == "GOTO".to_string() {self.goto_cmd(text);}
-	else if keyword == "LET".to_string() {self.let_cmd(text);}
-	else if keyword == "IF".to_string() {self.if_cmd(text);}
-	else if keyword == "GOSUB".to_string() {self.gosub_cmd(text);}
-	else if keyword == "RETURN".to_string() {self.return_cmd(text);}
-	else if keyword == "FOR".to_string() {self.for_cmd(text);}
-	else if keyword == "NEXT".to_string() {self.next_cmd(text);}
-	else if keyword == "REM".to_string() {self.rem_cmd(text);}
-	else if keyword == "STOP".to_string() {self.stop_cmd(text);}
-	else if keyword == "END".to_string() {self.end_cmd(text);}
-	else if keyword == "READ".to_string() {self.read_cmd(text);}
-	else if keyword == "RESTORE".to_string() {self.restore_cmd(text);}
-	else {self.next_line = -1;}
+	match &*text[1].clone().to_uppercase() {
+	    "FUNCTION" => self.function_cmd(text),
+	    "DIM" => self.dim_cmd(text),
+	    "OPTION" => self.option_cmd(text),
+	    "INPUT" => self.input_cmd(text),
+	    "PRINT" => self.print_cmd(text),
+	    "GOTO" => self.goto_cmd(text),
+	    "LET" => self.let_cmd(text),
+	    "IF" => self.if_cmd(text),
+	    "GOSUB" => self.gosub_cmd(text),
+	    "RETURN" => self.return_cmd(text),
+	    "FOR" => self.for_cmd(text),
+	    "NEXT" => self.next_cmd(text),
+	    "REM" => self.rem_cmd(text),
+	    "STOP" => self.stop_cmd(text),
+	    "END" => self.end_cmd(text),
+	    "READ" => self.read_cmd(text),
+	    "RESTORE" => self.restore_cmd(text),
+	    _ => self.next_line = -1
+	}
     }
 
 
@@ -221,12 +220,11 @@ impl State {
 	// Check if command is present, else do nothing
 	if text.len() <= 1 {return;}
 
-	// Set keyword
-	let keyword = text[1].clone().to_uppercase();
-
 	// Execute given command
-	if keyword == "DATA".to_string() {self.data_cmd(text);}
-	else {self.next_line = -1;}
+	match &*text[1].clone().to_uppercase() {
+	    "DATA" => self.data_cmd(text),
+	    _ => self.next_line = -1
+	}
     }
 
 
