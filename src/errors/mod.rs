@@ -6,14 +6,14 @@
 pub fn parse_float(string_to_parse:String, function_name:String) -> f64 {
     match string_to_parse.parse::<f64>() {
 	Ok(i) => {
-	    return i;
+	    i
 	},
 	Err(_e) => {
 	    stateless_error([].to_vec(),
 			    [].to_vec(),
 			    function_name,
 			    "Invalid float.".to_string());
-	    return -1.0;
+	    -1.0
 	}
     }
 }
@@ -23,14 +23,14 @@ pub fn parse_float(string_to_parse:String, function_name:String) -> f64 {
 pub fn parse_int(string_to_parse:String, function_name:String) -> i64 {
     match string_to_parse.parse::<i64>() {
 	Ok(i) => {
-	    return i
+	    i
 	},
 	Err(_e) => {
 	    stateless_error([].to_vec(),
 			    [].to_vec(),
 			    function_name,
 			    "Invalid integer.".to_string());
-	    return -1;
+	    -1
 	}
     }
 }
