@@ -240,7 +240,7 @@ impl State {
     // Go to next line
     fn pt_next_line(&mut self) {
 	self.print_location = 0;
-	println!("");
+	println!();
     }
 
 
@@ -248,7 +248,7 @@ impl State {
     fn pt_cond_next_line(&mut self) {
 	if self.print_location != 0 {
 	    self.print_location = 0;
-	    println!("");
+	    println!();
 	}
     }
 

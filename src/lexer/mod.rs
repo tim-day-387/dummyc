@@ -18,7 +18,7 @@ use types::find_type;
 
 
 // Constants
-const RESERVED:[&'static str; 27] = ["FUNCTION", "RESTORE", "RETURN", "OPTION", "GOSUB", "PRINT",
+const RESERVED:[&str; 27] = ["FUNCTION", "RESTORE", "RETURN", "OPTION", "GOSUB", "PRINT",
 				     "INPUT", "READ", "BASE", "DATA", "STOP", "GOTO", "THEN", "NEXT",
 				     "STEP", "FOR", "REM", "LET", "DIM", "END", "DEF",
 				     "IF", "TO", "ON", ";", ":", ","];
@@ -40,12 +40,11 @@ pub fn perform_multi_lexing(line_string:String) -> Vec<Vec<String>> {
 
     for token in tokens {
 	if first {first = false; continue;}
-	if token.to_uppercase() == "REM".to_string() {saw_rem = true;}
+	if token.to_uppercase() == *"REM" {saw_rem = true;}
 
-	if token == ":".to_string() && !saw_rem {
+	if token == *":" && !saw_rem {
 	    output.push(verify(command));
-	    command = Vec::new();
-	    command.push(line_number.clone());
+	    command = vec![line_number.clone()];
 	} else {
 	    command.push(token);
 	}
@@ -53,7 +52,7 @@ pub fn perform_multi_lexing(line_string:String) -> Vec<Vec<String>> {
 
     output.push(verify(command));
 
-    return output;
+    output
 }
 
 
@@ -65,12 +64,14 @@ fn verify(mut tokens:Vec<String>) -> Vec<String> {
 	let function_name = "verify".to_string();
 	let message = "Line has no line number.".to_string();
 	stateless_error(artifacts, artifact_names, function_name, message);
-	return Vec::new();
-    } else if tokens.len() > 1 && !RESERVED.contains(&&tokens[1].clone().to_uppercase().as_str()) {
+
+	Vec::new()
+    } else if tokens.len() > 1 && !RESERVED.contains(&tokens[1].clone().to_uppercase().as_str()) {
 	tokens.insert(1, "LET".to_string());
-	return tokens;
+
+	tokens
     } else {
-	return tokens;
+	tokens
     }
 }
 
@@ -82,18 +83,16 @@ pub fn remove_spaces(file_string:String) -> String {
     let mut in_string = false;
     
     for c in char_vec {
-	if c != ' ' {
+	if c != ' ' || in_string {
 	    output_string.push(c);
-        } else if in_string {
-	    output_string.push(c);
-	}
+        }
 
 	if c == '"' {
 	    in_string = !in_string;
 	}
     }
 
-    return output_string;
+    output_string
 }
 
 
@@ -104,7 +103,7 @@ fn tokenize(line_string:String) -> Vec<String> {
 
     output.insert(0, line_number);
 
-    return output;
+    output
 }
 
 
@@ -124,14 +123,14 @@ pub fn split_line_number(unclean_line_string:String) -> (String, String) {
 	}
     }
 
-    return (line_number, rest);
+    (line_number, rest)
 }
 
 
 // Create a vector of tokens
 fn rest_tokenize(file_string:String) -> Vec<String> {
     let mut output:Vec<String> = Vec::new();
-    let mut cur:String = file_string.trim().to_string().clone();
+    let mut cur:String = file_string.trim().to_string();
     let mut offset = 0;
     let locations = find_res_tokens(file_string);
 
@@ -142,11 +141,11 @@ fn rest_tokenize(file_string:String) -> Vec<String> {
 	cur = rest.to_string();
     }
 
-    if cur != "".to_string() {output.push(cur);}
+    if cur != *"" {output.push(cur);}
 
     output.retain(|x| x != &"".to_string());
 
-    return output;
+    output
 }
 
 
@@ -156,17 +155,13 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
     let mut i_in_string_or_res = Vec::new();
     let mut in_string = false;
     let mut in_brack = false;
-    let mut iter = 0;
-    let char_vec:Vec<char> = file_string.chars().collect();
 
-    for c in char_vec.clone() {
+    for (iter, c) in file_string.chars().enumerate() {
 	if c == '"' {in_string = !in_string;}
 	if in_string {i_in_string_or_res.push(iter);}
 	
 	if (c == '(' || c == ')') && !i_in_string_or_res.contains(&iter) {in_brack = !in_brack;}
 	if in_brack {i_in_string_or_res.push(iter);}
-
-	iter +=1;
     }
     
     for i in &RESERVED {
@@ -187,11 +182,11 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
 	}
     }
 
-    locations.sort();
+    locations.sort_unstable();
     
-    return locations;
+    locations
 }
 
 
 // Check if a shebang token
-pub fn is_shebang(token:String) -> bool {return SHEBANG.is_match(&token);}
+pub fn is_shebang(token:String) -> bool {SHEBANG.is_match(&token)}
