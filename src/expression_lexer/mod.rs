@@ -24,26 +24,26 @@ pub fn split(token:String, rels_or_ops:bool, strict:bool) -> (String, String, St
     let output;
 
     if rels_or_ops {
-	output = split_priority(token.clone(), rels_or_ops.clone(), -1);
+	output = split_priority(token.clone(), rels_or_ops, -1);
     } else {
-	let first = split_priority(token.clone(), rels_or_ops.clone(), 1);
-	let second = split_priority(token.clone(), rels_or_ops.clone(), 2);
-	let third = split_priority(token.clone(), rels_or_ops.clone(), 3);
+	let first = split_priority(token.clone(), rels_or_ops, 1);
+	let second = split_priority(token.clone(), rels_or_ops, 2);
+	let third = split_priority(token.clone(), rels_or_ops, 3);
 
-	if first.1 != "".to_string() {output = first;}
-	else if second.1 != "".to_string() {output = second;}
+	if first.1 != *"" {output = first;}
+	else if second.1 != *"" {output = second;}
 	else {output = third;}
     }
 
-    if strict && (output.0 == "".to_string() || output.1 == "".to_string() || output.2 == "".to_string()) {
-	let artifacts = [token.clone()].to_vec();
+    if strict && (output.0 == *"" || output.1 == *"" || output.2 == *"") {
+	let artifacts = [token].to_vec();
 	let artifact_names = ["token".to_string()].to_vec();
 	let function_name = "split".to_string();
 	let message = "Tried to create empty split.".to_string();
 	stateless_error(artifacts, artifact_names, function_name, message);
     }
 
-    return output;
+    output
 }
 
 
@@ -106,7 +106,7 @@ pub fn split_priority(mut token:String, rels_or_ops:bool, priority:i64) -> (Stri
 	if in_exp {first_part_string.insert(0, c);}
     }
 
-    return (first_part_string, operation_string, second_part_string);
+    (first_part_string, operation_string, second_part_string)
 }
 
 
@@ -128,7 +128,7 @@ pub fn split_function(token:String) -> (String, String) {
     arguments.pop();
     arguments.remove(0);
 
-    return (name, arguments);
+    (name, arguments)
 }
 
 
@@ -141,7 +141,7 @@ pub fn split_arguments(unclean_token:String) -> Vec<String> {
     let mut output:Vec<String> = Vec::new();
 
     // Check if empty string
-    if token == "".to_string() {
+    if token == *"" {
 	return output;
     }
     
@@ -162,17 +162,17 @@ pub fn split_arguments(unclean_token:String) -> Vec<String> {
 
     output.push(current);
 
-    return output;
+    output
 }
 
 
 // Remove outer parans
 fn remove_outer_parans(token:String) -> String {    
-    let mut copy_token = token.clone();
+    let mut copy_token = token;
     copy_token.pop();
     copy_token.remove(0);
 
-    return copy_token;
+    copy_token
 }
 
 
@@ -180,8 +180,8 @@ fn remove_outer_parans(token:String) -> String {
 fn has_outer_parans(mut token:String) -> bool {
     let mut in_string:bool = false;
 
-    if token.chars().nth(0) != Some('(') || token.chars().nth(token.len() - 1) != Some(')') {
-	return false;
+    if !token.starts_with('(') || token.chars().nth(token.len() - 1) != Some(')') {
+	false
     } else {
 	token.pop();
 	token.remove(0);
@@ -192,6 +192,6 @@ fn has_outer_parans(mut token:String) -> bool {
 	    if c == '(' && !in_string {return true;}
 	}
 
-	return true;
+	true
     }
 }
