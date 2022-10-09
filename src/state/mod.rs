@@ -12,6 +12,7 @@ use std::cmp;
 
 // File Imports
 use data::Data;
+use types::enums::Type;
 use types::find_type;
 use errors::stateless_error;
 use lexer::{is_shebang, perform_multi_lexing, split_line_number};
@@ -362,7 +363,7 @@ impl State {
 	for item in text.iter().skip(2) {
 	    if item.clone() == *"," || item.clone() == *";" {
 		continue;
-	    } else if find_type(item.clone()) == 3000 {
+	    } else if find_type(item.clone()) == Type::String {
                 let object = Data::new_simplified(item.clone(), self.clone());
 
 		self.pt_output_text(object.print_out_text);
@@ -482,7 +483,7 @@ impl State {
 	// Generate data object
 	let object = Data::new_simplified(data, self.clone());
 
-	if find_type(var_name.clone()) == 2000 {
+	if find_type(var_name.clone()) == Type::Function {
             let array_ref = Data::get_array_reference(var_name, self.clone());
 	    self.variables.insert(array_ref, object);
 	} else {

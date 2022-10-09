@@ -2,6 +2,10 @@
 #![forbid(unsafe_code)]
 
 
+// Modules
+pub mod enums;
+
+
 // Testing methods
 #[cfg(test)]
 mod tests;
@@ -15,6 +19,7 @@ use lazy_static::lazy_static;
 
 
 // File Imports
+use self::enums::Type;
 use errors::{stateless_error, unhandled_error};
 use expression_lexer::{split, split_function};
 
@@ -32,7 +37,7 @@ lazy_static! {
 
 
 // Determine output type
-pub fn find_type(token:String) -> i64 {
+pub fn find_type(token:String) -> Type {
     let string_test = is_string(token.clone());
     let float_test = is_float(token.clone());
     let int_test = is_int(token.clone());
@@ -62,14 +67,14 @@ pub fn find_type(token:String) -> i64 {
 			"Object does not match any of the types.".to_string())
     }
 
-    if string_test {3000}             // string
-    else if float_test {4002}         // float
-    else if int_test {4001}           // int
-    else if sci_float_test {4003}     // sci_float
-    else if function_test {2000}      // function
-    else if expression_test {0}       // expresssion
-    else if symbol_test {1000}        // symbol
-    else {unhandled_error(); -1}
+    if string_test {Type::String}
+    else if float_test {Type::Float}
+    else if int_test {Type::Int}
+    else if sci_float_test {Type::SciFloat}
+    else if function_test {Type::Function}
+    else if expression_test {Type::Expression}
+    else if symbol_test {Type::Symbol}
+    else {unhandled_error(); Type::Undefined}
 }
 
 

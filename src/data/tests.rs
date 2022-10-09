@@ -1,4 +1,5 @@
 // File Imports
+use types::enums::Type;
 use data::*;
 
 
@@ -8,7 +9,7 @@ fn type_1() {
     let mut given:Data = Data::new("\"This is a test\"".to_string());
     given.find_output_type();
 
-    assert_eq!(3000, given.output_type);
+    assert_eq!(Type::String, given.output_type);
 }
 
 
@@ -18,7 +19,7 @@ fn type_2() {
     let mut given:Data = Data::new("Thisisanotherdifferenttest".to_string());
     given.find_output_type();
 
-    assert_eq!(1000, given.output_type);
+    assert_eq!(Type::Symbol, given.output_type);
 }
 
 

@@ -10,11 +10,11 @@ mod tests;
 // General Imports
 use Path;
 use rand::Rng;
-use std::cmp;
 
 
 // File Imports
 use state::State;
+use types::enums::Type;
 use types::find_type;
 use errors::{stateless_error, parse_int, parse_float, error_divide_zero};
 use expression_lexer::{split, split_function, split_arguments};
@@ -24,7 +24,7 @@ use expression_lexer::{split, split_function, split_arguments};
 #[derive(PartialEq, Clone)]
 pub struct Data {
     pub plain_text:String,
-    pub output_type:i64,
+    pub output_type:Type,
     pub print_out_text:String,
 }
 
@@ -52,7 +52,7 @@ impl Data {
     pub fn new(given_text:String) -> Data {
 	Data {
 	    plain_text:given_text,
-	    output_type:-1, // -1 - null; 0 - expression; 1000 - symbol; 2000 symbol_callable; 3000 - string; 4001-3 - int, float, sci_float
+	    output_type:Type::Undefined,
 	    print_out_text:"".to_string(),
 	}
     }
@@ -61,15 +61,15 @@ impl Data {
     // Simplify data output to one which can be stored and printed out
     pub fn simplify(&mut self, state:State) {
 	self.find_output_type();
-	
-	if self.output_type == 2000 {             // symbol_callable
+
+	if self.output_type == Type::Function {
 	    self.resolve_callable(state);
-	} else if self.output_type == 1000 {      // symbol
+	} else if self.output_type == Type::Symbol {
 	    self.resolve_symbol(state);
-	} else if self.output_type == 0 {         // expression
+	} else if self.output_type == Type::Expression {
 	    self.resolve_expression(state);
 	}
-	
+
 	self.get_print_out();
     }
 
@@ -183,24 +183,24 @@ impl Data {
 
 
     // Find output type from an operation
-    fn find_operation_output_type(self, other:Data) -> i64 {
-	if (self.output_type - other.output_type).abs() > 500 {
+    fn find_operation_output_type(self, other:Data) -> Type {
+	if !self.clone().output_type.check_if_compatible(other.clone().output_type) {
 	    stateless_error([].to_vec(),
 			    [].to_vec(),
 			    "find_operation_output_type".to_string(),
 			    "Incompatible types.".to_string());
-	    -1
+	    Type::Undefined
 	} else {
-	    cmp::max(self.output_type, other.output_type)
+	    self.output_type.precedence(other.output_type)
 	}
     }
 
 
     // Perform the compare
     pub fn compare(self, other:Data, operation_string:String) -> bool {
-	let output_type = self.clone().find_operation_output_type(other.clone());
+	let output_type:Type = self.clone().find_operation_output_type(other.clone());
 
-	if output_type == 4001 || output_type == 4002 || output_type == 4003 { // int or float or sci_float
+	if output_type.check_if_number() {
 	    let a = parse_float(self.plain_text, "compare".to_string());
 	    let b = parse_float(other.plain_text, "compare".to_string());
 
@@ -223,11 +223,11 @@ impl Data {
 
     // Perform the operation
     pub fn operation(&mut self, other:Data, operation_string:String) {
-	let output_type:i64 = self.clone().find_operation_output_type(other.clone());
+	let output_type:Type = self.clone().find_operation_output_type(other.clone());
 
-	if output_type == 3000 { // string
+	if output_type == Type::String {
 	    self.plain_text = format!("{}{}{}{}", "\"", self.print_out_text.clone(), other.print_out_text, "\"");
-	} else if output_type == 4001 { // int
+	} else if output_type == Type::Int {
 	    let a = parse_int(self.plain_text.clone(), "operation".to_string());
 	    let b = parse_int(other.plain_text, "operation".to_string());
 
@@ -250,8 +250,8 @@ impl Data {
 				[].to_vec(),
 				"operation".to_string(),
 				"Invalid operation.".to_string());
-            } 
-	} else if output_type == 4002 || output_type == 4003 { // float or sci_float
+            }
+	} else if output_type.check_if_float() {
 	    let a = parse_float(self.plain_text.clone(), "operation".to_string());
 	    let b = parse_float(other.plain_text, "operation".to_string());
 
@@ -316,11 +316,11 @@ impl Data {
 
     // Find text to be printed out, handle formatting
     fn get_print_out(&mut self) {
-	if self.output_type == 3000 { // string
+	if self.output_type == Type::String {
 	    self.print_out_text = self.plain_text.clone();
 	    self.print_out_text.pop();
 	    self.print_out_text.remove(0);
-	} else if self.output_type == 4001 { // int
+	} else if self.output_type == Type::Int {
 	    let i = parse_int(self.plain_text.clone(), "get_print_out".to_string());
 
 	    if i < 0 {
@@ -328,7 +328,7 @@ impl Data {
 	    } else {
 		self.print_out_text = format!("{}{}{}", " ", i, " ");
 	    }
-	} else if self.output_type == 4002 { // float
+	} else if self.output_type == Type::Float {
 	    let i = parse_float(self.plain_text.clone(), "get_print_out".to_string());
 
 	    if i < -1.0 {
@@ -344,7 +344,7 @@ impl Data {
 	    } else {
 		self.print_out_text = format!("{}{}{}", " ", i, " ");
 	    }
-	} else if self.output_type == 4003 { // sci_float
+	} else if self.output_type == Type::SciFloat {
 	    let mut output:String = "".to_string();
 	    let mut last = ' ';
 	    let mut point = false;

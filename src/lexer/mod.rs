@@ -9,6 +9,7 @@ mod tests;
 
 // General Imports
 use regex::Regex;
+use types::enums::Type;
 use errors::stateless_error;
 use lazy_static::lazy_static;
 
@@ -58,7 +59,7 @@ pub fn perform_multi_lexing(line_string:String) -> Vec<Vec<String>> {
 
 // Create an error if the command is not formed properly, add implied let statements
 fn verify(mut tokens:Vec<String>) -> Vec<String> {
-    if (find_type(tokens[0].clone()) != 4001) && !is_shebang(tokens[0].clone()) {
+    if (find_type(tokens[0].clone()) != Type::Int) && !is_shebang(tokens[0].clone()) {
 	stateless_error([].to_vec(),
 			[].to_vec(),
 			"verify".to_string(),
