@@ -16,7 +16,7 @@ use std::cmp;
 // File Imports
 use state::State;
 use types::find_type;
-use errors::stateless_error;
+use errors::{stateless_error, parse_int, parse_float, error_divide_zero};
 use expression_lexer::{split, split_function, split_arguments};
 
 
@@ -38,11 +38,10 @@ impl Data {
 	output.simplify(state);
 
 	if given_text.clone() != "".to_string() && output.plain_text.clone() == "".to_string() {
-	    let artifacts = [given_text.clone()].to_vec();
-	    let artifact_names = ["token".to_string()].to_vec();
-	    let function_name = "new_simplified".to_string();
-	    let message = "Cannot reduce to empty data object.".to_string();
-	    stateless_error(artifacts, artifact_names, function_name, message);
+	    stateless_error([given_text.clone()].to_vec(),
+			    ["token".to_string()].to_vec(),
+			    "new_simplified".to_string(),
+			    "Cannot reduce to empty data object.".to_string());
 	}
 
 	return output;
@@ -56,33 +55,6 @@ impl Data {
 	    output_type:-1, // -1 - null; 0 - expression; 1000 - symbol; 2000 symbol_callable; 3000 - string; 4001-3 - int, float, sci_float
 	    print_out_text:"".to_string(),
 	}
-    }
-
-
-    // Invalid float error
-    fn error_invalid_float(function_name:String) {
-	let artifacts = [].to_vec();
-	let artifact_names = [].to_vec();
-	let message = "Invalid float.".to_string();
-	stateless_error(artifacts, artifact_names, function_name, message);    
-    }
-
-
-    // Invalid int error
-    fn error_invalid_int(function_name:String) {
-	let artifacts = [].to_vec();
-	let artifact_names = [].to_vec();
-	let message = "Invalid integer.".to_string();
-	stateless_error(artifacts, artifact_names, function_name, message);    
-    }
-
-
-    // Divide by zero error
-    fn error_divide_zero(function_name:String) {
-	let artifacts = [].to_vec();
-	let artifact_names = [].to_vec();
-	let message = "Attempted to divide by zero.".to_string();
-	stateless_error(artifacts, artifact_names, function_name, message);
     }
 
 
@@ -111,12 +83,12 @@ impl Data {
 
 	if arguments.len() == 1 {
 	    let location_string = Data::new_simplified(arguments[0].clone(), state.clone()).plain_text;
-	    
+
 	    location = match location_string.parse::<i64>() {
 		Ok(i) => i,
 		Err(_e) => -1,
 	    };
-	    
+
 	    text = format!("{}{}{}{}", name, "(", location, ")");
 	}
 
@@ -132,12 +104,7 @@ impl Data {
 
 	if name == "int".to_string() && arguments.len() == 1 {
 	    let arg_data = Data::new_simplified(arguments[0].clone(), state.clone());
-	    let mut number:i64 = -1;
-
-	    match arg_data.plain_text.parse::<f64>() {
-		Ok(i) => number = i.round() as i64,
-		Err(_e) => Data::error_invalid_float("resolve_callable".to_string()),
-	    };
+	    let number:i64 = parse_float(arg_data.plain_text, "resolve_callable".to_string()).round() as i64;
 
 	    *self = Data::new_simplified(number.to_string(), state);
 	} else if Data::does_var_exist(array_ref.clone(), state.clone()) {
@@ -216,25 +183,24 @@ impl Data {
     // Find output type from an operation
     fn find_operation_output_type(self, other:Data) -> i64 {
 	if (self.output_type - other.output_type).abs() > 500 {
-	    let artifacts = [].to_vec();
-	    let artifact_names = [].to_vec();
-	    let function_name = "find_operation_output_type".to_string();
-	    let message = "Incompatible types.".to_string();
-	    stateless_error(artifacts, artifact_names, function_name, message);
+	    stateless_error([].to_vec(),
+			    [].to_vec(),
+			    "find_operation_output_type".to_string(),
+			    "Incompatible types.".to_string());
 	    return -1;
 	} else {
 	    return cmp::max(self.output_type, other.output_type);
 	}
     }
-    
+
 
     // Perform the compare
     pub fn compare(self, other:Data, operation_string:String) -> bool {
 	let output_type = self.clone().find_operation_output_type(other.clone());
 
 	if output_type == 4001 || output_type == 4002 || output_type == 4003 { // int or float or sci_float
-	    let a = match self.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_float("compare".to_string()); return false;}};
-	    let b = match other.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_float("compare".to_string()); return false;}};
+	    let a = parse_float(self.plain_text.clone(), "compare".to_string());
+	    let b = parse_float(other.plain_text.clone(), "compare".to_string());
 
 	    if operation_string == "<".to_string() {
 		return a < b;
@@ -251,7 +217,7 @@ impl Data {
 	    return false;
 	}
     }
-    
+
 
     // Perform the operation
     pub fn operation(&mut self, other:Data, operation_string:String) {
@@ -260,8 +226,8 @@ impl Data {
 	if output_type == 3000 { // string
 	    self.plain_text = format!("{}{}{}{}", "\"".to_string(), self.print_out_text.clone(), other.print_out_text.clone(), "\"".to_string());
 	} else if output_type == 4001 { // int
-	    let a = match self.plain_text.parse::<i64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_int("operation".to_string()); return;}};
-	    let b = match other.plain_text.parse::<i64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_int("operation".to_string()); return;}};
+	    let a = parse_int(self.plain_text.clone(), "operation".to_string());
+	    let b = parse_int(other.plain_text.clone(), "operation".to_string());
 
 	    if operation_string == "+".to_string() {
 		self.plain_text = (a+b).to_string();
@@ -271,22 +237,21 @@ impl Data {
 		self.plain_text = (a-b).to_string();
 	    } else if operation_string == "/".to_string() {
 		if b == 0 {
-		    Data::error_divide_zero("operation".to_string());
+		    error_divide_zero("operation".to_string());
 		} else {
 		    self.plain_text = (a/b).to_string();
 		}
 	    } else if operation_string == "^".to_string() {
 		self.plain_text = (a as f64).powf(b as f64).to_string();
 	    } else {
-		let artifacts = [].to_vec();
-		let artifact_names = [].to_vec();
-		let function_name = "operation".to_string();
-		let message = "Invalid operation.".to_string();
-		stateless_error(artifacts, artifact_names, function_name, message);
+		stateless_error([].to_vec(),
+				[].to_vec(),
+				"operation".to_string(),
+				"Invalid operation.".to_string());
             } 
 	} else if output_type == 4002 || output_type == 4003 { // float or sci_float
-	    let a = match self.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_float("operation".to_string()); return;}};
-	    let b = match other.plain_text.parse::<f64>() {Ok(i) => i, Err(_e) => {Data::error_invalid_float("operation".to_string()); return;}};
+	    let a = parse_float(self.plain_text.clone(), "operation".to_string());
+	    let b = parse_float(other.plain_text.clone(), "operation".to_string());
 
 	    if operation_string == "+".to_string() {
 		self.plain_text = (a+b).to_string();
@@ -296,25 +261,23 @@ impl Data {
 		self.plain_text = (a-b).to_string();
 	    } else if operation_string == "/".to_string() {
 		if b == 0.0 {
-		    Data::error_divide_zero("operation".to_string());
+		    error_divide_zero("operation".to_string());
 		} else {
 		    self.plain_text = (a/b).to_string();
 		}
 	    } else if operation_string == "^".to_string() {
 		self.plain_text = a.powf(b).to_string();
 	    } else {
-		let artifacts = [].to_vec();
-		let artifact_names = [].to_vec();
-		let function_name = "operation".to_string();
-		let message = "Invalid operation.".to_string();
-		stateless_error(artifacts, artifact_names, function_name, message);
+		stateless_error([].to_vec(),
+				[].to_vec(),
+				"operation".to_string(),
+				"Invalid operation.".to_string());
             }
 	} else {
-	    let artifacts = [].to_vec();
-	    let artifact_names = [].to_vec();
-	    let function_name = "operation".to_string();
-	    let message = "Unsupported type.".to_string();
-	    stateless_error(artifacts, artifact_names, function_name, message);
+	    stateless_error([].to_vec(),
+			    [].to_vec(),
+			    "operation".to_string(),
+			    "Unsupported type.".to_string());
 	}
     }
 
@@ -332,11 +295,10 @@ impl Data {
 	match state.variables.get(&self.plain_text) {
 	    Some(value)=> var_value = value,
 	    _=> {
-		let artifacts = [self.plain_text.clone()].to_vec();
-		let artifact_names = ["variable".to_string()].to_vec();
-		let function_name = "get_var_value".to_string();
-		let message = "Variable does not exist.".to_string();
-		stateless_error(artifacts, artifact_names, function_name, message);
+		stateless_error([self.plain_text.clone()].to_vec(),
+				["variable".to_string()].to_vec(),
+				"get_var_value".to_string(),
+				"Variable does not exist.".to_string());
 	    }
 	}
 
@@ -360,45 +322,43 @@ impl Data {
 	    self.print_out_text.pop();
 	    self.print_out_text.remove(0);
 	} else if self.output_type == 4001 { // int
-	    match self.plain_text.clone().parse::<i64>() {
-		Ok(i) => if i < 0 {
-		    self.print_out_text = format!("{}{}", i, " ".to_string());
-		} else {
-		    self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
-		},
-		Err(_e) => Data::error_invalid_int("get_print_out".to_string()),
-	    };
+	    let i = parse_int(self.plain_text.clone(), "get_print_out".to_string());
+
+	    if i < 0 {
+		self.print_out_text = format!("{}{}", i, " ".to_string());
+	    } else {
+		self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
+	    }
 	} else if self.output_type == 4002 { // float
-	    match self.plain_text.clone().parse::<f64>() {
-		Ok(i) => if i < -1.0 {
-		    self.print_out_text = format!("{}{}", i, " ".to_string());
-		} else if i < 0.0 {
-		    self.print_out_text = format!("{}{}", i, " ".to_string());
-		    self.print_out_text.remove(1);
-		} else if i == 0.0 {
-		    self.print_out_text = format!("{}{}{}", " ".to_string(), i.abs(), " ".to_string());
-		} else if i < 1.0 {
-		    self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
-		    self.print_out_text.remove(1);
-		} else {
-		    self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
-		},
-		Err(_e) => Data::error_invalid_float("get_print_out".to_string()),
-	    };
+	    let i = parse_float(self.plain_text.clone(), "get_print_out".to_string());
+
+	    if i < -1.0 {
+		self.print_out_text = format!("{}{}", i, " ".to_string());
+	    } else if i < 0.0 {
+		self.print_out_text = format!("{}{}", i, " ".to_string());
+		self.print_out_text.remove(1);
+	    } else if i == 0.0 {
+		self.print_out_text = format!("{}{}{}", " ".to_string(), i.abs(), " ".to_string());
+	    } else if i < 1.0 {
+		self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
+		self.print_out_text.remove(1);
+	    } else {
+		self.print_out_text = format!("{}{}{}", " ".to_string(), i, " ".to_string());
+	    }
 	} else if self.output_type == 4003 { // sci_float
 	    let mut output:String = "".to_string();
 	    let mut last = ' ';
 	    let mut point = false;
-	    let mut temp = "".to_string();
-	    
-	    match self.plain_text.clone().parse::<f64>() {
-		Ok(i) => if i < 0.0 {
-		    temp = format!("{:.E}{}", i, " ".to_string());
-		} else {
-		    temp = format!("{}{:.E}{}", " ".to_string(), i, " ".to_string());
-		},
-		Err(_e) => Data::error_invalid_float("get_print_out".to_string()),
-	    };
+	    let temp;
+
+	    let i = parse_float(self.plain_text.clone(), "get_print_out".to_string());
+
+	    if i < 0.0 {
+		temp = format!("{:.E}{}", i, " ".to_string());
+	    } else {
+		temp = format!("{}{:.E}{}", " ".to_string(), i, " ".to_string());
+	    }
+
 	    for c in temp.chars() {
 		if c == '.' {point = true;}
 		if c == 'E' && !point {output.push('.');}

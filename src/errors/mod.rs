@@ -2,6 +2,49 @@
 #![forbid(unsafe_code)]
 
 
+// Parse float or error
+pub fn parse_float(string_to_parse:String, function_name:String) -> f64 {
+    match string_to_parse.parse::<f64>() {
+	Ok(i) => {
+	    return i;
+	},
+	Err(_e) => {
+	    stateless_error([].to_vec(),
+			    [].to_vec(),
+			    function_name,
+			    "Invalid float.".to_string());
+	    return -1.0;
+	}
+    }
+}
+
+
+// Parse int or error
+pub fn parse_int(string_to_parse:String, function_name:String) -> i64 {
+    match string_to_parse.parse::<i64>() {
+	Ok(i) => {
+	    return i
+	},
+	Err(_e) => {
+	    stateless_error([].to_vec(),
+			    [].to_vec(),
+			    function_name,
+			    "Invalid integer.".to_string());
+	    return -1;
+	}
+    }
+}
+
+
+// Divide by zero error
+pub fn error_divide_zero(function_name:String) {
+    let artifacts = [].to_vec();
+    let artifact_names = [].to_vec();
+    let message = "Attempted to divide by zero.".to_string();
+    stateless_error(artifacts, artifact_names, function_name, message);
+}
+
+
 // Produce an error without outputting state
 pub fn stateless_error(artifacts:Vec<String>, artifact_names:Vec<String>, function_name:String, message:String) {
     error_header(function_name, message);
