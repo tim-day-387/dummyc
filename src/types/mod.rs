@@ -46,14 +46,14 @@ pub fn find_type(token:String) -> i64 {
     let mut num_true = 0;
 
     for test in all {
-	if test {num_true = num_true + 1;}
+	if test {num_true += 1;}
     }
 
     if num_true > 1 || num_true == 0 {
 	let artifacts = [string_test.to_string(), float_test.to_string(),
 			 sci_float_test.to_string(), int_test.to_string(),
 			 function_test.to_string(), expression_test.to_string(),
-			 symbol_test.to_string(), token.clone()].to_vec();
+			 symbol_test.to_string(), token].to_vec();
 	let artifact_names = ["string".to_string(), "float".to_string(),
 			      "sci_float".to_string(), "int".to_string(),
 			      "function".to_string(), "expression".to_string(),
@@ -63,14 +63,14 @@ pub fn find_type(token:String) -> i64 {
         stateless_error(artifacts, artifact_names, function_name, message);
     }
 
-    if string_test {return 3000;}             // string
-    else if float_test {return 4002;}         // float
-    else if int_test {return 4001;}           // int
-    else if sci_float_test {return 4003;}     // sci_float
-    else if function_test {return 2000;}      // function
-    else if expression_test {return 0;}       // expresssion
-    else if symbol_test {return 1000;}        // symbol
-    else {unhandled_error(); return -1;}
+    if string_test {3000}             // string
+    else if float_test {4002}         // float
+    else if int_test {4001}           // int
+    else if sci_float_test {4003}     // sci_float
+    else if function_test {2000}      // function
+    else if expression_test {0}       // expresssion
+    else if symbol_test {1000}        // symbol
+    else {unhandled_error(); -1}
 }
 
 
@@ -78,30 +78,26 @@ pub fn find_type(token:String) -> i64 {
 fn is_float(token:String) -> bool {
     let mut output = FLOAT.is_match(&token) || SCI_FLOAT.is_match(&token);
 
-    match token.clone().parse::<f64>() {
+    match token.parse::<f64>() {
 	Ok(i) => {
-	    let signif;
-	    
-	    if i.abs() < 1.0 {
-		signif = i.abs().to_string().replace("0.", "").len();
+	    let signif = if i.abs() < 1.0 {
+		i.abs().to_string().replace("0.", "").len()
 	    } else {
-		signif = i.abs().to_string().replace(".", "").len();
-	    }
-	    
+		i.abs().to_string().replace('.', "").len()
+	    };
+
 	    if signif <= 6 {
 		if is_int(token.clone()) {
-		    output = false && output; // int
-		} else {
-		    output = true && output; // float
+		    output = false;
 		}
 	    } else {
-		output = false && output; // sci_float
+		output = false;
 	    }
 	},
-	Err(_e) => output = false && output,
+	Err(_e) => output = false,
     }
 
-    return output;
+    output
 }
 
 
@@ -109,51 +105,43 @@ fn is_float(token:String) -> bool {
 fn is_sci_float(token:String) -> bool {
     let mut output = FLOAT.is_match(&token) || SCI_FLOAT.is_match(&token);
 
-    match token.clone().parse::<f64>() {
+    match token.parse::<f64>() {
 	Ok(i) => {
-	    let signif;
-	    
-	    if i.abs() < 1.0 {
-		signif = i.abs().to_string().replace("0.", "").len();
+	    let signif = if i.abs() < 1.0 {
+		i.abs().to_string().replace("0.", "").len()
 	    } else {
-		signif = i.abs().to_string().replace(".", "").len();
-	    }
-	    
+		i.abs().to_string().replace('.', "").len()
+	    };
+
 	    if signif <= 6 {
-		if is_int(token.clone()) {
-		    output = false && output; // int
-		} else {
-		    output = false && output; // float
-		}
-	    } else {
-		output = true && output; // sci_float
+		output = false;
 	    }
 	},
-	Err(_e) => output = false && output,
+	Err(_e) => output = false,
     }
 
-    return output;
+    output
 }
 
 
 // Check if integer
-fn is_int(token:String) -> bool {return INTEGER.is_match(&token);}
+fn is_int(token:String) -> bool {INTEGER.is_match(&token)}
 
 
 // Check if string
-fn is_string(token:String) -> bool {return STRING.is_match(&token);}
+fn is_string(token:String) -> bool {STRING.is_match(&token)}
 
 
 // Check if symbol
-fn is_symbol(token:String) -> bool {return SYMBOL.is_match(&token);}
+fn is_symbol(token:String) -> bool {SYMBOL.is_match(&token)}
 
 
 // Check if expression
 fn is_expression(token:String) -> bool {
-    return EXPRESSION.is_match(&token) &&
+    EXPRESSION.is_match(&token) &&
 	!STRING.is_match(&token) &&
 	!SCI_FLOAT.is_match(&token) &&
-	split(token, false, false).1 != "".to_string();
+	split(token, false, false).1 != *""
 }
 
 
@@ -162,7 +150,7 @@ fn is_function(token:String) -> bool {
     let mut output = FUNCTION.is_match(&token);
 
     if output {
-	let args = split_function(token.clone()).1;
+	let args = split_function(token).1;
 
 	for c in args.chars() {
 	    if c == ')' {
@@ -176,5 +164,5 @@ fn is_function(token:String) -> bool {
 	}
     }
 
-    return output;
+    output
 }
