@@ -86,7 +86,7 @@ impl State {
     pub fn add_prev(&mut self, line:String) {
 	let prev_line = split_line_number(line.clone()).0.parse::<i64>().unwrap();
 	
-	self.prev_code.push((prev_line, line.clone()));
+	self.prev_code.push((prev_line, line));
     }
 
 
@@ -104,8 +104,8 @@ impl State {
     // Load one commmand
     pub fn load_prev_command(&mut self, line:String) {
 	match split_line_number(line.clone()).0.parse::<i64>() {
-	    Ok(i) => self.prev_code.push((i, line.clone())),
-	    Err(_e) => if !is_shebang(line.clone()) {
+	    Ok(i) => self.prev_code.push((i, line)),
+	    Err(_e) => if !is_shebang(line) {
 		let artifacts = [].to_vec();
 		let artifact_names = [].to_vec();
 		let function_name = "load_prev".to_string();
@@ -127,20 +127,18 @@ impl State {
 	// Execute any previous commands
 	loop {
 	    let mut command:String = "".to_string();
-	    
+
 	    // Find next command to execute
 	    for items in &self.prev_code {
-		if self.next_line == -1 && self.prev_line < items.0 {
-		    command = items.1.clone();
-		    break;
-		} else if self.next_line != -1 && self.next_line <= items.0 {
-		    command = items.1.clone();
-		    break;
-		}
+		if (self.next_line == -1 && self.prev_line < items.0) ||
+		    (self.next_line != -1 && self.next_line <= items.0) {
+			command = items.1.clone();
+			break;
+		    }
 	    }
 
 	    // Check if there is a line
-	    if command == "".to_string() {
+	    if command == *"" {
 		// There are no more commands
 		break;
 	    } else {
@@ -154,7 +152,7 @@ impl State {
     // Execute the given command
     fn exec_command(&mut self, line:String, scan_type:i64) {
 	// Lex command
-	let commands:Vec<Vec<String>> = perform_multi_lexing(line.clone());
+	let commands:Vec<Vec<String>> = perform_multi_lexing(line);
 
 	// Check for shebang, and do nothing
 	if is_shebang(commands[0][0].clone()) {return;}
@@ -270,7 +268,7 @@ impl State {
 
     // Save data to var
     fn save_data_to_var(&mut self, text:String) {
-	if text == ",".to_string() {return}
+	if text == *"," {return}
 
 	match self.data_stack.pop() {
 	    Some(i) => {self.variables.insert(text, i);},
@@ -293,11 +291,11 @@ impl State {
 
     // Implementation of the DATA command
     fn data_cmd(&mut self, text:Vec<String>) {
-	for counter in 2..text.len() {
-	    if text[counter].clone() == ",".to_string() {
+	for item in text.iter().skip(2) {
+	    if item.clone() == *"," {
 		continue;
 	    } else {
-		let data = Data::new_simplified(text[counter].clone(), self.clone());
+		let data = Data::new_simplified(item.clone(), self.clone());
 
 		self.data_stack.insert(0, data.clone());
 		self.data_stack_original.insert(0, data.clone());
@@ -366,27 +364,27 @@ impl State {
 
 	self.pt_cond_next_line();
 
-	for counter in 2..text.len() {
-	    if text[counter].clone() == ",".to_string() || text[counter].clone() == ";".to_string() {
+	for item in text.iter().skip(2) {
+	    if item.clone() == *"," || item.clone() == *";" {
 		continue;
-	    } else if find_type(text[counter].clone()) == 3000 {
-                let object = Data::new_simplified(text[counter].clone(), self.clone());
+	    } else if find_type(item.clone()) == 3000 {
+                let object = Data::new_simplified(item.clone(), self.clone());
 
 		self.pt_output_text(object.print_out_text);
 		self.pt_next_line();
             } else {
 		std::io::stdin().read_line(&mut line).unwrap();
-		line = line.to_string().replace("\n", "");
+		line = line.to_string().replace('\n', "");
 
 		let data:Data = Data::new_simplified(line.clone(), self.clone());
 
-		self.variables.insert(text[counter].clone(), data);
+		self.variables.insert(item.clone(), data);
 		line = "".to_string();
 	    }
 	}
 
 	// Check if we had too many args
-	if self.input_args.len() != 0 {
+	if !self.input_args.is_empty() {
 	    let artifacts = [].to_vec();
 	    let artifact_names = [].to_vec();
 	    let function_name = "function_cmd".to_string();
@@ -394,14 +392,14 @@ impl State {
 	    stateless_error(artifacts, artifact_names, function_name, message);
 	}
     }
-	
+
 
     // Implmentation of the FUNCTION command
     fn function_cmd(&mut self, text:Vec<String>) {
 	let given = self.input_args.len();
 	let needed = (((text.len() - 2) - 1) / 2) + 1;
 
-	if text[2] == "RETURN".to_string() || text[2] == "return".to_string() {
+	if text[2] == *"RETURN" || text[2] == *"return" {
 	    let mut var_value:&Data = &Data::new("".to_string());
 	    
 	    match self.variables.get(&text[3]) {
@@ -426,8 +424,8 @@ impl State {
 		}
 
 		// Check if we have a punc token
-		if text[counter].clone() == ",".to_string() {
-		    counter = counter + 1;
+		if text[counter].clone() == *"," {
+		    counter += 1;
 		    continue;
 		}
 
@@ -449,12 +447,12 @@ impl State {
 		self.variables.insert(text[counter].clone(), arg.clone());
 
 		// Iterate token
-		counter = counter + 1;
+		counter += 1;
 	    }	    
 	}
 
 	// Check if we had too many args
-	if self.input_args.len() != 0 {
+	if !self.input_args.is_empty() {
 	    let artifacts = [given.to_string(), needed.to_string()].to_vec();
 	    let artifact_names = ["given".to_string(), "needed".to_string()].to_vec();
 	    let function_name = "function_cmd".to_string();
@@ -466,20 +464,20 @@ impl State {
 
     // Implmentation of the PRINT command
     fn print_cmd(&mut self, text:Vec<String>) {
-	for counter in 2..text.len() {
-	    if text[counter].clone() == ";".to_string() {
+	for item in text.iter().skip(2) {
+	    if item.clone() == *";" {
 		continue;
-            } else if text[counter].clone() == ",".to_string() {
+            } else if item.clone() == *"," {
 		self.pt_next_print_zone();
 		continue;
             }
 	    
-	    let object = Data::new_simplified(text[counter].clone(), self.clone());
+	    let object = Data::new_simplified(item.clone(), self.clone());
 
 	    self.pt_output_text(object.print_out_text);
 	}
 
-	if text[text.len() - 1].clone() != ";".to_string() {
+	if text[text.len() - 1].clone() != *";" {
 	    self.pt_next_line();
 	}
     }
@@ -494,10 +492,10 @@ impl State {
 	let object = Data::new_simplified(data, self.clone());
 
 	if find_type(var_name.clone()) == 2000 {
-            let array_ref = Data::get_array_reference(var_name.clone(), self.clone());
-	    self.variables.insert(array_ref.clone(), object.clone());
+            let array_ref = Data::get_array_reference(var_name, self.clone());
+	    self.variables.insert(array_ref, object);
 	} else {
-	    self.variables.insert(var_name.clone(), object.clone());
+	    self.variables.insert(var_name, object);
 	}
     }
 
@@ -514,11 +512,9 @@ impl State {
 	let objectb = Data::new_simplified(datab, self.clone());
 
 	// Check if equivalent
-	if relational == "=".to_string() && objecta.eq(&objectb) {
-	    goto = text[4].clone().parse::<i64>().unwrap();
-	} else if relational == "<>".to_string() && !objecta.eq(&objectb) {
-	    goto = text[4].clone().parse::<i64>().unwrap();
-	} else if objecta.compare(objectb, relational) {
+	if (relational == *"=" && objecta.eq(&objectb)) ||
+	    (relational == *"<>" && !objecta.eq(&objectb)) ||
+	    (objecta.compare(objectb, relational)) {
 	    goto = text[4].clone().parse::<i64>().unwrap();
 	}
 
@@ -555,15 +551,13 @@ impl State {
     fn for_cmd(&mut self, text:Vec<String>) {
 	let zero:Data = Data::new_simplified("0".to_string(), self.clone());
 	let cur_value:Data;
-	let step:Data;
-	
-	// Parse step
-	if text.len() == 5 {
-	    step = Data::new_simplified("1".to_string(), self.clone());
+
+	let step:Data = if text.len() == 5 {
+	    Data::new_simplified("1".to_string(), self.clone())
 	} else {
-	    step = Data::new_simplified(text[6].clone(), self.clone());
-	}
-	
+	    Data::new_simplified(text[6].clone(), self.clone())
+	};
+
 	// Split statement
 	let (var_name, _relational, data) = split(text[2].clone(), true, true);
 
@@ -587,13 +581,12 @@ impl State {
 
 	// Final allowed value
 	let limit = Data::new_simplified(text[4].clone(), self.clone());
-	let negative = step.clone().compare(zero.clone(), "<".to_string());
+	let negative = step.compare(zero, "<".to_string());
 
-	if cur_value.clone().compare(limit.clone(), "<".to_string()) && !negative {
-	    self.for_return_to_line.insert(var_name.clone(), text[0].clone().parse::<i64>().unwrap());
-	} else if cur_value.clone().compare(limit.clone(), ">".to_string()) && negative {
-	    self.for_return_to_line.insert(var_name.clone(), text[0].clone().parse::<i64>().unwrap());
-	}
+	if (cur_value.clone().compare(limit.clone(), "<".to_string()) && !negative) ||
+	    (cur_value.compare(limit, ">".to_string()) && negative) {
+		self.for_return_to_line.insert(var_name, text[0].clone().parse::<i64>().unwrap());
+	    }
     }
 
 
@@ -605,7 +598,7 @@ impl State {
 	match self.for_return_to_line.get(&var_name) {
 	    Some(value)=> {
 		// Return to FOR
-		self.next_line = value.clone();
+		self.next_line = *value;
 	    },
 	    _=> {
 		// Keep going, remove variable
