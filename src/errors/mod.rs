@@ -38,10 +38,10 @@ pub fn parse_int(string_to_parse:String, function_name:String) -> i64 {
 
 // Divide by zero error
 pub fn error_divide_zero(function_name:String) {
-    let artifacts = [].to_vec();
-    let artifact_names = [].to_vec();
-    let message = "Attempted to divide by zero.".to_string();
-    stateless_error(artifacts, artifact_names, function_name, message);
+    stateless_error([].to_vec(),
+		    [].to_vec(),
+		    function_name,
+		    "Attempted to divide by zero.".to_string());
 }
 
 
@@ -61,11 +61,10 @@ pub fn stateless_error(artifacts:Vec<String>, artifact_names:Vec<String>, functi
 
 // Generic unhandled error function
 pub fn unhandled_error() {
-    let artifacts = [].to_vec();
-    let artifact_names = [].to_vec();
-    let function_name = "unknown".to_string();
-    let message = "There is an unhandled error. Sorry.".to_string();
-    stateless_error(artifacts, artifact_names, function_name, message);    
+    stateless_error([].to_vec(),
+		    [].to_vec(),
+		    "unknown".to_string(),
+		    "There is an unhandled error. Sorry.".to_string());
 }
 
 
