@@ -32,10 +32,10 @@ fn main() {
     let mut basic_path = Path::new(".");
     
     // Parse arguments
-    for n in 1..args.len() {
+    for arg in args.iter().skip(1) {
 	// Check if path is set
-	if path_set == false {
-	    basic_path = Path::new(&args[n]);
+	if !path_set {
+	    basic_path = Path::new(arg);
 	    path_set = true;
 	} else {
 	    let artifacts = [].to_vec();
@@ -47,7 +47,7 @@ fn main() {
     }
 
     // Interpret file or run interactive?
-    if path_set == true {
+    if path_set {
 	script(basic_path);
     } else {
 	interactive();
@@ -87,7 +87,7 @@ fn interactive() {
 	    
 	    // Collect input
 	    std::io::stdin().read_line(&mut line).unwrap();
-	    line = line.to_string().replace("\n", "");
+	    line = line.to_string().replace('\n', "");
 
 	    // Check if we should execute
 	    if line == "RUN" || line == "EXIT" {
