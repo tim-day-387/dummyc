@@ -50,17 +50,16 @@ pub fn find_type(token:String) -> i64 {
     }
 
     if num_true > 1 || num_true == 0 {
-	let artifacts = [string_test.to_string(), float_test.to_string(),
+	stateless_error([string_test.to_string(), float_test.to_string(),
 			 sci_float_test.to_string(), int_test.to_string(),
 			 function_test.to_string(), expression_test.to_string(),
-			 symbol_test.to_string(), token].to_vec();
-	let artifact_names = ["string".to_string(), "float".to_string(),
-			      "sci_float".to_string(), "int".to_string(),
-			      "function".to_string(), "expression".to_string(),
-			      "symbol".to_string(), "token".to_string()].to_vec();
-	let function_name = "find_type".to_string();
-	let message = "Object does not match any of the types.".to_string();
-        stateless_error(artifacts, artifact_names, function_name, message);
+			 symbol_test.to_string(), token].to_vec(),
+			["string".to_string(), "float".to_string(),
+			 "sci_float".to_string(), "int".to_string(),
+			 "function".to_string(), "expression".to_string(),
+			 "symbol".to_string(), "token".to_string()].to_vec(),
+			"find_type".to_string(),
+			"Object does not match any of the types.".to_string())
     }
 
     if string_test {3000}             // string

@@ -106,11 +106,10 @@ impl State {
 	match split_line_number(line.clone()).0.parse::<i64>() {
 	    Ok(i) => self.prev_code.push((i, line)),
 	    Err(_e) => if !is_shebang(line) {
-		let artifacts = [].to_vec();
-		let artifact_names = [].to_vec();
-		let function_name = "load_prev".to_string();
-		let message = "Line has no line number.".to_string();
-		stateless_error(artifacts, artifact_names, function_name, message);
+		stateless_error([].to_vec(),
+				[].to_vec(),
+				"load_prev".to_string(),
+				"Line has no line number.".to_string());
 	    }
 	}
     }
@@ -273,11 +272,10 @@ impl State {
 	match self.data_stack.pop() {
 	    Some(i) => {self.variables.insert(text, i);},
 	    None => {
-		let artifacts = [].to_vec();
-		let artifact_names = [].to_vec();
-		let function_name = "read_cmd".to_string();
-		let message = "No data to read.".to_string();
-		stateless_error(artifacts, artifact_names, function_name, message);
+		stateless_error([].to_vec(),
+				[].to_vec(),
+				"read_cmd".to_string(),
+				"No data to read.".to_string());
 	    },
 	};
     }
@@ -311,11 +309,10 @@ impl State {
 	self.array_offset = match offset.plain_text.parse::<i64>() {
 	    Ok(i) => i,
 	    Err(_e) => {
-		let artifacts = [].to_vec();
-		let artifact_names = [].to_vec();
-		let function_name = "option_cmd".to_string();
-		let message = "Base is not an integer.".to_string();
-		stateless_error(artifacts, artifact_names, function_name, message);
+		stateless_error([].to_vec(),
+				[].to_vec(),
+				"option_cmd".to_string(),
+				"Base is not an integer.".to_string());
 		-1
 	    }
 	};
@@ -329,22 +326,20 @@ impl State {
 	let arguments = split_arguments(split_function(text[2].clone()).1);
 
 	if arguments.len() != 1 {
-	    let artifacts = [].to_vec();
-	    let artifact_names = [].to_vec();
-	    let function_name = "dim_cmd".to_string();
-	    let message = "Wrong number of arguments.".to_string();
-	    stateless_error(artifacts, artifact_names, function_name, message);
+	    stateless_error([].to_vec(),
+			    [].to_vec(),
+			    "dim_cmd".to_string(),
+			    "Wrong number of arguments.".to_string());
 	}
 
 	let size_string = Data::new_simplified(arguments[0].clone(), self.clone()).plain_text;
 	let size = match size_string.parse::<i64>() {
 	    Ok(i) => i,
 	    Err(_e) => {
-		let artifacts = [].to_vec();
-		let artifact_names = [].to_vec();
-		let function_name = "dim_cmd".to_string();
-		let message = "Invalid integer.".to_string();
-		stateless_error(artifacts, artifact_names, function_name, message);
+		stateless_error([].to_vec(),
+				[].to_vec(),
+				"dim_cmd".to_string(),
+				"Invalid integer.".to_string());
 		return;
             }
 	};
@@ -385,11 +380,10 @@ impl State {
 
 	// Check if we had too many args
 	if !self.input_args.is_empty() {
-	    let artifacts = [].to_vec();
-	    let artifact_names = [].to_vec();
-	    let function_name = "function_cmd".to_string();
-	    let message = "Too many input arguments.".to_string();
-	    stateless_error(artifacts, artifact_names, function_name, message);
+	    stateless_error([].to_vec(),
+			    [].to_vec(),
+			    "function_cmd".to_string(),
+			    "Too many input arguments.".to_string());
 	}
     }
 
@@ -405,11 +399,10 @@ impl State {
 	    match self.variables.get(&text[3]) {
 		Some(value)=> var_value = value,
 		_=> {
-		    let artifacts = [].to_vec();
-		    let artifact_names = [].to_vec();
-		    let function_name = "function_cmd".to_string();
-		    let message = "Variable does not exist.".to_string();
-		    stateless_error(artifacts, artifact_names, function_name, message);
+		    stateless_error([].to_vec(),
+				    [].to_vec(),
+				    "function_cmd".to_string(),
+				    "Variable does not exist.".to_string());
 		}
 	    }
 
@@ -435,11 +428,10 @@ impl State {
 		match self.input_args.pop() {
 		    Some(value)=> arg = value,
 		    _=> {
-			let artifacts = [given.to_string(), needed.to_string()].to_vec();
-			let artifact_names = ["given".to_string(), "needed".to_string()].to_vec();
-			let function_name = "function_cmd".to_string();
-			let message = "Not enough input arguments.".to_string();
-			stateless_error(artifacts, artifact_names, function_name, message);
+			stateless_error([given.to_string(), needed.to_string()].to_vec(),
+					["given".to_string(), "needed".to_string()].to_vec(),
+					"function_cmd".to_string(),
+					"Not enough input arguments.".to_string());
 		    }
 		}
 
@@ -453,11 +445,10 @@ impl State {
 
 	// Check if we had too many args
 	if !self.input_args.is_empty() {
-	    let artifacts = [given.to_string(), needed.to_string()].to_vec();
-	    let artifact_names = ["given".to_string(), "needed".to_string()].to_vec();
-	    let function_name = "function_cmd".to_string();
-	    let message = "Too many input arguments.".to_string();
-	    stateless_error(artifacts, artifact_names, function_name, message);
+	    stateless_error([given.to_string(), needed.to_string()].to_vec(),
+			    ["given".to_string(), "needed".to_string()].to_vec(),
+			    "function_cmd".to_string(),
+			    "Too many input arguments.".to_string());
 	}
     }
 
@@ -536,11 +527,10 @@ impl State {
 	// Update state
 	match self.return_to_line.pop() {
 	    None => {
-		let artifacts = [].to_vec();
-		let artifact_names = [].to_vec();
-		let function_name = "return_cmd".to_string();
-		let message = "Nowhere to return to.".to_string();
-		stateless_error(artifacts, artifact_names, function_name, message);
+		stateless_error([].to_vec(),
+				[].to_vec(),
+				"return_cmd".to_string(),
+				"Nowhere to return to.".to_string());
 	    },
 	    Some(line_to_return_to) => self.prev_line = line_to_return_to,
 	}

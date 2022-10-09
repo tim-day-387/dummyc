@@ -36,11 +36,10 @@ pub fn split(token:String, rels_or_ops:bool, strict:bool) -> (String, String, St
     }
 
     if strict && (output.0 == *"" || output.1 == *"" || output.2 == *"") {
-	let artifacts = [token].to_vec();
-	let artifact_names = ["token".to_string()].to_vec();
-	let function_name = "split".to_string();
-	let message = "Tried to create empty split.".to_string();
-	stateless_error(artifacts, artifact_names, function_name, message);
+	stateless_error([token].to_vec(),
+			["token".to_string()].to_vec(),
+			"split".to_string(),
+			"Tried to create empty split.".to_string());
     }
 
     output

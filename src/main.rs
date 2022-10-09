@@ -38,11 +38,10 @@ fn main() {
 	    basic_path = Path::new(arg);
 	    path_set = true;
 	} else {
-	    let artifacts = [].to_vec();
-	    let artifact_names = [].to_vec();
-	    let function_name = "main".to_string();
-	    let message = "File path already specified.".to_string();
-	    stateless_error(artifacts, artifact_names, function_name, message);
+	    stateless_error([].to_vec(),
+			    [].to_vec(),
+			    "main".to_string(),
+			    "File path already specified.".to_string());
 	}
     }
 
