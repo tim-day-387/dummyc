@@ -220,3 +220,13 @@ fn find_type_22() {
 
     assert_eq!(answer, find_type(given));
 }
+
+
+// Testing find_type()
+#[test]
+fn find_type_23() {
+    let given:String = "3.".to_string();
+    let answer = Type::Float;
+
+    assert_eq!(answer, find_type(given));
+}
