@@ -241,7 +241,7 @@ impl Data {
 		if b == 0 {
 		    error_divide_zero("operation".to_string());
 		} else {
-		    self.plain_text = (a/b).to_string();
+		    self.plain_text = ((a as f64)/(b as f64)).to_string();
 		}
 	    } else if operation_string == *"^" {
 		self.plain_text = (a as f64).powf(b as f64).to_string();

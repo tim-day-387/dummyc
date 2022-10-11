@@ -84,6 +84,11 @@ pub fn split_priority(mut token:String, rels_or_ops:bool, priority:i64) -> (Stri
 
 		    if ops.contains(&c) {operation_string.insert(0, c);}
 		    else {second_part_string.insert(0, c);}
+		} else if c == 'E' {
+		    second_part_string.insert(0, last_char);
+		    second_part_string.insert(0, c);
+		    seen_op = false;
+		    continue;
 		} else {
 		    operation_string.insert(0, last_char);
 		    first_part_string.insert(0, c);

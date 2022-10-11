@@ -52,6 +52,16 @@ fn split_5() {
 }
 
 
+// Testing split()
+#[test]
+fn split_6() {
+    let given:String = "6.000*2.3E+1".to_string();
+    let answer = ("6.000".to_string(), "*".to_string(), "2.3E+1".to_string());
+
+    assert_eq!(answer, split(given, false, true));
+}
+
+
 // Testing split_arguments()
 #[test]
 fn split_arguments_1() {
