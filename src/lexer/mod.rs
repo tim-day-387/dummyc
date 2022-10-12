@@ -25,12 +25,13 @@ const RESERVED:[&str; 27] = ["FUNCTION", "RESTORE", "RETURN", "OPTION", "GOSUB",
 				     "IF", "TO", "ON", ";", ":", ","];
 lazy_static! {
     static ref SHEBANG:Regex = Regex::new(r"^(#!.*)$").unwrap();
+    static ref LINENUM:Regex = Regex::new(r"[0-9]*").unwrap();
 }
 
 
 // Perform all lexer command for multiple commands per line
 pub fn perform_multi_lexing(line_string:String) -> Vec<Vec<String>> {
-    let tokens:Vec<String> = tokenize(remove_spaces(line_string));
+    let tokens:Vec<String> = tokenize(line_string);
     let mut command:Vec<String> = Vec::new();
     let mut output:Vec<Vec<String>>= Vec::new();
     let line_number:String = tokens[0].clone();
@@ -107,23 +108,15 @@ fn tokenize(line_string:String) -> Vec<String> {
 }
 
 
-// Get only line numer
+// Get only line number
 pub fn split_line_number(unclean_line_string:String) -> (String, String) {
-    let line_string:String = remove_spaces(unclean_line_string);
-    let mut line_number:String = "".to_string();
-    let mut rest:String = "".to_string();
-    let mut done = false;
+    let clean_line_string:String = remove_spaces(unclean_line_string);
+    let matches:Vec<String> = LINENUM
+        .find_iter(&clean_line_string)
+        .map(|m| m.as_str().to_string())
+        .collect();
 
-    for c in line_string.chars() {
-	if c.is_digit(10) && !done {
-	    line_number.push(c);
-	} else {
-	    rest.push(c);
-	    done = true;
-	}
-    }
-
-    (line_number, rest)
+    (matches[0].clone(), clean_line_string[matches[0].clone().len()..clean_line_string.len()].to_string())
 }
 
 
