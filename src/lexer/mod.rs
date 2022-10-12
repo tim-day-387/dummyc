@@ -158,10 +158,9 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
 
     for (iter, c) in file_string.chars().enumerate() {
 	if c == '"' {in_string = !in_string;}
-	if in_string {i_in_string_or_res.push(iter);}
-	
-	if (c == '(' || c == ')') && !i_in_string_or_res.contains(&iter) {in_brack = !in_brack;}
-	if in_brack {i_in_string_or_res.push(iter);}
+	if (c == '(' || c == ')') && !in_string {in_brack = !in_brack;}
+
+	if in_string || in_brack {i_in_string_or_res.push(iter);}
     }
     
     for i in &RESERVED {
@@ -170,16 +169,12 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
 
 	value.append(&mut lower_value);
 	
-	for loc in value {
-	    if !i_in_string_or_res.contains(&loc) {
-		locations.push(loc);
-		locations.push(loc + i.len());
-
-		for k in loc..(loc + i.len()) {
-		    i_in_string_or_res.push(k);
-		}
+	value.iter().map(|loc| {
+	    if !i_in_string_or_res.contains(loc) {
+		locations.extend([*loc, loc + i.len()]);
+		i_in_string_or_res.extend(*loc..(*loc + i.len()));
 	    }
-	}
+	}).for_each(drop);
     }
 
     locations.sort_unstable();
