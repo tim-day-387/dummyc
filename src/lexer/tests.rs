@@ -2,6 +2,36 @@
 use lexer::*;
 
 
+// Testing split_line_number()
+#[test]
+fn split_line_number_1() {
+    let given:String = remove_spaces("30000 REM This is just some random test lol".to_string());
+    let answer:(String, String) = ("30000".to_string(), "REMThisisjustsomerandomtestlol".to_string());
+
+    assert_eq!(answer, split_line_number(given));
+}
+
+
+// Testing split_line_number()
+#[test]
+fn split_line_number_2() {
+    let given:String = remove_spaces("3 lol".to_string());
+    let answer:(String, String) = ("3".to_string(), "lol".to_string());
+
+    assert_eq!(answer, split_line_number(given));
+}
+
+
+// Testing split_line_number()
+#[test]
+fn split_line_number_3() {
+    let given:String = remove_spaces("34230498023948".to_string());
+    let answer:(String, String) = ("34230498023948".to_string(), "".to_string());
+
+    assert_eq!(answer, split_line_number(given));
+}
+
+
 // Testing tokenize()
 #[test]
 fn tokenize_1() {
