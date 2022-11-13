@@ -15,7 +15,7 @@ use data::Data;
 use types::enums::Type;
 use types::find_type;
 use errors::stateless_error;
-use lexer::{is_shebang, perform_multi_lexing, split_line_number};
+use lexer::{is_shebang, is_blank, perform_multi_lexing, split_line_number};
 use expression_lexer::{split, split_function, split_arguments};
 
 
@@ -106,10 +106,10 @@ impl State {
     pub fn load_prev_command(&mut self, line:String) {
 	match split_line_number(line.clone()).0.parse::<i64>() {
 	    Ok(i) => self.prev_code.push((i, line)),
-	    Err(_e) => if !is_shebang(line) {
+	    Err(_e) => if !is_shebang(line.clone()) && !is_blank(line) {
 		stateless_error([].to_vec(),
 				[].to_vec(),
-				"load_prev".to_string(),
+				"load_prev_command".to_string(),
 				"Line has no line number.".to_string());
 	    }
 	}

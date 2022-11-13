@@ -25,6 +25,7 @@ const RESERVED:[&str; 27] = ["FUNCTION", "RESTORE", "RETURN", "OPTION", "GOSUB",
 				     "IF", "TO", "ON", ";", ":", ","];
 lazy_static! {
     static ref SHEBANG:Regex = Regex::new(r"^(#!.*)$").unwrap();
+    static ref BLANK:Regex = Regex::new(r"^([\\ \t\n]*)$").unwrap();
     static ref LINENUM:Regex = Regex::new(r"[0-9]*").unwrap();
 }
 
@@ -60,7 +61,9 @@ pub fn perform_multi_lexing(line_string:String) -> Vec<Vec<String>> {
 
 // Create an error if the command is not formed properly, add implied let statements
 fn verify(mut tokens:Vec<String>) -> Vec<String> {
-    if (find_type(tokens[0].clone()) != Type::Int) && !is_shebang(tokens[0].clone()) {
+    if find_type(tokens[0].clone()) != Type::Int
+	&& !is_shebang(tokens[0].clone())
+	&& !is_blank(tokens[0].clone()) {
 	stateless_error([].to_vec(),
 			[].to_vec(),
 			"verify".to_string(),
@@ -178,3 +181,7 @@ fn find_res_tokens(file_string:String) -> Vec<usize> {
 
 // Check if a shebang token
 pub fn is_shebang(token:String) -> bool {SHEBANG.is_match(&token)}
+
+
+// Check if a blank token
+pub fn is_blank(token:String) -> bool {BLANK.is_match(&token)}
