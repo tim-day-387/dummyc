@@ -19,7 +19,7 @@ use types::find_type;
 
 
 // Constants
-const RESERVED:[&str; 27] = ["FUNCTION", "RESTORE", "RETURN", "OPTION", "GOSUB", "PRINT",
+const RESERVED:[&str; 28] = ["FUNCTION", "RESTORE", "RETURN", "OPTION", "IMPORT", "GOSUB", "PRINT",
 				     "INPUT", "READ", "BASE", "DATA", "STOP", "GOTO", "THEN", "NEXT",
 				     "STEP", "FOR", "REM", "LET", "DIM", "END", "DEF",
 				     "IF", "TO", "ON", ";", ":", ","];

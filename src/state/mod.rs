@@ -40,7 +40,8 @@ pub struct State {
     pub print_zone:i64,
     pub array_offset:i64,
     pub data_stack:Vec<Data>,
-    pub data_stack_original:Vec<Data>
+    pub data_stack_original:Vec<Data>,
+    pub lib_path:Vec<String>
 }
 
 
@@ -61,7 +62,9 @@ impl State {
 	    print_zone:1,
 	    array_offset:0,
 	    data_stack:Vec::new(),
-	    data_stack_original:Vec::new()
+	    data_stack_original:Vec::new(),
+	    lib_path:["/usr/lib/dummyc/std".to_string(),
+		      "./std".to_string()].to_vec()
 	}
     }
 
@@ -208,6 +211,7 @@ impl State {
 	    "END" => self.end_cmd(text),
 	    "READ" => self.read_cmd(text),
 	    "RESTORE" => self.restore_cmd(text),
+	    "IMPORT" => self.import_cmd(text),
 	    _ => self.next_line = -1
 	}
     }
@@ -396,7 +400,7 @@ impl State {
 
 	if text[2] == *"RETURN" || text[2] == *"return" {
 	    let mut var_value:&Data = &Data::new("".to_string());
-	    
+
 	    match self.variables.get(&text[3]) {
 		Some(value)=> var_value = value,
 		_=> {
@@ -600,6 +604,16 @@ impl State {
 
 	// Remove line to return to
 	self.for_return_to_line.remove(&var_name);
+    }
+
+
+    // Implmentation of the IMPORT command
+    fn import_cmd(&mut self, text:Vec<String>) {
+	let mut path = text[2].clone();
+	path.pop();
+	path.remove(0);
+
+	self.lib_path.push(path);
     }
 
 

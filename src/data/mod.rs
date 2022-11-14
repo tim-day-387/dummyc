@@ -133,18 +133,39 @@ impl Data {
 
     // Execute the given function call
     fn function(&mut self, state:State, name:String, arguments:Vec<String>) {
-	let location_a = "./std/".to_string();
-	let location_b = "/usr/lib/dummyc/std/".to_string();
-	let string_path_a = format!("{}{}{}", location_a, name, ".bas");
-	let string_path_b = format!("{}{}{}", location_b, name, ".bas");
-	let file_path_a = Path::new(&string_path_a);
-	let file_path_b = Path::new(&string_path_b);
+	let mut lib_path:Vec<String> = state.lib_path.clone();
+	let mut file_path:&Path = Path::new(&"none");
+	let mut string_path;
 
-	let file_path:&Path = if file_path_a.exists() {
-	    file_path_a
-	} else {
-	    file_path_b
-	};
+	for _ in lib_path.clone().into_iter() {
+	    let string_path_begin = match lib_path.pop() {
+		Some(i) => i,
+		None => {stateless_error([].to_vec(),
+					    [].to_vec(),
+					    "function".to_string(),
+					    "No path found.".to_string());
+			    "none".to_string()
+		}
+	    };
+
+	    string_path = format!("{}{}{}{}", string_path_begin, "/", name, ".bas");
+
+	    let file_path_test = Path::new(&string_path);
+
+	    if Path::new(&string_path).exists() {
+		file_path = file_path_test;
+		break;
+	    } else {
+	        file_path = Path::new(&"none");
+	    }
+	}
+
+	if file_path == Path::new(&"none") {
+	    stateless_error([].to_vec(),
+			    [].to_vec(),
+			    "function".to_string(),
+			    "Function does not exist.".to_string());
+	}
 
 	// Useful variables
 	let mut lim_state = State::new();
